@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   Container, 
@@ -11,30 +11,36 @@ import {
   Alert 
 } from '@mui/material';
 
-const Login = () => {
+const Register = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { success, error: loginError } = await login(username, password);
+      const { success, error: registerError } = await register(username, email, password);
       if (success) {
-        const from = location.state?.from?.pathname || '/home';
-        navigate(from, { replace: true });
+        navigate('/login', { replace: true });
       } else {
-        setError(loginError);
+        setError(registerError);
       }
     } catch (err) {
-      setError('login failed');
+      setError('Registration failed');
     } finally {
       setLoading(false);
     }
@@ -52,7 +58,7 @@ const Login = () => {
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
           <Typography component="h1" variant="h5" align="center" gutterBottom>
-            login
+            Register
           </Typography>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -64,7 +70,7 @@ const Login = () => {
               margin="normal"
               required
               fullWidth
-              label="username"
+              label="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={loading}
@@ -73,10 +79,30 @@ const Login = () => {
               margin="normal"
               required
               fullWidth
-              label="password"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={loading}
             />
             <Button
@@ -86,16 +112,13 @@ const Login = () => {
               sx={{ mt: 3, mb: 2 }}
               disabled={loading}
             >
-              {loading ? 'logging in...' : 'login'}
+              {loading ? 'Registering...' : 'Register'}
             </Button>
           </form>
-          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-            If you don't have an account, <Link to="/register">sign up</Link>
-          </Typography>
         </Paper>
       </Box>
     </Container>
   );
 };
 
-export default Login;
+export default Register;
