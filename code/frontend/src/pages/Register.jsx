@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import validator from 'validator';
 import { 
   Container, 
   Paper, 
@@ -25,6 +26,18 @@ const Register = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    if (!validator.isEmail(email)) {
+      setError('Invalid email address');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      setError('Password must be at least 8 characters long, contain an uppercase letter, and a number');
+      setLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');

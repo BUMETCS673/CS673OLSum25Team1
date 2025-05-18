@@ -14,6 +14,7 @@ import {
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { success, error: loginError } = await login(username, password);
+      const { success, error: loginError } = await login(username, password, rememberMe);
       if (success) {
         const from = location.state?.from?.pathname || '/home';
         navigate(from, { replace: true });
@@ -79,6 +80,16 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
             />
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                disabled={loading}
+              />
+              <label htmlFor="rememberMe" style={{ marginLeft: '8px' }}>Remember me</label>
+            </Box>
             <Button
               type="submit"
               fullWidth
