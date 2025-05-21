@@ -1,0 +1,115 @@
+name: CD workflow
+
+on:
+  push:
+    branches:
+      - ci/setup-cd-workflow
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  DB_IMAGE: ${{ github.repository }}/db
+  BACKEND_IMAGE: ${{ github.repository }}/backend
+  FRONTEND_IMAGE: ${{ github.repository }}/frontend
+  NGINX_IMAGE: ${{ github.repository }}/nginx
+  TAG: ${{ github.ref_name }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 构建并推送数据库镜像
+      - name: Build and push database image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./code
+          file: ./code/database/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
+
+      # 构建并推送后端镜像
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./code
+          file: ./code/backend/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
+
+      # 构建并推送前端镜像（不推送，只用于构建 nginx 镜像）
+      - name: Build frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./code
+          file: ./code/frontend/Dockerfile
+          push: false
+          tags: frontend-build:${{ env.TAG }}
+          load: true  # 确保镜像在本地可用
+          build-args: |
+            NODE_ENV=production
+            
+      # 构建并推送 nginx 镜像（使用本地的前端镜像）
+      - name: Build and push nginx image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./code
+          file: ./code/nginx/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
+          build-args: |
+            FRONTEND_IMAGE=frontend-build:${{ env.TAG }}
+
+  # deploy:
+  #   needs: build-and-push
+  #   runs-on: ubuntu-latest
+    
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Deploy to EC2
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.EC2_HOST }}
+  #         username: ${{ secrets.EC2_USERNAME }}
+  #         key: ${{ secrets.EC2_SSH_KEY }}
+  #         script: |
+  #           # 登录到 GitHub Container Registry
+  #           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+  #           # 拉取最新镜像
+  #           docker pull ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
+  #           docker pull ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
+  #           docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
+  #           docker pull ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
+            
+  #           # 更新 docker-compose.yml 中的镜像标签
+  #           sed -i "s|image: ghcr.io/.*/db:.*|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+  #           sed -i "s|image: ghcr.io/.*/backend:.*|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+  #           sed -i "s|image: ghcr.io/.*/frontend:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+  #           sed -i "s|image: ghcr.io/.*/nginx:.*|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+            
+  #           # 重启服务
+  #           docker-compose down
+  #           docker-compose up -d
+            
+  #           # 清理旧镜像
+  #           docker image prune -f 
