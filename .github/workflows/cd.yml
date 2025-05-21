@@ -9,10 +9,11 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  DB_IMAGE: ${{ github.repository }}/db
-  BACKEND_IMAGE: ${{ github.repository }}/backend
-  FRONTEND_IMAGE: ${{ github.repository }}/frontend
-  NGINX_IMAGE: ${{ github.repository }}/nginx
+  REPOSITORY_LOWER: ${{ lower(github.repository) }}
+  DB_IMAGE: ${{ env.REPOSITORY_LOWER }}/db
+  BACKEND_IMAGE: ${{ env.REPOSITORY_LOWER }}/backend
+  FRONTEND_IMAGE: ${{ env.REPOSITORY_LOWER }}/frontend
+  NGINX_IMAGE: ${{ env.REPOSITORY_LOWER }}/nginx
   TAG: ${{ github.ref_name }}
 
 jobs:
