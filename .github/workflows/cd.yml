@@ -61,7 +61,7 @@ jobs:
           context: ./code/frontend
           file: ./code/frontend/Dockerfile
           push: false
-          image: getactive-frontend:latest
+          tags: getactive-frontend:latest
           load: true  # 确保镜像在本地可用
           build-args: |
             NODE_ENV=production
