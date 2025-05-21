@@ -38,43 +38,36 @@ jobs:
         with:
           driver: docker
 
-      # # 构建并推送数据库镜像
-      # - name: Build and push database image
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: ./code/database
-      #     file: ./code/database/Dockerfile
-      #     push: true
-      #     tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
+      - name: Build and push database image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./code/database
+          file: ./code/database/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
 
-      # # 构建并推送后端镜像
-      # - name: Build and push backend image
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: ./code/backend
-      #     file: ./code/backend/Dockerfile
-      #     push: true
-      #     tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./code/backend
+          file: ./code/backend/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
 
-      # 构建并推送前端镜像（不推送，只用于构建 nginx 镜像）
       - name: Build frontend image
         uses: docker/build-push-action@v5
         with:
           context: ./code/frontend
           file: ./code/frontend/Dockerfile
           push: false
-          # tags: |
-          #   ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
-          #   ${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
           tags: getactive-frontend:latest
-          load: true  # 确保镜像在本地可用
+          load: true
           build-args: |
             NODE_ENV=production
             
       - name: List local Docker images after frontend build
         run: docker images
 
-      # 构建并推送 nginx 镜像（使用本地的前端镜像）
       - name: Build and push nginx image
         uses: docker/build-push-action@v5
         with:
@@ -83,46 +76,46 @@ jobs:
           push: true
           no-cache: true
           tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
-          # build-args: |
-          #   FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
-          # build-args: |
-          #   FRONTEND_IMAGE=getactive-frontend:latest
 
       - name: List local Docker images after nginx build
         run: docker images
-  # deploy:
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
-    
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
 
-  #     - name: Deploy to EC2
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ secrets.EC2_HOST }}
-  #         username: ${{ secrets.EC2_USERNAME }}
-  #         key: ${{ secrets.EC2_SSH_KEY }}
-  #         script: |
-  #           # 登录到 GitHub Container Registry
-  #           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            PROJECT_DIR="/srv/getactive"
+
+            echo "Navigating to project directory: $PROJECT_DIR"
+            cd $PROJECT_DIR
+
+            echo "Logging into GitHub Container Registry..."
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
-  #           # 拉取最新镜像
-  #           docker pull ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
-  #           docker pull ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
-  #           docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
-  #           docker pull ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
+            echo "Pulling latest images..."
+            docker pull ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
+            docker pull ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
+            docker pull ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
             
-  #           # 更新 docker-compose.yml 中的镜像标签
-  #           sed -i "s|image: ghcr.io/.*/db:.*|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
-  #           sed -i "s|image: ghcr.io/.*/backend:.*|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
-  #           sed -i "s|image: ghcr.io/.*/frontend:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
-  #           sed -i "s|image: ghcr.io/.*/nginx:.*|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+            echo "Updating image tags in docker-compose.yml..."
+            sed -i "s|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+            sed -i "s|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+            sed -i "s|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
             
-  #           # 重启服务
-  #           docker-compose down
-  #           docker-compose up -d
+            echo "Restarting services using docker-compose..."
+            docker-compose down
+            docker-compose up -d
             
-  #           # 清理旧镜像
-  #           docker image prune -f 
+            echo "Cleaning up old Docker images..."
+            docker image prune -f
+            
+            echo "Deployment to EC2 completed successfully!" 
