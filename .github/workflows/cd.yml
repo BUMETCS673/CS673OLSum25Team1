@@ -13,72 +13,73 @@ env:
   BACKEND_IMAGE: bumetcs673/cs673olsum25team1/backend
   FRONTEND_IMAGE: bumetcs673/cs673olsum25team1/frontend
   NGINX_IMAGE: bumetcs673/cs673olsum25team1/nginx
-  TAG: ${{ github.ref_name }}
+  # TAG: ${{ github.ref_name }}
+  TAG: v0.11
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+  # build-and-push:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Log in to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #       with:
+  #         driver: docker
 
-      - name: Build and push database image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/database
-          file: ./code/database/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
+  #     - name: Build and push database image
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: ./code/database
+  #         file: ./code/database/Dockerfile
+  #         push: true
+  #         tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
 
-      - name: Build and push backend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/backend
-          file: ./code/backend/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
+  #     - name: Build and push backend image
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: ./code/backend
+  #         file: ./code/backend/Dockerfile
+  #         push: true
+  #         tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
 
-      - name: Build frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/frontend
-          file: ./code/frontend/Dockerfile
-          push: false
-          tags: getactive-frontend:latest
-          load: true
-          build-args: |
-            NODE_ENV=production
+  #     - name: Build frontend image
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: ./code/frontend
+  #         file: ./code/frontend/Dockerfile
+  #         push: false
+  #         tags: getactive-frontend:latest
+  #         load: true
+  #         build-args: |
+  #           NODE_ENV=production
             
-      - name: List local Docker images after frontend build
-        run: docker images
+  #     - name: List local Docker images after frontend build
+  #       run: docker images
 
-      - name: Build and push nginx image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/nginx
-          file: ./code/nginx/Dockerfile
-          push: true
-          no-cache: true
-          tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
+  #     - name: Build and push nginx image
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: ./code/nginx
+  #         file: ./code/nginx/Dockerfile
+  #         push: true
+  #         no-cache: true
+  #         tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
 
-      - name: List local Docker images after nginx build
-        run: docker images
+  #     - name: List local Docker images after nginx build
+  #       run: docker images
 
   deploy:
     needs: build-and-push
