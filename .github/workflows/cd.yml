@@ -68,6 +68,9 @@ jobs:
           build-args: |
             NODE_ENV=production
             
+      - name: List local Docker images after frontend build
+        run: docker images
+
       # 构建并推送 nginx 镜像（使用本地的前端镜像）
       - name: Build and push nginx image
         uses: docker/build-push-action@v5
