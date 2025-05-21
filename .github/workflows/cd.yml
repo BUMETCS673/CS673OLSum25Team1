@@ -61,7 +61,7 @@ jobs:
           context: ./code/frontend
           file: ./code/frontend/Dockerfile
           push: false
-          tags: frontend-build:${{ env.TAG }}
+          tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
           load: true  # 确保镜像在本地可用
           build-args: |
             NODE_ENV=production
@@ -75,7 +75,7 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
           build-args: |
-            FRONTEND_IMAGE=frontend-build:${{ env.TAG }}
+            FRONTEND_IMAGE=${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
 
   # deploy:
   #   needs: build-and-push
