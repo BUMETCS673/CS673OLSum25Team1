@@ -86,6 +86,8 @@ jobs:
           # build-args: |
           #   FRONTEND_IMAGE=getactive-frontend:latest
 
+      - name: List local Docker images after nginx build
+        run: docker images
   # deploy:
   #   needs: build-and-push
   #   runs-on: ubuntu-latest
