@@ -36,23 +36,23 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 构建并推送数据库镜像
-      - name: Build and push database image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/database
-          file: ./code/database/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
+      # # 构建并推送数据库镜像
+      # - name: Build and push database image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./code/database
+      #     file: ./code/database/Dockerfile
+      #     push: true
+      #     tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
 
-      # 构建并推送后端镜像
-      - name: Build and push backend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/backend
-          file: ./code/backend/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
+      # # 构建并推送后端镜像
+      # - name: Build and push backend image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./code/backend
+      #     file: ./code/backend/Dockerfile
+      #     push: true
+      #     tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
 
       # 构建并推送前端镜像（不推送，只用于构建 nginx 镜像）
       - name: Build frontend image
@@ -61,9 +61,10 @@ jobs:
           context: ./code/frontend
           file: ./code/frontend/Dockerfile
           push: false
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
-            ${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
+          # tags: |
+          #   ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
+          #   ${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
+          tags: getactive-frontend:latest
           load: true  # 确保镜像在本地可用
           build-args: |
             NODE_ENV=production
@@ -80,8 +81,10 @@ jobs:
           push: true
           no-cache: true
           tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
+          # build-args: |
+          #   FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
           build-args: |
-            FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
+            FRONTEND_IMAGE=getactive-frontend:latest
 
   # deploy:
   #   needs: build-and-push
