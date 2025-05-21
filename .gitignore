@@ -3,3 +3,4 @@ code/.DS_Store
 code/backend/.DS_Store
 code/frontend/.DS_Store
 
+.env
