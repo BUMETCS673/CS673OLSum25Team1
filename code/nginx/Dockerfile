@@ -1,6 +1,5 @@
 # Use the frontend build output
-ARG FRONTEND_IMAGE=getactive-frontend:latest
-FROM ${FRONTEND_IMAGE} as frontend
+FROM getactive-frontend:latest as frontend
 
 # Nginx stage
 FROM nginx:alpine

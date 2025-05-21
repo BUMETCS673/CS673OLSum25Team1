@@ -83,8 +83,8 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
           # build-args: |
           #   FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
-          build-args: |
-            FRONTEND_IMAGE=getactive-frontend:latest
+          # build-args: |
+          #   FRONTEND_IMAGE=getactive-frontend:latest
 
   # deploy:
   #   needs: build-and-push
