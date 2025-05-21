@@ -40,7 +40,7 @@ jobs:
       - name: Build and push database image
         uses: docker/build-push-action@v5
         with:
-          context: ./code
+          context: ./code/database
           file: ./code/database/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
@@ -49,7 +49,7 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v5
         with:
-          context: ./code
+          context: ./code/backend
           file: ./code/backend/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
@@ -58,7 +58,7 @@ jobs:
       - name: Build frontend image
         uses: docker/build-push-action@v5
         with:
-          context: ./code
+          context: ./code/frontend
           file: ./code/frontend/Dockerfile
           push: false
           tags: frontend-build:${{ env.TAG }}
@@ -70,7 +70,7 @@ jobs:
       - name: Build and push nginx image
         uses: docker/build-push-action@v5
         with:
-          context: ./code
+          context: ./code/nginx
           file: ./code/nginx/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
