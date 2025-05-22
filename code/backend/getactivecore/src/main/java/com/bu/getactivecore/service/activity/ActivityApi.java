@@ -11,4 +11,6 @@ public interface ActivityApi {
     List<Activity> getAllActivities();
 
     List<Activity> getActivityByName(String activityName);
+
+    Activity createActivity(Activity activity);
 }

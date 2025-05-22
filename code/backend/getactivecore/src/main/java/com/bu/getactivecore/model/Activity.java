@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -19,12 +22,18 @@ import org.hibernate.annotations.UuidGenerator;
 public class Activity {
     @Id
     @UuidGenerator
-    @Column(name = "activity_id")
+    @Column(name = "id")
     private String activityId;
 
-    @Column(name = "activity_name")
-    private String activityName;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "start_time")
-    private Long startTime;
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "start_date_time")
+    private LocalDateTime startDateTime;
+
+    @Column(name = "end_date_time")
+    private LocalDateTime endDateTime;
 }

@@ -4,6 +4,7 @@ import com.bu.getactivecore.model.Activity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -53,5 +54,16 @@ public class ActivityController {
         response.put("timestamp", String.valueOf(System.currentTimeMillis()));
         
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * create an activity
+     *
+     * @return List of activities
+     */
+    @PostMapping("/activities")
+    public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
+        Activity savedActivity = m_activityApi.createActivity(activity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedActivity);
     }
 }

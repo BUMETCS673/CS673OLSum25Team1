@@ -38,8 +38,7 @@ If your feature requires changes to the database schema (adding, removing, or mo
    # Stop and remove the old container
    docker rm -f getactive-db
    
-   # Rebuild and start
-   docker build -t getactive-db .
+   # Rebuild and-t getactive-db .
    docker run -d --name getactive-db -p 3306:3306 getactive-db
    ```
 
@@ -71,7 +70,8 @@ If you encounter issues:
    ```
 
 2. Container Won't Start
-   ```bash
+   ```bash start
+   docker build 
    # View detailed logs
    docker logs getactive-db
    ```

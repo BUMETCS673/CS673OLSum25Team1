@@ -23,6 +23,7 @@ dependencies {
     runtimeOnly 'com.h2database:h2' // H2 database for in-memory testing
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

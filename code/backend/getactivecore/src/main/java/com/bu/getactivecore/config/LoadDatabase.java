@@ -15,16 +15,16 @@ public class LoadDatabase {
     CommandLineRunner demoPreloadData(ActivityRepository activityRepo) {
         return args -> {
             Activity act1 = Activity.builder()
-                    .activityName("Rock Climbing")
-                    .startTime(System.currentTimeMillis())
+                    .name("Rock Climbing")
+                   // .startTime(System.currentTimeMillis())
                     .build();
             Activity act2 = Activity.builder()
-                    .activityName("Yoga")
-                    .startTime(System.currentTimeMillis())
+                    .name("Yoga")
+                    //.startTime(System.currentTimeMillis())
                     .build();
             Activity act3 = Activity.builder()
-                    .activityName("Running")
-                    .startTime(System.currentTimeMillis())
+                    .name("Running")
+                    //.startTime(System.currentTimeMillis())
                     .build();
 
             log.info("Preloading {}", activityRepo.save(act1));

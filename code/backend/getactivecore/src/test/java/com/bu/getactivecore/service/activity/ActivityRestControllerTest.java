@@ -38,9 +38,9 @@ class ActivityRestControllerTest {
     public void givenActivities_expectedActivitiesReturned() throws Exception {
 
         List<Activity> mockedActivities = List.of(
-                Activity.builder().activityName("Running").startTime(System.currentTimeMillis()).build(),
-                Activity.builder().activityName("Yoga").startTime(System.currentTimeMillis()).build(),
-                Activity.builder().activityName("Rock Climbing").startTime(System.currentTimeMillis()).build()
+                Activity.builder().name("Running").build(),
+                Activity.builder().name("Yoga").build(),
+                Activity.builder().name("Rock Climbing").build()
         );
         given(m_activityApi.getAllActivities()).willReturn(mockedActivities);
         m_mvc.perform(
