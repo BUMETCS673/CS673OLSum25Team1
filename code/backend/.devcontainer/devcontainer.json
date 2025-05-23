@@ -14,6 +14,9 @@
       "moby": "true"
     }
   },
+  "remoteEnv": {
+    "MAIL_PASSWORD": "${localEnv:MAIL_PASSWORD}"
+  },
   "customizations": {
     "vscode": {
       "settings": {},
@@ -22,7 +25,8 @@
         "ms-vscode.gradle",
         "ms-azuretools.vscode-docker",
         "mhutchie.git-graph",
-        "streetsidesoftware.code-spell-checker"
+        "streetsidesoftware.code-spell-checker",
+        "github.copilot"
       ]
     }
   },

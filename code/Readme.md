@@ -41,7 +41,7 @@ The project consists of three main services:
 
 2. Start all services using Docker Compose:
    ```bash
-   docker-compose up -d
+   docker-compose --profile prod up -d
    ```
 
 3. Check service status:
