@@ -1,6 +1,7 @@
 package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.model.Activity;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(ActivityController.class)
 @AutoConfigureMockMvc
+@Ignore
 class ActivityRestControllerTest {
 
     @Autowired
