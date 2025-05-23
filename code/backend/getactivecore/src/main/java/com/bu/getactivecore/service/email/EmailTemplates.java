@@ -1,4 +1,4 @@
-package com.bu.getactivecore.service.emailService;
+package com.bu.getactivecore.service.email;
 
 /**
  * Currently, there is only one email template for the registration verification email.
@@ -13,15 +13,15 @@ public class EmailTemplates {
     public static final String REGISTRATION_TEMPLATE =
             """
                     Welcome to GetActive! 🎉
-
+                    
                     Thanks for registering with us. To complete your registration, please confirm your email address by clicking the below link:
-
+                    
                     Verify your email: %s
-
+                    
                     This step ensures we’ve got the right email and lets you fully access your GetActive account.
-
+                    
                     If you didn't sign up for GetActive, you can safely ignore this message.
-
+                    
                     Thank you
                     """;
 }

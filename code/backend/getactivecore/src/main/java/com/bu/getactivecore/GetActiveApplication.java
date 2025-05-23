@@ -1,14 +1,8 @@
 package com.bu.getactivecore;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import com.bu.getactivecore.service.registration.api.RegistrationApi;
-import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
-import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootApplication

@@ -1,4 +1,4 @@
-package com.bu.getactivecore.service.registration.entity;
+package com.bu.getactivecore.service.users.entity;
 
 import lombok.Value;
 
