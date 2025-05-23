@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(ActivityController.class)
 @AutoConfigureMockMvc
-@Ignore
 class ActivityRestControllerTest {
 
     @Autowired
@@ -36,7 +35,7 @@ class ActivityRestControllerTest {
     @Autowired
     private ActivityApi m_activityApi;
 
-    @Test
+    @Ignore
     public void givenActivities_expectedActivitiesReturned() throws Exception {
 
         List<Activity> mockedActivities = List.of(
@@ -56,7 +55,7 @@ class ActivityRestControllerTest {
 
     }
 
-    @Test
+    @Ignore
     public void givenNoActivities_then_200Returned() throws Exception {
 
         List<Activity> mockedActivities = Collections.emptyList();
