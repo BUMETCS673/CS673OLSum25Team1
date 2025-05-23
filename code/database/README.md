@@ -72,7 +72,6 @@ If you encounter issues:
 
 2. Container Won't Start
    ```bash
-   docker build 
    # View detailed logs
    docker logs getactive-db
    ```
