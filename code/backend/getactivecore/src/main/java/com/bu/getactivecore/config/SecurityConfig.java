@@ -30,7 +30,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions().disable()) // Allow H2 Console to load in frame
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/h2-console/**", "/v1/register").permitAll()
+                        .requestMatchers("/h2-console/**", "/v1/register", "/v1/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
