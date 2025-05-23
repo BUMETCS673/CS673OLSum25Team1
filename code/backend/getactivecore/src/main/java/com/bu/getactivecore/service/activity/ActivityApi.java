@@ -10,7 +10,7 @@ import java.util.List;
 public interface ActivityApi {
     List<Activity> getAllActivities();
 
-    List<Activity> getActivityByName(String activityName);
+    List<Activity> getActivitiesByName(String name);
 
     Activity createActivity(Activity activity);
 }

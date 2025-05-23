@@ -3,6 +3,9 @@ package com.bu.getactivecore.config;
 import com.bu.getactivecore.model.Activity;
 import com.bu.getactivecore.repository.ActivityRepository;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,15 +19,21 @@ public class LoadDatabase {
         return args -> {
             Activity act1 = Activity.builder()
                     .name("Rock Climbing")
-                   // .startTime(System.currentTimeMillis())
+                    .startDateTime(LocalDateTime.now())
+                    .location("Location")
+                    .endDateTime(LocalDateTime.now())
                     .build();
             Activity act2 = Activity.builder()
                     .name("Yoga")
-                    //.startTime(System.currentTimeMillis())
+                    .location("Location")
+                    .startDateTime(LocalDateTime.now())
+                    .endDateTime(LocalDateTime.now())
                     .build();
             Activity act3 = Activity.builder()
                     .name("Running")
-                    //.startTime(System.currentTimeMillis())
+                    .location("Location")
+                    .startDateTime(LocalDateTime.now())
+                    .endDateTime(LocalDateTime.now())
                     .build();
 
             log.info("Preloading {}", activityRepo.save(act1));

@@ -1,6 +1,9 @@
 package com.bu.getactivecore.service.activity;
 
+import com.bu.getactivecore.error.ResourceNotFoundException;
 import com.bu.getactivecore.model.Activity;
+
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -40,10 +43,13 @@ public class ActivityController {
      * @param activityName Name of the activity
      * @return List of activities matching the name
      */
-    @GetMapping("/activity/{activityName}")
-    public List<Activity> getActivityByName(@PathVariable String activityName) {
-        log.info("Got request: /v1/activity/{}", activityName);
-        return m_activityApi.getActivityByName(activityName);
+    @GetMapping("/activity/{name}")
+    public List<Activity> getActivityByName(@PathVariable String name) {
+        List<Activity> activities = m_activityApi.getActivitiesByName(name);
+        if(activities.isEmpty()){
+           throw new ResourceNotFoundException("Activity cannot be found");
+        }
+        return m_activityApi.getActivitiesByName(name);
     }
 
     @GetMapping("/health")
@@ -56,14 +62,26 @@ public class ActivityController {
         return ResponseEntity.ok(response);
     }
 
+    
+    /**
+    @ai-generated,
+    Tool: Google Gemini,
+    Prompt: "how to create a Post API in spring boot",
+    Generated on: 2025-05-22,
+    Modified by: Jin Hao,
+    Modifications: change the return type and add validation to the input,
+    Verified: ✅ Unit tested, reviewed
+    */
+
     /**
      * create an activity
      *
-     * @return List of activities
+     * @param activity requested activity
+     * @return an activity
      */
-    @PostMapping("/activities")
-    public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
-        Activity savedActivity = m_activityApi.createActivity(activity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedActivity);
+    @PostMapping("/activity")
+    public ResponseEntity<Object> createActivity(@RequestBody @Valid Activity activity) throws Exception {
+        m_activityApi.createActivity(activity);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

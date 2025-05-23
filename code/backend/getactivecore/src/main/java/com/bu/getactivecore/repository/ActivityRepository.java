@@ -9,5 +9,5 @@ import java.util.List;
  * Repository interface for Activity entity.
  */
 public interface ActivityRepository extends JpaRepository<Activity, String> {
-    List<Activity> findByActivityNameContaining(String activityName);
+    List<Activity> findByNameContaining(String name);
 }
