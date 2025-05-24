@@ -1,8 +1,7 @@
 package com.bu.getactivecore.service.activity;
 
-import com.bu.getactivecore.error.ResourceNotFoundException;
 import com.bu.getactivecore.model.Activity;
-
+import com.bu.getactivecore.shared.exception.ApiException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ public class ActivityController {
     public List<Activity> getActivityByName(@PathVariable String name) {
         List<Activity> activities = m_activityApi.getActivitiesByName(name);
         if(activities.isEmpty()){
-           throw new ResourceNotFoundException("Activity cannot be found");
+           throw new ApiException(HttpStatus.NOT_FOUND, null, "Activity cannot be found");
         }
         return m_activityApi.getActivitiesByName(name);
     }

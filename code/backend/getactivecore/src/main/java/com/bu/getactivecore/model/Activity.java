@@ -16,7 +16,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotEmpty;
+
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;;
 
 @Data
@@ -31,14 +32,14 @@ public class Activity {
     @Column(name = "id")
     private String id;
 
-    @NotEmpty(message = "Name cannot be empty")
+    @NotBlank(message = "Name cannot be blank")
     @Column(name = "name")
     private String name;
 
     @Column(name = "description")
     private String description;
 
-    @NotEmpty(message = "Location cannot be empty")
+    @NotBlank(message = "Location cannot be blank")
     @Column(name = "location")
     private String location;
 
