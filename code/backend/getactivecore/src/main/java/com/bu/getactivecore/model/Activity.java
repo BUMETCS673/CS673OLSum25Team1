@@ -8,7 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;;
 
 @Data
 @Builder
@@ -19,12 +29,29 @@ import org.hibernate.annotations.UuidGenerator;
 public class Activity {
     @Id
     @UuidGenerator
-    @Column(name = "activity_id")
-    private String activityId;
+    @Column(name = "id")
+    private String id;
 
-    @Column(name = "activity_name")
-    private String activityName;
+    @NotBlank(message = "Name cannot be blank")
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "start_time")
-    private Long startTime;
+    @Column(name = "description")
+    private String description;
+
+    @NotBlank(message = "Location cannot be blank")
+    @Column(name = "location")
+    private String location;
+
+    @NotNull
+    @Column(name = "start_date_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime startDateTime;
+
+    @NotNull
+    @Column(name = "end_date_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime endDateTime;
 }

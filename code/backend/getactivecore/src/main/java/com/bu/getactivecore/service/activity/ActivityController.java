@@ -1,9 +1,12 @@
 package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.model.Activity;
+import com.bu.getactivecore.shared.exception.ApiException;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -39,10 +42,13 @@ public class ActivityController {
      * @param activityName Name of the activity
      * @return List of activities matching the name
      */
-    @GetMapping("/activity/{activityName}")
-    public List<Activity> getActivityByName(@PathVariable String activityName) {
-        log.info("Got request: /v1/activity/{}", activityName);
-        return m_activityApi.getActivityByName(activityName);
+    @GetMapping("/activity/{name}")
+    public List<Activity> getActivityByName(@PathVariable String name) {
+        List<Activity> activities = m_activityApi.getActivitiesByName(name);
+        if(activities.isEmpty()){
+           throw new ApiException(HttpStatus.NOT_FOUND, null, "Activity cannot be found");
+        }
+        return m_activityApi.getActivitiesByName(name);
     }
 
     @GetMapping("/health")
@@ -53,5 +59,28 @@ public class ActivityController {
         response.put("timestamp", String.valueOf(System.currentTimeMillis()));
         
         return ResponseEntity.ok(response);
+    }
+
+    
+    /**
+    @ai-generated,
+    Tool: Google Gemini,
+    Prompt: "how to create a Post API in spring boot",
+    Generated on: 2025-05-22,
+    Modified by: Jin Hao,
+    Modifications: change the return type and add validation to the input,
+    Verified: ✅ Unit tested, reviewed
+    */
+
+    /**
+     * create an activity
+     *
+     * @param activity requested activity
+     * @return an activity
+     */
+    @PostMapping("/activity")
+    public ResponseEntity<Object> createActivity(@RequestBody @Valid Activity activity) throws Exception {
+        m_activityApi.createActivity(activity);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

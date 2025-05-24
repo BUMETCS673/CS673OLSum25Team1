@@ -23,7 +23,13 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public List<Activity> getActivityByName(String activityName) {
-        return m_activityRepo.findByActivityNameContaining(activityName);
+    public List<Activity> getActivitiesByName(String activityName) {
+        return m_activityRepo.findByNameContaining(activityName);
+    }
+
+    @Override
+    public Activity createActivity(Activity activity) {
+        m_activityRepo.save(activity);
+        return activity;
     }
 }
