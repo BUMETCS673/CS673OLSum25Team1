@@ -1,4 +1,4 @@
-package com.bu.getactivecore.model;
+package com.bu.getactivecore.model.activity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +25,9 @@ public class Activity {
     @Column(name = "activity_name")
     private String activityName;
 
+    /**
+     * The start time of the activity in milliseconds since epoch.
+     */
     @Column(name = "start_time")
-    private Long startTime;
+    private Long startTimeMs;
 }
