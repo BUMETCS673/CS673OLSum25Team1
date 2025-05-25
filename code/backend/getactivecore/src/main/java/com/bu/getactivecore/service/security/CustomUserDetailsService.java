@@ -1,7 +1,7 @@
 package com.bu.getactivecore.service.security;
 
-import com.bu.getactivecore.model.UserPrincipal;
-import com.bu.getactivecore.model.Users;
+import com.bu.getactivecore.model.users.UserPrincipal;
+import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,13 +11,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-
+/**
+ * Service responsible for retrieving user information during authentication to convert {@link Users} entity into a
+ * {@link UserPrincipal} to be used by Spring Security.
+ */
 @Slf4j
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository m_userRepo;
 
+    /**
+     * Constructs the service with the provided {@link UserRepository}.
+     *
+     * @param userRepo used to fetch user data
+     */
     public CustomUserDetailsService(UserRepository userRepo) {
         m_userRepo = userRepo;
     }
@@ -30,8 +38,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             log.warn("User not found with username: {}", username);
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        // TODO: Get authorities
         return new UserPrincipal(user.get());
     }
-
 }

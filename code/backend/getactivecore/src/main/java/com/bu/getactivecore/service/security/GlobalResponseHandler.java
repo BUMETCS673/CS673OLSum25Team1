@@ -10,8 +10,14 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+
+/**
+ * Intercepts all controller responses and wraps them into a standardized API response format. It ensures that every
+ * successful response body is wrapped inside an {@link ApiResponse} object, providing a consistent structure for API
+ * consumers.
+ */
 @ControllerAdvice
-public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
+public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {

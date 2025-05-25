@@ -13,6 +13,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for sending email verifications.
+ */
 @Slf4j
 @Service
 public class EmailVerificationService implements EmailApi {
@@ -22,6 +25,12 @@ public class EmailVerificationService implements EmailApi {
     @Value("${spring.mail.username}")
     private String m_serverEmail;
 
+
+    /**
+     * Constructor for EmailVerificationService.
+     *
+     * @param javaEmailSender used for sending emails
+     */
     public EmailVerificationService(JavaMailSender javaEmailSender) {
         m_javaEmailSender = javaEmailSender;
     }
@@ -34,11 +43,12 @@ public class EmailVerificationService implements EmailApi {
         msg.setTo(email);
         msg.setSubject("GetActive: Registration Verification");
         msg.setText(body);
-
-        log.debug("Sending verification email to: {}", email);
         try {
             m_javaEmailSender.send(msg);
-        } catch (MailParseException | MailSendException e) {
+        } catch (MailParseException e) {
+            log.error("Failed to send verification email to: {}", email, e);
+            throw new ApiException(HttpStatus.BAD_REQUEST, ErrorCode.EMAIL_INVALID, "Unable to send verification email to email address: '" + email + "'", e);
+        } catch (MailSendException e) {
             log.error("Failed to send verification email to: {}", email, e);
             throw new ApiException(HttpStatus.BAD_REQUEST, ErrorCode.EMAIL_SEND_FAILED, "Unable to send verification email to email address: '" + email + "'", e);
         }
