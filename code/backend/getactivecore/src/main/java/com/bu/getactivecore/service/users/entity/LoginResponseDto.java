@@ -1,5 +1,6 @@
 package com.bu.getactivecore.service.users.entity;
 
+import com.bu.getactivecore.model.users.Users;
 import lombok.Value;
 
 /**
@@ -14,4 +15,8 @@ public class LoginResponseDto {
      * access protected resources.
      */
     String token;
+    String userId;
+    String username;
+    String email;
+
 }

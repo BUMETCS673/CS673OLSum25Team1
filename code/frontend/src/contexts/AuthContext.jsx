@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '../services/auth';
+import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     const { success, userData, error } = await authService.login(username, password);
+    console.log("userData", userData);
     if (success) {
       setUser(userData);
     }

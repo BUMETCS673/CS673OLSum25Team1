@@ -25,7 +25,7 @@ export const authService = {
       jwtUtils.setToken('auth_token', data.token);
       //jwtUtils.setToken('refresh_token', refreshToken);
       
-      return { success: true, userData: data.token, error: null};
+      return { success: true, userData: {userId: data.userId, username: data.username, userEmail: data.email}, error: null};
     } catch (error) {
       return { 
         success: false, 

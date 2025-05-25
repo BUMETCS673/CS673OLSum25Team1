@@ -100,10 +100,12 @@ public class UsersService implements UserInfoApi {
         Authentication authentication = m_authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword()));
 
+        Optional<Users> existingUser =m_userRepo.findByUsername(requestDto.getUsername());
+
         // If authentication is successful, the user is logged in
-        if (authentication.isAuthenticated()) {
+        if (authentication.isAuthenticated() && existingUser.isPresent()) {
             String token = m_jwtApi.generateToken(requestDto.getUsername());
-            return new LoginResponseDto(token);
+            return new LoginResponseDto(token, existingUser.get().getUserId(), existingUser.get().getUsername(), existingUser.get().getEmail());
         } else {
             throw new ApiException(HttpStatus.UNAUTHORIZED, ErrorCode.WRONG_CREDENTIALS, "Invalid credentials provided");
         }
