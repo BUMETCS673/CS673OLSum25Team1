@@ -107,25 +107,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = ApiError.from(apiEx.getErrorCode(), apiEx.getStatus(), apiEx.getErrorMessage(), apiEx);
         return buildResponseEntity(apiError);
     }
-
-        /**
-    @ai-generated,
-    Tool: Google Gemini,
-    Prompt: "org.springframework.web.bind.MethodArgumentNotValidException",
-    Generated on: 2025-05-22,
-    Modified by: Jin Hao Li,
-    Verified: ✅ Unit tested, reviewed
-*/
-
-
-    /*@ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        List<String> errors = new ArrayList<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.add(error.getDefaultMessage())
-        );
-
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), null, errors);
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }*/
 }
