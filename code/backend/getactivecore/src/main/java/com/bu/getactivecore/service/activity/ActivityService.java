@@ -32,6 +32,11 @@ public class ActivityService implements ActivityApi {
         m_userActivityRoleRepo = activityRoleRepo;
     }
 
+     @Override
+    public List<Activity> getActivityByName(String activityName) {
+        return m_activityRepo.findByNameContaining(activityName);
+    }
+
 
     @Override
     public List<Activity> getAllActivities() {
@@ -39,25 +44,14 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public List<Activity> getActivitiesByName(String activityName) {
-        return m_activityRepo.findByNameContaining(activityName);
-    }
-
-    @Override
-    public Activity createActivity(Activity activity) {
-        m_activityRepo.save(activity);
-        return activity;
-    }
-
-    @Override
-    public ActivityResponseDto createActivity(String authenticatedUserId, ActivityCreateRequestDto request) {
-        Activity activity = m_activityRepo.save(ActivityDto.from(request));
+    public Activity createActivity(String userId, Activity activity) {
+        Activity createdActivity  = m_activityRepo.save(activity);
         UserActivityRole userActivityRole = UserActivityRole.builder()
-                .userId(authenticatedUserId)
-                .activityId(activity.getActivityId())
+                .userId(userId)
+                .activityId(createdActivity.getId())
                 .role(UserActivityRole.RoleType.ADMIN)
                 .build();
-        m_userActivityRoleRepo.save(userActivityRole);
-        return new ActivityResponseDto(ActivityDto.of(activity));
+       m_userActivityRoleRepo.save(userActivityRole);
+       return createdActivity;
     }
 }

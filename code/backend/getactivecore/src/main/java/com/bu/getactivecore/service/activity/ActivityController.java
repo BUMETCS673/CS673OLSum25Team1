@@ -1,14 +1,5 @@
 package com.bu.getactivecore.service.activity;
 
-<<<<<<< HEAD
-import com.bu.getactivecore.model.Activity;
-import com.bu.getactivecore.shared.exception.ApiException;
-import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
-=======
 import com.bu.getactivecore.model.activity.Activity;
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.model.users.Users;
@@ -17,9 +8,10 @@ import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
+import com.bu.getactivecore.shared.exception.ApiException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
->>>>>>> 89b24c05759778e50c71afa62f82337825c1b6ba
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -75,25 +67,15 @@ public class ActivityController {
      */
     @GetMapping("/activity/{name}")
     public List<Activity> getActivityByName(@PathVariable String name) {
-        List<Activity> activities = m_activityApi.getActivitiesByName(name);
+        List<Activity> activities = m_activityApi.getActivityByName(name);
         if(activities.isEmpty()){
            throw new ApiException(HttpStatus.NOT_FOUND, null, "Activity cannot be found");
         }
-        return m_activityApi.getActivitiesByName(name);
+        return m_activityApi.getActivityByName(name);
     }
+
 
     @PutMapping("/activity")
-    public ActivityResponseDto createActivity(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody ActivityCreateRequestDto request) {
-        log.info("Got request: /v1/activity");
-
-        // TODO implement the logic to create an activity
-        Users user1 = user.getUser();
-        String userId = user1.getUserId();
-        return m_activityApi.createActivity(userId, request);
-    }
-
-
-    @PostMapping("/activity")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #request.activityId)")
     public ActivityResponseDto updateActivity(@Valid @RequestBody ActivityUpdateRequestDto request) {
         log.info("Got request: /v1/activity/update");
@@ -124,7 +106,6 @@ public class ActivityController {
         
         return ResponseEntity.ok(response);
     }
-
     
     /**
     @ai-generated,
@@ -143,8 +124,10 @@ public class ActivityController {
      * @return an activity
      */
     @PostMapping("/activity")
-    public ResponseEntity<Object> createActivity(@RequestBody @Valid Activity activity) throws Exception {
-        m_activityApi.createActivity(activity);
+    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user, @RequestBody @Valid Activity activity) throws Exception {
+        Users user1 = user.getUser();
+        String userId = user1.getUserId();
+        m_activityApi.createActivity(userId, activity);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

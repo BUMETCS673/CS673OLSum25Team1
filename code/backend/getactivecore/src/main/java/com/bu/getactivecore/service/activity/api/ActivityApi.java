@@ -21,5 +21,5 @@ public interface ActivityApi {
      * @param request Details of the activity to create
      * @return Response containing details of the created activity
      */
-    ActivityResponseDto createActivity(String userId, ActivityCreateRequestDto request);
+    Activity createActivity(String userId, Activity activity);
 }

@@ -1,13 +1,14 @@
 package com.bu.getactivecore.service.activity;
 
-import com.bu.getactivecore.model.Activity;
+import com.bu.getactivecore.service.activity.api.ActivityApi;
+import com.bu.getactivecore.model.activity.Activity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,13 +27,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.bu.getactivecore.service.activity.ActivityService;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(ActivityController.class)
 @AutoConfigureMockMvc
 class ActivityRestControllerTest {
@@ -101,7 +103,7 @@ class ActivityRestControllerTest {
                     .build();
         List<Activity> mockedActivities = new ArrayList<>();
         mockedActivities.add(act1);
-        given(m_activityApi.getActivitiesByName("Rock Climbing")).willReturn(mockedActivities);
+        given(m_activityApi.getActivityByName("Rock Climbing")).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activity/{name}","Rock Climbing").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -114,7 +116,7 @@ class ActivityRestControllerTest {
     public void givenActivityNotFound_then_404Returned() throws Exception {
 
         List<Activity> mockedActivities = Collections.emptyList();
-        given(m_activityApi.getActivitiesByName("Rock Climbing")).willReturn(mockedActivities);
+        given(m_activityApi.getActivityByName("Rock Climbing")).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activity/{name}","Rock Climbing").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -134,9 +136,11 @@ class ActivityRestControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);            
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); 
 
-        given(m_activityApi.createActivity(act1)).willReturn(act1);
+        String user_id = "1" ;          
+
+        given(m_activityApi.createActivity(user_id, act1)).willReturn(act1);
 
         String json = mapper.writeValueAsString(act1);
 
@@ -160,9 +164,11 @@ class ActivityRestControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);            
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); 
+        
+        String user_id="1";           
 
-        given(m_activityApi.createActivity(act1)).willReturn(act1);
+        given(m_activityApi.createActivity(user_id, act1)).willReturn(act1);
 
         String json = mapper.writeValueAsString(act1);
 

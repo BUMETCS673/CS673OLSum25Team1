@@ -34,16 +34,14 @@ public class ActivityDto {
      */
     public static ActivityDto of(Activity activity) {
         return ActivityDto.builder()
-                .activityId(activity.getActivityId())
-                .name(activity.getActivityName())
-                .startTimeMs(activity.getStartTimeMs())
+                .activityId(activity.getId())
+                .name(activity.getName())
                 .build();
     }
 
     public static Activity from(ActivityCreateRequestDto request) {
         return Activity.builder()
-                .activityName(request.getName())
-                .startTimeMs(request.getStartTimeMs())
+                .name(request.getName())
                 .build();
     }
 }
