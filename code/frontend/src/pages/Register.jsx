@@ -9,7 +9,8 @@ import {
   Button, 
   Typography,
   Box,
-  Alert 
+  Alert,
+  LinearProgress
 } from '@mui/material';
 
 const Register = () => {
@@ -19,8 +20,41 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({ label: '', color: '' });
   const navigate = useNavigate();
   const { register } = useAuth();
+
+  const getPasswordStrength = (password) => {
+    let score = 0;
+    if (password.length >= 8) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    return score;
+  };
+
+  const getStrengthLabel = (score) => {
+    switch (score) {
+      case 1:
+        return { label: 'Weak', color: 'red' };
+      case 2:
+        return { label: 'Medium', color: 'orange' };
+      case 3:
+        return { label: 'Strong', color: 'green' };
+      case 4:
+        return { label: 'Very Strong', color: 'darkgreen' };
+      default:
+        return { label: 'Very Weak', color: 'gray' };
+    }
+  };
+
+  const getNextLevelHint = (password) => {
+    if (password.length < 8) return 'Add more characters to make it at least 8.';
+    if (!/[A-Z]/.test(password)) return 'Add an uppercase letter.';
+    if (!/[0-9]/.test(password)) return 'Add a number.';
+    if (!/[^A-Za-z0-9]/.test(password)) return 'Add a special character.';
+    return '';
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,7 +129,16 @@ const Register = () => {
               label="Email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (!validator.isEmail(e.target.value)) {
+                  setError('Invalid email format');
+                } else if (!e.target.value.endsWith('@bu.edu')) {
+                  setError('Email must be a BU email (e.g., example@bu.edu)');
+                } else {
+                  setError('');
+                }
+              }}
               disabled={loading}
             />
             <TextField
@@ -105,9 +148,32 @@ const Register = () => {
               label="Password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                const score = getPasswordStrength(e.target.value);
+                setPasswordStrength(getStrengthLabel(score));
+              }}
               disabled={loading}
             />
+            <LinearProgress
+              variant="determinate"
+              value={(getPasswordStrength(password) / 4) * 100}
+              sx={{ height: 10, borderRadius: 5, backgroundColor: 'lightgray', mt: 1 }}
+            />
+            <Typography
+              variant="body2"
+              align="left"
+              sx={{ color: passwordStrength.color, mt: 1 }}
+            >
+              {passwordStrength.label}
+            </Typography>
+            <Typography
+              variant="body2"
+              align="left"
+              sx={{ color: 'gray', mt: 1 }}
+            >
+              {getNextLevelHint(password)}
+            </Typography>
             <TextField
               margin="normal"
               required
@@ -115,7 +181,14 @@ const Register = () => {
               label="Confirm Password"
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (e.target.value !== password) {
+                  setError('Passwords do not match');
+                } else {
+                  setError('');
+                }
+              }}
               disabled={loading}
             />
             <Button
