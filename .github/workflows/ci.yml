@@ -60,7 +60,7 @@ jobs:
         if: always()
         with:
           name: problems-report
-          path: code/backend/getactivecore/build/reports/problems/problems-report.html
+          path: code/backend/getactivecore/build/reports/tests/test/index.html
           
       - name: Build and start backend service
         working-directory: ./code/backend/getactivecore
