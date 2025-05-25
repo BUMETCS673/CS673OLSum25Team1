@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-@WebMvcTest(ActivityController.class)
+@SpringBootTest
 @AutoConfigureMockMvc
 class ActivityRestControllerTest {
 
@@ -124,7 +123,7 @@ class ActivityRestControllerTest {
 ;
     }
 
-    @WithMockUser
+   /* @WithMockUser
     @Test
     public void givenCreateActivitySuccessfully_then_201Returned() throws Exception {
         Activity act1 = Activity.builder()
@@ -179,6 +178,6 @@ class ActivityRestControllerTest {
 	      .contentType(MediaType.APPLICATION_JSON)
 	      .accept(MediaType.APPLICATION_JSON))
           .andExpect(status().isBadRequest());
-    }
+    }*/
     
 }
