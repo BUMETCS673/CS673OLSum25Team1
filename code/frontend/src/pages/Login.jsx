@@ -29,6 +29,8 @@ const Login = () => {
 
     try {
       const { success, error: loginError } = await login(username, password, rememberMe);
+      console.log("success", success);
+      console.log("loginError", loginError);
       if (success) {
         const from = location.state?.from?.pathname || '/home';
         navigate(from, { replace: true });

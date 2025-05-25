@@ -2,19 +2,34 @@ import api from './api';
 import { jwtUtils } from '../utils/jwt';
 
 export const authService = {
+  register: async (username, email, password) => {
+    try {
+      const response = await api.post('/register', { username, email, password });
+      return {
+        success: true,
+        error: null
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Register failed'
+      };
+    }
+  },
+
   login: async (username, password) => {
     try {
-      const response = await api.post('/auth/login', { username, password });
-      const { token, refreshToken, user } = response.data;
+      const response = await api.post('/login', { username, password });
+      const { data } = response.data;
       
-      jwtUtils.setToken('auth_token', token);
-      jwtUtils.setToken('refresh_token', refreshToken);
+      jwtUtils.setToken('auth_token', data.token);
+      //jwtUtils.setToken('refresh_token', refreshToken);
       
-      return { success: true, user };
+      return { success: true, userData: data.token, error: null};
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || '登录失败' 
+        error: error.response?.data?.message || 'Login failed' 
       };
     }
   },

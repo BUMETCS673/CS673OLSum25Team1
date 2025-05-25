@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const { success, user: userData, error } = await authService.login(username, password);
+    const { success, userData, error } = await authService.login(username, password);
     if (success) {
       setUser(userData);
     }
@@ -35,8 +35,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const register = async (username, password) => {
-    const { success, error } = await authService.register(username, password);
+  const register = async (username, email, password) => {
+    const { success, error } = await authService.register(username, email, password);
     return { success, error };
   };
 
