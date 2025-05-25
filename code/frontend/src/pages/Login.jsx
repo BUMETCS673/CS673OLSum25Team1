@@ -10,6 +10,7 @@ import {
   Box,
   Alert 
 } from '@mui/material';
+import logo from '../../../../misc/logo.png'; // Adjust the path as necessary
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -51,9 +52,13 @@ const Login = () => {
           alignItems: 'center',
         }}
       >
+        <img src={logo} alt="GetActive Logo" style={{ width: '100px', marginBottom: '16px' }} />
+        <Typography component="h1" variant="h4" align="center" gutterBottom>
+          GetActive
+        </Typography>
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
           <Typography component="h1" variant="h5" align="center" gutterBottom>
-            login
+            Login
           </Typography>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -97,7 +102,7 @@ const Login = () => {
               sx={{ mt: 3, mb: 2 }}
               disabled={loading}
             >
-              {loading ? 'logging in...' : 'login'}
+              {loading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
           <Typography variant="body2" align="center" sx={{ mt: 2 }}>
