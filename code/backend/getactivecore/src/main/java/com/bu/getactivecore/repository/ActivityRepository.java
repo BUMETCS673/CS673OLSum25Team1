@@ -1,6 +1,6 @@
 package com.bu.getactivecore.repository;
 
-import com.bu.getactivecore.model.Activity;
+import com.bu.getactivecore.model.activity.Activity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

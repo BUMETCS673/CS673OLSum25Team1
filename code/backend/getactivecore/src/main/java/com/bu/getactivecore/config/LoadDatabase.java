@@ -1,7 +1,7 @@
 package com.bu.getactivecore.config;
 
-import com.bu.getactivecore.model.Activity;
-import com.bu.getactivecore.model.Users;
+import com.bu.getactivecore.model.activity.Activity;
+import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,7 @@ public class LoadDatabase {
     CommandLineRunner demoPreloadData(ActivityRepository activityRepo, UserRepository userRepo) {
         return args -> {
             Activity act1 = Activity.builder()
+<<<<<<< HEAD
                     .name("Rock Climbing")
                     .startDateTime(LocalDateTime.now())
                     .location("Location")
@@ -36,6 +37,18 @@ public class LoadDatabase {
                     .location("Location")
                     .startDateTime(LocalDateTime.now())
                     .endDateTime(LocalDateTime.now())
+=======
+                    .activityName("Rock Climbing")
+                    .startTimeMs(System.currentTimeMillis())
+                    .build();
+            Activity act2 = Activity.builder()
+                    .activityName("Yoga")
+                    .startTimeMs(System.currentTimeMillis())
+                    .build();
+            Activity act3 = Activity.builder()
+                    .activityName("Running")
+                    .startTimeMs(System.currentTimeMillis())
+>>>>>>> 89b24c05759778e50c71afa62f82337825c1b6ba
                     .build();
 
             Users user1 = Users.builder()
