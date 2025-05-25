@@ -1,7 +1,7 @@
 package com.bu.getactivecore.config;
 
-import com.bu.getactivecore.model.Activity;
-import com.bu.getactivecore.model.Users;
+import com.bu.getactivecore.model.activity.Activity;
+import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +18,15 @@ public class LoadDatabase {
         return args -> {
             Activity act1 = Activity.builder()
                     .activityName("Rock Climbing")
-                    .startTime(System.currentTimeMillis())
+                    .startTimeMs(System.currentTimeMillis())
                     .build();
             Activity act2 = Activity.builder()
                     .activityName("Yoga")
-                    .startTime(System.currentTimeMillis())
+                    .startTimeMs(System.currentTimeMillis())
                     .build();
             Activity act3 = Activity.builder()
                     .activityName("Running")
-                    .startTime(System.currentTimeMillis())
+                    .startTimeMs(System.currentTimeMillis())
                     .build();
 
             Users user1 = Users.builder()

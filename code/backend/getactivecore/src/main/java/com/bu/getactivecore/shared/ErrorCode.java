@@ -5,11 +5,16 @@ package com.bu.getactivecore.shared;
  */
 public enum ErrorCode {
 
-    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "An unexpected error occurred"),
-    INVALID_EMAIL("INVALID_EMAIL", "The provided email address is invalid"),
-    INVALID_DATA_STRUCTURE("INVALID_REQUEST_DATA_STRUCTURE", "The request data structure is invalid"),
+    EMAIL_SEND_FAILED("EMAIL_SEND_FAILED", "Failed to send verification email"),
     EMAIL_USERNAME_TAKEN("EMAIL_USERNAME_TAKEN", "The provided email or username is already taken"),
-    EMAIL_SEND_FAILED("EMAIL_SEND_FAILED", "Failed to send verification email");
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "An unexpected error occurred"),
+    DATA_STRUCTURE_INVALID("DATA_STRUCTURE_INVALID", "The requested data structure is invalid"),
+    EMAIL_INVALID("EMAIL_INVALID", "The provided email address is invalid"),
+    TOKEN_INVALID("TOKEN_INVALID", "The provided token is invalid"),
+    RESOURCE_ACCESS_DENIED("RESOURCE_ACCESS_DENIED", "Access to the requested resource is denied"),
+    UNSUPPORTED_MEDIA_TYPE("UNSUPPORTED_MEDIA_TYPE", "The provided media type is not supported"),
+    UNSUPPORTED_OPERATION("UNSUPPORTED_OPERATION", "This endpoint does not support the requested operation"),
+    WRONG_CREDENTIALS("INVALID_CREDENTIALS", "The provided username and password are invalid");
 
     private final String m_code;
     private final String m_details;
