@@ -179,7 +179,7 @@ const Register = () => {
               required
               fullWidth
               label="Confirm Password"
-              type="password"
+              type="confirmpassword"
               value={confirmPassword}
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
