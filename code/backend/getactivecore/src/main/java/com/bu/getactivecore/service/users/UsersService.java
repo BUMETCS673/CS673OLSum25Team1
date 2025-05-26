@@ -1,6 +1,7 @@
 package com.bu.getactivecore.service.users;
 
 import com.bu.getactivecore.model.users.Users;
+import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.email.api.EmailApi;
 import com.bu.getactivecore.service.jwt.api.JwtApi;
@@ -100,12 +101,11 @@ public class UsersService implements UserInfoApi {
         Authentication authentication = m_authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword()));
 
-        Optional<Users> existingUser =m_userRepo.findByUsername(requestDto.getUsername());
-
         // If authentication is successful, the user is logged in
-        if (authentication.isAuthenticated() && existingUser.isPresent()) {
+        if (authentication.isAuthenticated()) {
             String token = m_jwtApi.generateToken(requestDto.getUsername());
-            return new LoginResponseDto(token, existingUser.get().getUserId(), existingUser.get().getUsername(), existingUser.get().getEmail());
+            Users user = ((UserPrincipal) authentication.getPrincipal()).getUser();
+            return new LoginResponseDto(token, user.getUsername(), user.getEmail());
         } else {
             throw new ApiException(HttpStatus.UNAUTHORIZED, ErrorCode.WRONG_CREDENTIALS, "Invalid credentials provided");
         }

@@ -15,7 +15,6 @@ public class LoginResponseDto {
      * access protected resources.
      */
     String token;
-    String userId;
     String username;
     String email;
 
