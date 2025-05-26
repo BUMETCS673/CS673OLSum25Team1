@@ -32,24 +32,20 @@ public class Activity {
     @Column(name = "id")
     private String id;
 
-    @NotBlank(message = "Name cannot be blank")
     @Column(name = "name")
     private String name;
 
     @Column(name = "description")
     private String description;
 
-    @NotBlank(message = "Location cannot be blank")
     @Column(name = "location")
     private String location;
 
-    @NotNull
     @Column(name = "start_date_time")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDateTime;
 
-    @NotNull
     @Column(name = "end_date_time")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")

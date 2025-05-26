@@ -54,9 +54,10 @@ public class ActivityController {
      * @return List of activities
      */
     @GetMapping("/activities")
-    public List<Activity> getActivities() {
-        log.info("Got request: /v1/activities");
-        return m_activityApi.getAllActivities();
+    public List<ActivityDto> getActivities() {
+        List<Activity> activities = m_activityApi.getAllActivities();
+        List<ActivityDto> activityDto = activities.stream().map(activity ->ActivityDto.of(activity)).toList();
+        return activityDto;
     }
 
     /**
@@ -66,12 +67,13 @@ public class ActivityController {
      * @return List of activities matching the name
      */
     @GetMapping("/activity/{name}")
-    public List<Activity> getActivityByName(@PathVariable String name) {
+    public List<ActivityDto> getActivityByName(@PathVariable String name) {
         List<Activity> activities = m_activityApi.getActivityByName(name);
+        List<ActivityDto> activityDto = activities.stream().map(activity ->ActivityDto.of(activity)).toList();
         if(activities.isEmpty()){
            throw new ApiException(HttpStatus.NOT_FOUND, null, "Activity cannot be found");
         }
-        return m_activityApi.getActivityByName(name);
+        return activityDto;
     }
 
 
@@ -124,10 +126,10 @@ public class ActivityController {
      * @return an activity
      */
     @PostMapping("/activity")
-    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user, @RequestBody @Valid Activity activity) throws Exception {
+    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user, @RequestBody @Valid ActivityCreateRequestDto request) throws Exception {
         Users user1 = user.getUser();
         String userId = user1.getUserId();
-        m_activityApi.createActivity(userId, activity);
+        m_activityApi.createActivity(userId, ActivityCreateRequestDto.from(request));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

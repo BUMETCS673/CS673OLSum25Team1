@@ -5,9 +5,6 @@ import com.bu.getactivecore.model.activity.UserActivityRole;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRoleRepository;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
-import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
-import com.bu.getactivecore.service.activity.entity.ActivityDto;
-import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

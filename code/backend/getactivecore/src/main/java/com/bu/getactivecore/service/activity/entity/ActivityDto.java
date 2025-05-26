@@ -1,6 +1,16 @@
 package com.bu.getactivecore.service.activity.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.UuidGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
 import com.bu.getactivecore.model.activity.Activity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,20 +21,17 @@ import lombok.Data;
 @Builder
 public class ActivityDto {
 
-    /**
-     * Unique identifier for the activity.
-     */
-    private String activityId;
+    private String id;
 
-    /**
-     * Name of the activity.
-     */
     private String name;
 
-    /**
-     * Start time of the activity in milliseconds since epoch.
-     */
-    private Long startTimeMs;
+    private String description;
+
+    private String location;
+
+    private LocalDateTime startDateTime;
+
+    private LocalDateTime endDateTime;
 
     /**
      * Converts an Activity entity to an ActivityDto.
@@ -34,14 +41,12 @@ public class ActivityDto {
      */
     public static ActivityDto of(Activity activity) {
         return ActivityDto.builder()
-                .activityId(activity.getId())
+                .id(activity.getId())
+                .location(activity.getLocation())
                 .name(activity.getName())
-                .build();
-    }
-
-    public static Activity from(ActivityCreateRequestDto request) {
-        return Activity.builder()
-                .name(request.getName())
-                .build();
+                .startDateTime(activity.getStartDateTime())
+                .endDateTime(activity.getEndDateTime())
+                .description(activity.getDescription())
+                .build();     
     }
 }

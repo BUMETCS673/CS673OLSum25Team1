@@ -1,6 +1,7 @@
 package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.service.activity.api.ActivityApi;
+import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.model.activity.Activity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -8,10 +9,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +39,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import org.springframework.security.core.userdetails.User;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +59,7 @@ class ActivityRestControllerTest {
 
     @Autowired
 	private WebApplicationContext context;
+    
 
     @BeforeEach
 	public void setup() {
@@ -123,15 +134,23 @@ class ActivityRestControllerTest {
 ;
     }
 
-   /* @WithMockUser
+    // TODO: fix tests
+    /*@WithMockUser
     @Test
     public void givenCreateActivitySuccessfully_then_201Returned() throws Exception {
-        Activity act1 = Activity.builder()
+        UserDetails userDetails = User.withUsername("testuser").password("password").roles("USER").build();
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    
+
+        ActivityCreateRequestDto request = ActivityCreateRequestDto.builder()
                     .name("Rock Climbing")
                     .startDateTime(LocalDateTime.now())
                     .location("Location")
                     .endDateTime(LocalDateTime.now())
                     .build();
+  
+        Activity activity = ActivityCreateRequestDto.from(request); 
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -139,10 +158,9 @@ class ActivityRestControllerTest {
 
         String user_id = "1" ;          
 
-        given(m_activityApi.createActivity(user_id, act1)).willReturn(act1);
+        given(m_activityApi.createActivity(user_id, activity)).willReturn(activity);
 
-        String json = mapper.writeValueAsString(act1);
-
+        String json = mapper.writeValueAsString(request);
           m_mvc.perform( MockMvcRequestBuilders
 	      .post("/v1/activity")
           .with(csrf())
