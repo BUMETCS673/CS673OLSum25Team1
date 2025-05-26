@@ -126,6 +126,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           #build: npm run build # 这个 build 命令在前面已经执行过了，可以省略或改为 'npm run start' 如果有
+          working-directory: ./code/frontend
           start: npm run dev # 这个 start 命令在前面已经执行过了，可以省略或改为 'npm run start' 如果有
           wait-on: 'http://localhost:5173' # Cypress 会等待这个URL可用
           wait-on-timeout: 120 # 等待超时时间（秒）
