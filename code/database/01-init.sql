@@ -14,10 +14,10 @@ CREATE TABLE activities (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE user_activities (
+    id CHAR(36) PRIMARY KEY,
     user_id CHAR(36) NOT NULL,
     activity_id CHAR(36) NOT NULL,
     role ENUM('ADMIN', 'PARTICIPANT') NOT NULL,
-    PRIMARY KEY (user_id, activity_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (activity_id) REFERENCES activities(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
