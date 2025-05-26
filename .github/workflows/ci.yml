@@ -131,7 +131,7 @@ jobs:
           wait-on: 'http://localhost:5173' # Cypress 会等待这个URL可用
           wait-on-timeout: 120 # 等待超时时间（秒）
           # project: ./code/frontend # 指定 Cypress 项目的路径
-          project: ./cypress # 指定 Cypress 项目的路径
+          # project: ./cypress # 指定 Cypress 项目的路径
           browser: chrome # 可以是 chrome, firefox, edge
           # 如果你不想看视频，可以设置 record: false
           # record: false # 如果你没有 Cypress Cloud 账号，设为 false
