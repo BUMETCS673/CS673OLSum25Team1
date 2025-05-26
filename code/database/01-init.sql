@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) PRIMARY KEY,
     name VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -18,6 +18,6 @@ CREATE TABLE user_activities (
     user_id CHAR(36) NOT NULL,
     activity_id CHAR(36) NOT NULL,
     role ENUM('ADMIN', 'PARTICIPANT') NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (activity_id) REFERENCES activities(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
