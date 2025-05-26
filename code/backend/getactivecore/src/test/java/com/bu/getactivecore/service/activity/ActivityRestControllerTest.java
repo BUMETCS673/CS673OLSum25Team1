@@ -123,13 +123,13 @@ class ActivityRestControllerTest {
 
     @WithMockUser
     @Test
-    public void givenActivityNotFound_then_404Returned() throws Exception {
+    public void givenActivityNotFound_then_200Returned() throws Exception {
 
         List<Activity> mockedActivities = Collections.emptyList();
         given(m_activityApi.getActivityByName("Rock Climbing")).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activity/{name}","Rock Climbing").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
 ;
     }
