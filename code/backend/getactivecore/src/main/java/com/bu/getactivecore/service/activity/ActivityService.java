@@ -57,7 +57,7 @@ public class ActivityService implements ActivityApi {
     public void createActivity(String userId, Activity activity) {
        Optional<Activity> foundActivity = m_activityRepo.findByName(activity.getName());
        if(foundActivity.isPresent()){
-          throw new ApiException(HttpStatus.BAD_REQUEST, null, "Activity name existed");
+          throw new ApiException(HttpStatus.BAD_REQUEST, null, "Activity name exists");
        }
 
        if(activity.getEndDateTime().isEqual(activity.getStartDateTime()) 
