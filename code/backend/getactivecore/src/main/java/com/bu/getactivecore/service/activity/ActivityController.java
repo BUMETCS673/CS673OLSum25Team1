@@ -70,9 +70,6 @@ public class ActivityController {
     public List<ActivityDto> getActivityByName(@PathVariable String name) {
         List<Activity> activities = m_activityApi.getActivityByName(name);
         List<ActivityDto> activityDto = activities.stream().map(activity ->ActivityDto.of(activity)).toList();
-        if(activities.isEmpty()){
-           throw new ApiException(HttpStatus.NOT_FOUND, null, "Activity cannot be found");
-        }
         return activityDto;
     }
 
