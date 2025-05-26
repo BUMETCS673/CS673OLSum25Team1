@@ -67,8 +67,7 @@ public class SecurityConfig {
                         // Permit following endpoints without authentication
                         .requestMatchers("/h2-console/**", "/v1/register",
                                 "/v1/health",
-                                "/v1/login",
-                                "/v1/activitt"
+                                "/v1/login"
                                 ).permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated()
