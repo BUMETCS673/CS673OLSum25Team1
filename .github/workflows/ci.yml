@@ -8,8 +8,8 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  integrated-test:
-    name: Integrated Tests
+  integration-test:
+    name: Integration Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -98,18 +98,59 @@ jobs:
         working-directory: ./code/frontend/
         run: |
           npm ci
-          npm run test
-      
-      - name: Upload Frontend JUnit Report
-        uses: actions/upload-artifact@v4
-        if: always() 
-        with:
-          name: frontend-junit-report
-          path: code/frontend/test-results/junit.xml 
 
-      - name: Upload Frontend Coverage Report
-        uses: actions/upload-artifact@v4
-        if: always() 
+      # - name: Build Frontend Application
+      #   working-directory: ./code/frontend
+      #   run: npm run build 
+
+      # - name: Serve Frontend Application (using serve package)
+      #   working-directory: ./code/frontend
+      #   run: |
+      #     npm install -g serve
+      #     serve -s build -l 5173 &
+      #     echo "Waiting for frontend service to start..."
+      #     for i in {1..30}; do
+      #       if curl -s http://localhost:5173; then
+      #         echo "Frontend service is up!"
+      #         break
+      #       fi
+      #       if [ $i -eq 30 ]; then
+      #         echo "Frontend service failed to start within timeout"
+      #         exit 1
+      #       fi
+      #       echo "Waiting... ($i/30)"
+      #       sleep 1
+      #     done
+
+      - name: Run Cypress E2E tests
+        uses: cypress-io/github-action@v6
         with:
-          name: frontend-coverage-report
-          path: code/frontend/coverage/
+          working-directory: ./code/frontend
+          start: npm run dev 
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 120
+          browser: chrome
+          
+      - name: Upload Cypress Test Artifacts (Videos & Screenshots)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-e2e-artifacts
+          path: |
+            ./code/frontend/cypress/videos
+            ./code/frontend/cypress/screenshots
+            ./code/frontend/cypress/reports/junit.xml
+      
+      # - name: Upload Frontend JUnit Report
+      #   uses: actions/upload-artifact@v4
+      #   if: always() 
+      #   with:
+      #     name: frontend-junit-report
+      #     path: code/frontend/test-results/junit.xml 
+
+      # - name: Upload Frontend Coverage Report
+      #   uses: actions/upload-artifact@v4
+      #   if: always() 
+      #   with:
+      #     name: frontend-coverage-report
+      #     path: code/frontend/coverage/

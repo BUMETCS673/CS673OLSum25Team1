@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '../services/auth';
+import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -8,23 +8,25 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
-      if (authService.isAuthenticated()) {
-        try {
-            const userData = await authService.getCurrentUser();
-            setUser(userData);
-        } catch (error) {
-          authService.logout();
-        }
-      }
-      setLoading(false);
-    };
-    initAuth();
+    // const initAuth = async () => {
+    //   if (authService.isAuthenticated()) {
+    //     try {
+    //         const userData = await authService.getCurrentUser();
+    //         setUser(userData);
+    //     } catch (error) {
+    //       authService.logout();
+    //     }
+    //   }
+    //   setLoading(false);
+    // };
+    // initAuth();
   }, []);
 
   const login = async (username, password) => {
-    const { success, user: userData, error } = await authService.login(username, password);
+    const { success, userData, error } = await authService.login(username, password);
+    console.log("userData", userData);
     if (success) {
+      setLoading(false);
       setUser(userData);
     }
     return { success, error };
@@ -35,8 +37,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const register = async (username, email, password) => {
+    const { success, error } = await authService.register(username, email, password);
+    return { success, error };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loading }}>
       {children}
     </AuthContext.Provider>
   );

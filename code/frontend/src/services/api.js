@@ -25,26 +25,26 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    // if (error.response?.status === 401 && !originalRequest._retry) {
+    //   originalRequest._retry = true;
 
-      try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-          const response = await api.post('/auth/refresh', { refreshToken });
-          const { token } = response.data;
+    //   // try {
+    //   //   const refreshToken = localStorage.getItem('refresh_token');
+    //   //   if (refreshToken) {
+    //   //     const response = await api.post('/auth/refresh', { refreshToken });
+    //   //     const { token } = response.data;
           
-          jwtUtils.setToken(token);
+    //   //     jwtUtils.setToken(token);
           
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        jwtUtils.removeToken();
-        localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
-      }
-    }
+    //   //     originalRequest.headers.Authorization = `Bearer ${token}`;
+    //   //     return api(originalRequest);
+    //   //   }
+    //   // } catch (refreshError) {
+    //   //   jwtUtils.removeToken();
+    //   //   localStorage.removeItem('refresh_token');
+    //   //   window.location.href = '/login';
+    //   // }
+    // }
 
     return Promise.reject(error);
   }
