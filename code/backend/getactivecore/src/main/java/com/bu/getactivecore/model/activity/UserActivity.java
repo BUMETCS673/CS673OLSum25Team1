@@ -1,12 +1,11 @@
 package com.bu.getactivecore.model.activity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
@@ -15,7 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.bu.getactivecore.model.users.Users;
+import org.hibernate.annotations.UuidGenerator;
 
 
 @Entity
@@ -32,22 +31,17 @@ import com.bu.getactivecore.model.users.Users;
 @Builder
 public class UserActivity {
 
-    @EmbeddedId
-    private UserActivityKey id;
+    @Id
+    @UuidGenerator
+    private String id;     
 
-    @ManyToOne
-    @MapsId("userId")
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @Column(name = "user_id", nullable = false)    
+    private String userId;
 
-    @ManyToOne
-    @MapsId("activityId")
-    @JoinColumn(name = "activity_id", nullable = false)
-    private Activity activity;
+    @Column(name = "activity_id", nullable = false)
+    private String activityId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleType role;
-
-
 }

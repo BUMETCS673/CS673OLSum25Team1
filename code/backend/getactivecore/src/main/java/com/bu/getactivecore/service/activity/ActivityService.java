@@ -8,9 +8,7 @@ import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
-import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
-import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import com.bu.getactivecore.shared.exception.ApiException;
 
 import org.springframework.http.HttpStatus;
@@ -74,8 +72,8 @@ public class ActivityService implements ActivityApi {
 
        Activity createdActivity  = m_activityRepo.save(activity);
        UserActivity userActivityRole = UserActivity.builder()
-                .user(user.get())
-                .activity(createdActivity)
+                .userId(userId)
+                .activityId(createdActivity.getId())
                 .role(RoleType.ADMIN)
                 .build();
        m_userActivityRoleRepo.save(userActivityRole);

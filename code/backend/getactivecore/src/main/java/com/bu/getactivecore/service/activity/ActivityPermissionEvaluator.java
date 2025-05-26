@@ -19,15 +19,15 @@ import java.util.Map;
 @Component("activityPermissionEvaluator")
 public class ActivityPermissionEvaluator {
 
-    private final UserActivityRepository roleRepo;
+    private final UserActivityRepository userActivityRepo;
 
     /**
      * Constructs the permission evaluator with the provided {@link UserActivityRepository}.
      *
-     * @param roleRepo used to fetch user roles for activities
+     * @param userActivityRepository used to fetch user roles for activities
      */
-    public ActivityPermissionEvaluator(UserActivityRepository roleRepo) {
-        this.roleRepo = roleRepo;
+    public ActivityPermissionEvaluator(UserActivityRepository userActivityRepo) {
+        this.userActivityRepo = userActivityRepo;
     }
 
     /**
@@ -41,7 +41,7 @@ public class ActivityPermissionEvaluator {
     public boolean isAuthorizedToUpdateActivity(Authentication authentication, String activityId) {
         Users user = ((UserPrincipal) authentication.getPrincipal()).getUser();
         String userId = user.getUserId();
-        return roleRepo.findByUserIdAndActivityId(userId, activityId)
+        return userActivityRepo.findByUserIdAndActivityId(userId, activityId)
                 .map(role -> RoleType.ADMIN == role.getRole())
                 .orElseThrow(() -> {
                     String reason = String.format("User %s is not an admin of activity %s", userId, activityId);

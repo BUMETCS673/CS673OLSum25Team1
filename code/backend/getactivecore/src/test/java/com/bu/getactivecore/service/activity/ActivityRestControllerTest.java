@@ -1,7 +1,6 @@
 package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.service.activity.api.ActivityApi;
-import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.model.activity.Activity;
 
