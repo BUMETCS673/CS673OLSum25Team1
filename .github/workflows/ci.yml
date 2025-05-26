@@ -125,30 +125,21 @@ jobs:
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6
         with:
-          #build: npm run build # 这个 build 命令在前面已经执行过了，可以省略或改为 'npm run start' 如果有
           working-directory: ./code/frontend
-          start: npm run dev # 这个 start 命令在前面已经执行过了，可以省略或改为 'npm run start' 如果有
-          wait-on: 'http://localhost:5173' # Cypress 会等待这个URL可用
-          wait-on-timeout: 120 # 等待超时时间（秒）
-          # project: ./code/frontend # 指定 Cypress 项目的路径
-          # project: ./cypress # 指定 Cypress 项目的路径
-          browser: chrome # 可以是 chrome, firefox, edge
-          # 如果你不想看视频，可以设置 record: false
-          # record: false # 如果你没有 Cypress Cloud 账号，设为 false
-        # env:
-        #   # 如果 Cypress 测试内部需要环境变量，可以在这里设置
-        #   CYPRESS_BASE_URL: http://localhost:5173 # 确保 Cypress 访问正确的前端URL
-
-      # --- 上传测试结果和报告 ---
+          start: npm run dev 
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 120
+          browser: chrome
+          
       - name: Upload Cypress Test Artifacts (Videos & Screenshots)
         uses: actions/upload-artifact@v4
-        if: always() # 无论测试通过与否都上传
+        if: always()
         with:
           name: cypress-e2e-artifacts
           path: |
-            ./code/frontend/cypress/videos # Cypress 录制的视频
-            ./code/frontend/cypress/screenshots # Cypress 截取的屏幕截图
-            ./code/frontend/cypress/reports/junit.xml # 示例 JUnit 报告路径
+            ./code/frontend/cypress/videos
+            ./code/frontend/cypress/screenshots
+            ./code/frontend/cypress/reports/junit.xml
       
       # - name: Upload Frontend JUnit Report
       #   uses: actions/upload-artifact@v4

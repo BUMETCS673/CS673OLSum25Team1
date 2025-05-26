@@ -6,5 +6,9 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
+    reporter: 'junit',
+    reporterOptions: {
+      mochaFile: 'cypress/reports/junit.xml',
+    },
   },
 });
