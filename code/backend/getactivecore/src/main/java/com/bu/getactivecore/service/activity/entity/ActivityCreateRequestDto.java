@@ -30,12 +30,12 @@ public class ActivityCreateRequestDto {
     @NotBlank(message = "Location cannot be blank")
     private String location;
 
-    @NotNull(message = "Start Date Time cannot be blank")
+    @NotNull(message = "Start DateTime cannot be blank")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDateTime;
 
-    @NotNull(message = "Start Date Time cannot be blank")
+    @NotNull(message = "Start DateTime cannot be blank")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime endDateTime;

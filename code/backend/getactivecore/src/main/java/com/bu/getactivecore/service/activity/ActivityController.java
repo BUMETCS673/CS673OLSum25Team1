@@ -55,9 +55,7 @@ public class ActivityController {
      */
     @GetMapping("/activities")
     public List<ActivityDto> getActivities() {
-        List<Activity> activities = m_activityApi.getAllActivities();
-        List<ActivityDto> activityDto = activities.stream().map(activity ->ActivityDto.of(activity)).toList();
-        return activityDto;
+        return m_activityApi.getAllActivities();
     }
 
     /**
@@ -68,9 +66,7 @@ public class ActivityController {
      */
     @GetMapping("/activity/{name}")
     public List<ActivityDto> getActivityByName(@PathVariable String name) {
-        List<Activity> activities = m_activityApi.getActivityByName(name);
-        List<ActivityDto> activityDto = activities.stream().map(activity ->ActivityDto.of(activity)).toList();
-        return activityDto;
+        return m_activityApi.getActivityByName(name);
     }
 
 

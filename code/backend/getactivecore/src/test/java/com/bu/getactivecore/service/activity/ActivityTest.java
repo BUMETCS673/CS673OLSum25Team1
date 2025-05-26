@@ -2,7 +2,7 @@ package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.config.JavaGmailMailConfig;
 import com.bu.getactivecore.repository.ActivityRepository;
-import com.bu.getactivecore.repository.UserActivityRoleRepository;
+import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
@@ -52,7 +52,7 @@ class ActivityTest {
     private ActivityApi activityApi;
 
     @Autowired
-    private UserActivityRoleRepository roleRepository;
+    private UserActivityRepository roleRepository;
 
     @Autowired
     private ActivityRepository activityRepository;

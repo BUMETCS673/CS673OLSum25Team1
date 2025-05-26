@@ -2,48 +2,30 @@ package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.model.activity.Activity;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.bu.getactivecore.service.activity.ActivityService;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import org.springframework.security.core.userdetails.User;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 class ActivityRestControllerTest {
@@ -73,10 +55,10 @@ class ActivityRestControllerTest {
     @Test
     public void givenActivities_expectedActivitiesReturned() throws Exception {
 
-        List<Activity> mockedActivities = List.of(
-                Activity.builder().name("Running").build(),
-                Activity.builder().name("Yoga").build(),
-                Activity.builder().name("Rock Climbing").build()
+        List<ActivityDto> mockedActivities = List.of(
+                ActivityDto.builder().name("Running").build(),
+                ActivityDto.builder().name("Yoga").build(),
+                ActivityDto.builder().name("Rock Climbing").build()
         );
         given(m_activityApi.getAllActivities()).willReturn(mockedActivities);
         m_mvc.perform(
@@ -92,7 +74,7 @@ class ActivityRestControllerTest {
     @Test
     public void givenNoActivities_then_200Returned() throws Exception {
 
-        List<Activity> mockedActivities = Collections.emptyList();
+        List<ActivityDto> mockedActivities = Collections.emptyList();
         given(m_activityApi.getAllActivities()).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activities").accept(MediaType.APPLICATION_JSON))
@@ -111,8 +93,8 @@ class ActivityRestControllerTest {
                     .location("Location")
                     .endDateTime(LocalDateTime.now())
                     .build();
-        List<Activity> mockedActivities = new ArrayList<>();
-        mockedActivities.add(act1);
+        List<ActivityDto> mockedActivities = new ArrayList<>();
+        mockedActivities.add(ActivityDto.of(act1));
         given(m_activityApi.getActivityByName("Rock Climbing")).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activity/{name}","Rock Climbing").accept(MediaType.APPLICATION_JSON))
@@ -125,7 +107,7 @@ class ActivityRestControllerTest {
     @Test
     public void givenActivityNotFound_then_200Returned() throws Exception {
 
-        List<Activity> mockedActivities = Collections.emptyList();
+        List<ActivityDto> mockedActivities = Collections.emptyList();
         given(m_activityApi.getActivityByName("Rock Climbing")).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activity/{name}","Rock Climbing").accept(MediaType.APPLICATION_JSON))

@@ -1,9 +1,10 @@
 package com.bu.getactivecore.service.activity;
 
-import com.bu.getactivecore.model.activity.UserActivityRole;
+import com.bu.getactivecore.model.activity.RoleType;
+import com.bu.getactivecore.model.activity.UserActivity;
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.model.users.Users;
-import com.bu.getactivecore.repository.UserActivityRoleRepository;
+import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.shared.exception.ResourceAccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -18,14 +19,14 @@ import java.util.Map;
 @Component("activityPermissionEvaluator")
 public class ActivityPermissionEvaluator {
 
-    private final UserActivityRoleRepository roleRepo;
+    private final UserActivityRepository roleRepo;
 
     /**
-     * Constructs the permission evaluator with the provided {@link UserActivityRoleRepository}.
+     * Constructs the permission evaluator with the provided {@link UserActivityRepository}.
      *
      * @param roleRepo used to fetch user roles for activities
      */
-    public ActivityPermissionEvaluator(UserActivityRoleRepository roleRepo) {
+    public ActivityPermissionEvaluator(UserActivityRepository roleRepo) {
         this.roleRepo = roleRepo;
     }
 
@@ -41,7 +42,7 @@ public class ActivityPermissionEvaluator {
         Users user = ((UserPrincipal) authentication.getPrincipal()).getUser();
         String userId = user.getUserId();
         return roleRepo.findByUserIdAndActivityId(userId, activityId)
-                .map(role -> UserActivityRole.RoleType.ADMIN == role.getRole())
+                .map(role -> RoleType.ADMIN == role.getRole())
                 .orElseThrow(() -> {
                     String reason = String.format("User %s is not an admin of activity %s", userId, activityId);
                     Map<String, List<String>> validationErrors = Map.of(
