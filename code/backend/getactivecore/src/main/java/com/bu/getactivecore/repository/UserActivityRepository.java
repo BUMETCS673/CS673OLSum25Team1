@@ -2,6 +2,8 @@ package com.bu.getactivecore.repository;
 
 import com.bu.getactivecore.model.activity.UserActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -17,5 +19,6 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Stri
      * @param activityId The ID of the activity to search the given user's role in.
      * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
      */
+     @Query(value = "SELECT * FROM user_activity WHERE userId = ?1 and activityId = ?2", nativeQuery = true)
     Optional<UserActivity> findByUserIdAndActivityId(String userId, String activityId);
 }
