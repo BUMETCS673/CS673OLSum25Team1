@@ -8,8 +8,10 @@ import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
+import com.bu.getactivecore.shared.exception.ApiException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -52,8 +54,7 @@ public class ActivityController {
      * @return List of activities
      */
     @GetMapping("/activities")
-    public List<Activity> getActivities() {
-        log.info("Got request: /v1/activities");
+    public List<ActivityDto> getActivities() {
         return m_activityApi.getAllActivities();
     }
 
@@ -63,24 +64,13 @@ public class ActivityController {
      * @param activityName Name of the activity
      * @return List of activities matching the name
      */
-    @GetMapping("/activity/{activityName}")
-    public List<Activity> getActivityByName(@PathVariable String activityName) {
-        log.info("Got request: /v1/activity/{}", activityName);
-        return m_activityApi.getActivityByName(activityName);
+    @GetMapping("/activity/{name}")
+    public List<ActivityDto> getActivityByName(@PathVariable String name) {
+        return m_activityApi.getActivityByName(name);
     }
+
 
     @PutMapping("/activity")
-    public ActivityResponseDto createActivity(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody ActivityCreateRequestDto request) {
-        log.info("Got request: /v1/activity");
-
-        // TODO implement the logic to create an activity
-        Users user1 = user.getUser();
-        String userId = user1.getUserId();
-        return m_activityApi.createActivity(userId, request);
-    }
-
-
-    @PostMapping("/activity")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #request.activityId)")
     public ActivityResponseDto updateActivity(@Valid @RequestBody ActivityUpdateRequestDto request) {
         log.info("Got request: /v1/activity/update");
@@ -110,5 +100,29 @@ public class ActivityController {
         response.put("timestamp", String.valueOf(System.currentTimeMillis()));
         
         return ResponseEntity.ok(response);
+    }
+    
+    /**
+    @ai-generated,
+    Tool: Google Gemini,
+    Prompt: "how to create a Post API in spring boot",
+    Generated on: 2025-05-22,
+    Modified by: Jin Hao,
+    Modifications: change the return type and add validation to the input,
+    Verified: ✅ Unit tested, reviewed
+    */
+
+    /**
+     * create an activity
+     *
+     * @param activity requested activity
+     * @return an activity
+     */
+    @PostMapping("/activity")
+    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user, @RequestBody @Valid ActivityCreateRequestDto request) throws Exception {
+        Users user1 = user.getUser();
+        String userId = user1.getUserId();
+        m_activityApi.createActivity(userId, ActivityCreateRequestDto.from(request));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

@@ -5,6 +5,9 @@ import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,16 +20,22 @@ public class LoadDatabase {
     CommandLineRunner demoPreloadData(ActivityRepository activityRepo, UserRepository userRepo) {
         return args -> {
             Activity act1 = Activity.builder()
-                    .activityName("Rock Climbing")
-                    .startTimeMs(System.currentTimeMillis())
+                    .name("Rock Climbing")
+                    .startDateTime(LocalDateTime.now())
+                    .location("Location")
+                    .endDateTime(LocalDateTime.now())
                     .build();
             Activity act2 = Activity.builder()
-                    .activityName("Yoga")
-                    .startTimeMs(System.currentTimeMillis())
+                    .name("Yoga")
+                    .location("Location")
+                    .startDateTime(LocalDateTime.now())
+                    .endDateTime(LocalDateTime.now())
                     .build();
             Activity act3 = Activity.builder()
-                    .activityName("Running")
-                    .startTimeMs(System.currentTimeMillis())
+                    .name("Running")
+                    .location("Location")
+                    .startDateTime(LocalDateTime.now())
+                    .endDateTime(LocalDateTime.now())
                     .build();
 
             Users user1 = Users.builder()

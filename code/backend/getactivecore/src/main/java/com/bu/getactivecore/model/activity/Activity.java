@@ -3,12 +3,21 @@ package com.bu.getactivecore.model.activity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @Builder
@@ -19,15 +28,25 @@ import org.hibernate.annotations.UuidGenerator;
 public class Activity {
     @Id
     @UuidGenerator
-    @Column(name = "activity_id")
-    private String activityId;
+    @Column(name = "id")
+    private String id;
 
-    @Column(name = "activity_name")
-    private String activityName;
+    @Column(name = "name", unique = true)
+    private String name;
 
-    /**
-     * The start time of the activity in milliseconds since epoch.
-     */
-    @Column(name = "start_time")
-    private Long startTimeMs;
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "location")
+    private String location;
+
+    @Column(name = "start_date_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime startDateTime;
+
+    @Column(name = "end_date_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime endDateTime;
 }

@@ -1,26 +1,52 @@
 package com.bu.getactivecore.service.activity.entity;
 
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import com.bu.getactivecore.model.activity.Activity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Value;
 
 /**
  * The DTO for creating a new activity.
  */
 @Value
+@Builder
 public class ActivityCreateRequestDto {
 
-    @NotBlank(message = "Activity name must be provided")
-    @Size(min = 2, message = "Activity name must be at least 2 characters long")
-    @Size(max = 100, message = "Activity name must not exceed 100 characters")
-    String name;
+    @NotBlank(message = "Name cannot be blank")
+    private String name;
 
-    /**
-     * The start time of the activity in milliseconds since epoch.
-     */
-    @NotNull(message = "Start time must be provided")
-    @Positive(message = "Start time must be a positive number")
-    Long startTimeMs;
+    private String description;
+
+    @NotBlank(message = "Location cannot be blank")
+    private String location;
+
+    @NotNull(message = "Start DateTime cannot be blank")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime startDateTime;
+
+    @NotNull(message = "Start DateTime cannot be blank")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime endDateTime;
+
+    public static Activity from(ActivityCreateRequestDto request) {
+        return Activity.builder()
+                .location(request.getLocation())
+                .name(request.getName())
+                .startDateTime(request.getStartDateTime())
+                .endDateTime(request.getEndDateTime())
+                .description(request.getDescription())
+                .build();          
+    }
 }
