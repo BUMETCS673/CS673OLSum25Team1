@@ -31,7 +31,6 @@ dependencies {
     runtimeOnly 'com.h2database:h2' // H2 database for in-memory testing
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Test dependencies
     testImplementation 'org.springframework.security:spring-security-test'
