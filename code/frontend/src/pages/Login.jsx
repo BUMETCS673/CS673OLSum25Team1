@@ -10,7 +10,7 @@ import {
   Box,
   Alert 
 } from '@mui/material';
-import logo from '../../../../misc/logo.png'; // Adjust the path as necessary
+import logo from '../../public/logo.png'; // Adjust the path as necessary
 
 const Login = () => {
   const [username, setUsername] = useState('');
