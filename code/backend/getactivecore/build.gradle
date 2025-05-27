@@ -39,6 +39,10 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2'
 }
 
+springBoot {
+    mainClass = 'com.bu.getactivecore.GetActiveApplication'
+}
+
 test {
     useJUnitPlatform()
 }
