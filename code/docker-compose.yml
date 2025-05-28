@@ -42,18 +42,8 @@ services:
       dockerfile: Dockerfile
       args:
         - NODE_ENV=production
-    image: getactive-frontend:latest
-    restart: "no"
+    container_name: getactive-frontend
     depends_on:
-      - backend
-
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: getactive-nginx
-    depends_on:
-      - frontend
       - backend
     ports:
       - "80:80"
