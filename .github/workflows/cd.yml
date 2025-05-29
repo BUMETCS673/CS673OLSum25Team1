@@ -12,7 +12,6 @@ env:
   DB_IMAGE: bumetcs673/cs673olsum25team1/db
   BACKEND_IMAGE: bumetcs673/cs673olsum25team1/backend
   FRONTEND_IMAGE: bumetcs673/cs673olsum25team1/frontend
-  NGINX_IMAGE: bumetcs673/cs673olsum25team1/nginx
   TAG: ${{ github.ref_name }}
 
 jobs:
@@ -86,7 +85,7 @@ jobs:
             echo "Pulling latest images..."
             docker pull ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
             docker pull ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
-            docker pull ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
+            docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
             
             echo "Updating image tags in docker-compose.yml..."
             sed -i "s|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
