@@ -35,8 +35,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
 
       - name: Build and push database image
         uses: docker/build-push-action@v5
@@ -59,26 +57,10 @@ jobs:
         with:
           context: ./code/frontend
           file: ./code/frontend/Dockerfile
-          push: false
-          tags: getactive-frontend:latest
-          load: true
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
           build-args: |
             NODE_ENV=production
-            
-      - name: List local Docker images after frontend build
-        run: docker images
-
-      - name: Build and push nginx image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/nginx
-          file: ./code/nginx/Dockerfile
-          push: true
-          no-cache: true
-          tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
-
-      - name: List local Docker images after nginx build
-        run: docker images
 
   deploy:
     needs: build-and-push
@@ -109,10 +91,10 @@ jobs:
             echo "Updating image tags in docker-compose.yml..."
             sed -i "s|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
             sed -i "s|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
-            sed -i "s|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+            sed -i "s|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
             
             echo "Restarting services using docker-compose..."
-            docker-compose down
+            docker-compose down --remove-orphans --timeout 30
             docker-compose up -d
             
             echo "Cleaning up old Docker images..."
