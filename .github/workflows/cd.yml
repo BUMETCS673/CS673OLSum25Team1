@@ -93,23 +93,23 @@ jobs:
             sed -i "s|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
             
             echo "Restarting services using docker-compose..."
-            docker stop getactive-frontend
+            docker stop getactive-frontend || echo "Frontend container already stopped or does not exist."
             sleep 10
-            docker stop getactive-backend
+            docker stop getactive-backend || echo "Backend container already stopped or does not exist."
             sleep 10
-            docker rm getactive-frontend
+            docker rm getactive-frontend || echo "Frontend container already removed or does not exist."
             sleep 10
-            docker rm getactive-backend
+            docker rm getactive-backend || echo "Backend container already removed or does not exist."
             sleep 10
-            docker stop getactive-db
+            docker stop getactive-db || echo "Database container already stopped or does not exist."
             sleep 10
-            docker rm getactive-db
+            docker rm getactive-db || echo "Database container already removed or does not exist."
             sleep 10
-            docker network rm frontend-network
+            docker network rm frontend-network || echo "Frontend network already removed or does not exist."
             sleep 10
-            docker network rm backend-network
+            docker network rm backend-network || echo "Backend network already removed or does not exist."
             sleep 10
-            docker volume rm mysql_data
+            docker volume rm mysql_data || echo "Database volume already removed or does not exist."
             sleep 10
             docker-compose up -d
             
