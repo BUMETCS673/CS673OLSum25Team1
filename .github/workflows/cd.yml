@@ -93,7 +93,24 @@ jobs:
             sed -i "s|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
             
             echo "Restarting services using docker-compose..."
-            docker-compose down --remove-orphans --timeout 30
+            docker stop getactive-frontend
+            sleep 10
+            docker stop getactive-backend
+            sleep 10
+            docker rm getactive-frontend
+            sleep 10
+            docker rm getactive-backend
+            sleep 10
+            docker stop getactive-db
+            sleep 10
+            docker rm getactive-db
+            sleep 10
+            docker network rm frontend-network
+            sleep 10
+            docker network rm backend-network
+            sleep 10
+            docker volume rm mysql_data
+            sleep 10
             docker-compose up -d
             
             echo "Cleaning up old Docker images..."
