@@ -1,5 +1,3 @@
-// cypress/e2e/login.cy.jsx
-
 describe('Login Page E2E Test', () => {
 
     it('should allow a user to register successfully', () => {
@@ -7,11 +5,8 @@ describe('Login Page E2E Test', () => {
         
         cy.findByLabelText(/Username/i).type('testuser');
         cy.findByLabelText(/Email/i).type('testuser@bu.edu');
-        //cy.logTestingPlaygroundURL();
-        //cy.pause();
-        cy.get('input[type="password"]').type('Password123!');
-        //cy.findByLabelText(/Password/i).type('Password123!');
-        cy.findByLabelText(/Confirm Password/i).type('Password123!');
+        cy.get('input[id="password"]').should('be.visible').type('Password123!');
+        cy.get('input[id="confirmpassword"]').should('be.visible').type('Password123!');
         
         cy.findByRole('button', { name: /Register/i }).click();
     
