@@ -1,10 +1,16 @@
 package com.bu.getactivecore.service.users;
 
 import com.bu.getactivecore.config.JavaGmailMailConfig;
+import com.bu.getactivecore.model.users.AccountState;
+import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.email.EmailVerificationService;
+import com.bu.getactivecore.service.jwt.api.JwtApi;
+import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
+import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.shared.ErrorCode;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,6 +19,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
+
+import static com.bu.getactivecore.service.jwt.api.JwtApi.TokenClaimType;
+import static com.bu.getactivecore.util.RestUtil.confirmRegistration;
+import static com.bu.getactivecore.util.RestUtil.register;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,6 +44,9 @@ class UserRegistrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JwtApi jwtApi;
 
     @AfterEach
     void setUp() {
@@ -281,36 +295,188 @@ class UserRegistrationTest {
     }
 
     @Test
-    void given_registered_user_and_same_username_used_for_registration_then_4xx_returned() throws Exception {
-        String validUserReq1 = """
-                {
-                    "email": "1234@bu.edu",
-                    "username": "test",
-                    "password": "test"
-                }
-                """;
+    void verify_new_registered_user_is_assigned_UNVERIFIED_state() throws Exception {
+        String username = "test";
+        String email = "1234@bu.edu";
+        String password = "test";
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto(email, username, password);
 
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validUserReq1))
+        register(mockMvc, validUserReq1)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist());
+        Optional<Users> testUser = userRepository.findByUsername(username);
+        Assertions.assertTrue(testUser.isPresent());
+        Assertions.assertEquals(AccountState.UNVERIFIED.name(), testUser.get().getAccountState().name());
+    }
+
+    @Test
+    void given_registered_user_and_same_username_used_for_registration_then_4xx_returned() throws Exception {
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+
+        register(mockMvc, validUserReq1)
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
-        String userReq2 = """
-                {
-                    "email": "anothermail@bu.edu",
-                    "username": "test",
-                    "password": "test"
-                }
-                """;
-        mockMvc.perform(post("/v1/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userReq2))
+        RegistrationRequestDto userReq2 = new RegistrationRequestDto("anothermail@bu.edu", "test", "test");
+        register(mockMvc, userReq2)
                 .andExpect(status().is4xxClientError())
                 .andDo(print())
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.errorCode").exists())
                 .andExpect(jsonPath("$.errors.errorCode").value(ErrorCode.EMAIL_USERNAME_TAKEN.getCode()));
+    }
+
+    @Test
+    void given_empty_confirmation_token_then_4xx_returned() throws Exception {
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+
+        register(mockMvc, validUserReq1)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist());
+
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto("");
+        confirmRegistration(mockMvc, confirmReq)
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.errorCode").exists())
+                .andExpect(jsonPath("$.errors.errorCode").value(ErrorCode.DATA_STRUCTURE_INVALID.getCode()));
+    }
+
+    @Test
+    void given_invalid_confirmation_token_then_4xx_returned() throws Exception {
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+
+        register(mockMvc, validUserReq1)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist());
+
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto("invalid.token");
+        confirmRegistration(mockMvc, confirmReq)
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.errorCode").exists())
+                .andExpect(jsonPath("$.errors.errorCode").value(ErrorCode.TOKEN_INVALID.getCode()));
+    }
+
+    @Test
+    void given_unknown_confirmation_user_token_then_4xx_returned() throws Exception {
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+
+        register(mockMvc, validUserReq1)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist());
+
+        String token = jwtApi.generateToken("not_test_user");
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        confirmRegistration(mockMvc, confirmReq)
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.errorCode").exists())
+                .andExpect(jsonPath("$.errors.errorCode").value(ErrorCode.TOKEN_INVALID.getCode()));
+
+        Optional<Users> registeredUser = userRepository.findByUsername("test");
+        Assertions.assertTrue(registeredUser.isPresent());
+        Assertions.assertEquals(AccountState.UNVERIFIED.name(), registeredUser.get().getAccountState().name());
+    }
+
+
+    @Test
+    void given_non_confirmation_token_then_user_remains_UNVERIFIED() throws Exception {
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+
+        register(mockMvc, validUserReq1)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist());
+
+        String token = jwtApi.generateToken("test");
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        confirmRegistration(mockMvc, confirmReq)
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.errorCode").exists())
+                .andExpect(jsonPath("$.errors.errorCode").value(ErrorCode.TOKEN_INVALID.getCode()));
+
+        Optional<Users> registeredUser = userRepository.findByUsername("test");
+        Assertions.assertTrue(registeredUser.isPresent());
+        Assertions.assertEquals(AccountState.UNVERIFIED.name(), registeredUser.get().getAccountState().name());
+    }
+
+    @Test
+    void given_confirmation_token_then_user_is_VERIFIED() throws Exception {
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto("1234@bu.edu", "test", "test");
+
+        register(mockMvc, validUserReq1)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist());
+
+        String token = jwtApi.generateToken("test", TokenClaimType.REGISTRATION_CONFIRMATION);
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        confirmRegistration(mockMvc, confirmReq)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.status").value("SUCCESS"));
+
+        Optional<Users> registeredUser = userRepository.findByUsername("test");
+        Assertions.assertTrue(registeredUser.isPresent());
+        Assertions.assertEquals(AccountState.VERIFIED.name(), registeredUser.get().getAccountState().name());
+    }
+
+
+    @Test
+    void verify_register_confirmation_is_idempotent() throws Exception {
+        String username = "test";
+        String email = "1234@bu.edu";
+        String password = "test";
+        RegistrationRequestDto validUserReq1 = new RegistrationRequestDto(email, username, password);
+
+        register(mockMvc, validUserReq1)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist());
+
+        String token = jwtApi.generateToken(username, TokenClaimType.REGISTRATION_CONFIRMATION);
+        ConfirmRegistrationRequestDto confirmReq = new ConfirmRegistrationRequestDto(token);
+        confirmRegistration(mockMvc, confirmReq)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.status").exists())
+                .andExpect(jsonPath("$.data.status").value("SUCCESS"));
+
+        Optional<Users> testUser = userRepository.findByUsername(username);
+        Assertions.assertTrue(testUser.isPresent());
+        Assertions.assertEquals(AccountState.VERIFIED.name(), testUser.get().getAccountState().name());
+
+
+        // Confirming again should not change the state
+        confirmRegistration(mockMvc, confirmReq)
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.status").exists())
+                .andExpect(jsonPath("$.data.status").value("SUCCESS"));
+
+        testUser = userRepository.findByUsername(username);
+        Assertions.assertTrue(testUser.isPresent());
+        Assertions.assertEquals(AccountState.VERIFIED.name(), testUser.get().getAccountState().name());
     }
 }

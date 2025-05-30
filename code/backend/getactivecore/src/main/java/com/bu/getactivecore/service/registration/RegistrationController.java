@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Entry point for all user related requests.
+ * Entry point for registration related operations.
  */
 @Slf4j
 @RestController

@@ -125,14 +125,25 @@ public class RestUtil {
      */
     public static ResultActions registerAndLogin(MockMvc mockMvc, RegistrationRequestDto registerRequest) throws Exception {
         // Register the user first
-        mockMvc.perform(post(RestEndpoint.REGISTER.get())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().is2xxSuccessful());
+        register(mockMvc, registerRequest).andExpect(status().isOk());
 
         // Then log in with the registered user
         LoginRequestDto loginRequest = new LoginRequestDto(registerRequest.getUsername(), registerRequest.getPassword());
         return login(mockMvc, loginRequest);
+    }
+
+    /**
+     * Registers a user with the provided registration request.
+     *
+     * @param mockMvc         the MockMvc instance to perform the request
+     * @param registerRequest the registration request containing user details
+     * @return ResultActions containing the result of the registration action
+     * @throws Exception if an error occurs during request execution
+     */
+    public static ResultActions register(MockMvc mockMvc, RegistrationRequestDto registerRequest) throws Exception {
+        return mockMvc.perform(post(RestEndpoint.REGISTER.get())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)));
     }
 
     /**
@@ -147,5 +158,19 @@ public class RestUtil {
         return mockMvc.perform(post(RestEndpoint.LOGIN.get())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)));
+    }
+
+    /**
+     * Sends a confirmation request to verify user registration.
+     *
+     * @param mockMvc             the MockMvc instance to perform the request
+     * @param confirmationRequest the confirmation request containing the token
+     * @return ResultActions containing the result of the confirmation action
+     * @throws Exception if an error occurs during request execution
+     */
+    public static ResultActions confirmRegistration(MockMvc mockMvc, Object confirmationRequest) throws Exception {
+        return mockMvc.perform(post(RestEndpoint.CONFIRM_REGISTRATION.get())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(confirmationRequest)));
     }
 }

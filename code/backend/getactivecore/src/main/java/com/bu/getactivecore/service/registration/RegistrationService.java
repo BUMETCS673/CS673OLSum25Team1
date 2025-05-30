@@ -16,14 +16,18 @@ import com.bu.getactivecore.shared.exception.ApiException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static com.bu.getactivecore.service.jwt.api.JwtApi.TOKEN_CLAIM_TYPE_KEY;
+import static com.bu.getactivecore.service.jwt.api.JwtApi.TokenClaimType;
 import static com.bu.getactivecore.shared.Constants.PASSWORD_ENCODER_STRENGTH;
 import static com.bu.getactivecore.shared.ErrorCode.EMAIL_USERNAME_TAKEN;
+import static com.bu.getactivecore.shared.ErrorCode.INTERNAL_SERVER_ERROR;
 import static com.bu.getactivecore.shared.ErrorCode.TOKEN_EXPIRED;
 import static com.bu.getactivecore.shared.ErrorCode.TOKEN_INVALID;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -109,21 +113,30 @@ public class RegistrationService implements RegistrationApi {
     @Override
     @Transactional
     public RegistrationResponseDto confirmRegistration(ConfirmRegistrationRequestDto verificationDto) {
-        String username = validToken(verificationDto);
+        String username = validateConfirmationToken(verificationDto);
         synchronized (VERIFICATION_LOCK) {
             Users user = m_userRepo.findByUsername(username).orElseThrow(() -> {
                 ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(TOKEN_INVALID)
-                        .message("Invalid registration token provided, unknown user " + username)
+                        .message("Invalid registration token provided, unknown '" + username + "' username")
                         .build();
                 return new ApiException(error);
             });
 
-            if (user.getAccountState() != AccountState.UNVERIFIED) {
-                log.debug("User {} is already verified, current state: {}", username, user.getAccountState());
-            } else {
-                user.setAccountState(AccountState.VERIFIED);
-                m_userRepo.save(user);
-                log.info("Successfully verified user's registration: {}", username);
+            switch (user.getAccountState()) {
+                case VERIFIED ->
+                        log.debug("User '{}' is already verified, current state: {}", username, user.getAccountState());
+                case UNVERIFIED -> {
+                    user.setAccountState(AccountState.VERIFIED);
+                    m_userRepo.save(user);
+                    log.info("Successfully confirmed registration for user '{}'", username);
+                }
+                default -> {
+                    log.warn("User '{}' is in an unexpected state: {}", username, user.getAccountState());
+                    ApiErrorPayload error = ApiErrorPayload.builder().status(HttpStatus.INTERNAL_SERVER_ERROR).errorCode(INTERNAL_SERVER_ERROR)
+                            .message("User is in an unexpected state " + user.getAccountState() + ", cannot confirm registration")
+                            .build();
+                    throw new ApiException(error);
+                }
             }
         }
         return RegistrationResponseDto.builder()
@@ -134,15 +147,23 @@ public class RegistrationService implements RegistrationApi {
     /**
      * Validates the provided token and extracts the username from it.
      *
-     * @param verificationDto containing the token to validate.
+     * @param confirmRegistrationDto containing the token to validate.
      * @return the username extracted from the token.
      * @throws ApiException if the token is invalid or expired.
      */
-    private String validToken(ConfirmRegistrationRequestDto verificationDto) {
+    private String validateConfirmationToken(ConfirmRegistrationRequestDto confirmRegistrationDto) {
         String username;
         try {
-            m_jwtApi.validateToken(verificationDto.getToken());
-            username = m_jwtApi.getUsername(verificationDto.getToken());
+            m_jwtApi.validateToken(confirmRegistrationDto.getToken());
+            String claim = m_jwtApi.getClaim(confirmRegistrationDto.getToken(), TOKEN_CLAIM_TYPE_KEY);
+            if (!TokenClaimType.REGISTRATION_CONFIRMATION.name().equals(claim)) {
+                ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(TOKEN_INVALID)
+                        .message("Invalid registration confirmation token provided")
+                        .debugMessage("Only tokens with type '" + TokenClaimType.REGISTRATION_CONFIRMATION.name() + "' are allowed, but got '" + claim + "'")
+                        .build();
+                throw new ApiException(error);
+            }
+            username = m_jwtApi.getUsername(confirmRegistrationDto.getToken());
         } catch (ExpiredJwtException e) {
             ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(TOKEN_EXPIRED)
                     .message("Token has expired")
@@ -152,7 +173,7 @@ public class RegistrationService implements RegistrationApi {
         } catch (JwtException e) {
             ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(TOKEN_INVALID)
                     .message("Invalid registration token provided")
-                    .debugMessage("Provided token is invalid '" + verificationDto.getToken() + "'. Reason: " + e.getMessage())
+                    .debugMessage("Provided token is invalid '" + confirmRegistrationDto.getToken() + "'. Reason: " + e.getMessage())
                     .build();
             throw new ApiException(error);
         }

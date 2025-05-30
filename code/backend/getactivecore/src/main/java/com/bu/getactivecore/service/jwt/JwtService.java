@@ -113,13 +113,15 @@ public class JwtService implements JwtApi {
     }
 
     @Override
-    public String generateToken(String username) {
+    public String generateToken(String username, TokenClaimType claimType) {
         if (username == null || username.isBlank()) {
             throw new ApiException("Username must not be blank");
         }
 
-
         Map<String, Object> claims = new HashMap<>();
+        if (claimType != null) {
+            claims.put(JwtApi.TOKEN_CLAIM_TYPE_KEY, claimType.name());
+        }
         return Jwts.builder()
                 .claims()
                 .add(claims)
@@ -164,4 +166,11 @@ public class JwtService implements JwtApi {
         // Since username is part of the claims, we can extract it directly
         return extractClaim(token, Claims::getSubject);
     }
+
+    @Override
+    public String getClaim(String token, String claimName) throws JwtException {
+        Claims claims = extractAllClaims(token);
+        return claims.get(claimName, String.class);
+    }
+
 }
