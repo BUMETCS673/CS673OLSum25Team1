@@ -1,8 +1,7 @@
 package com.bu.getactivecore.service.security;
 
-import com.bu.getactivecore.shared.ApiError;
+import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.ApiErrorResponse;
-import com.bu.getactivecore.shared.ErrorCode;
 import com.bu.getactivecore.shared.exception.ApiException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,6 +23,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.bu.getactivecore.shared.ErrorCode.DATA_STRUCTURE_INVALID;
+import static com.bu.getactivecore.shared.ErrorCode.UNSUPPORTED_MEDIA_TYPE;
+import static com.bu.getactivecore.shared.ErrorCode.UNSUPPORTED_OPERATION;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+
 /**
  * Global exception handler to standardize API error responses across the application.
  *
@@ -34,13 +39,13 @@ import java.util.Map;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
-     * Builds a {@link ResponseEntity} containing the given {@link ApiError}.
+     * Builds a {@link ResponseEntity} containing the given {@link ApiErrorPayload}.
      *
-     * @param apiError The error details to include in the response.
+     * @param apiErrorPayload The error details to include in the response.
      * @return A {@link ResponseEntity} containing the error response.
      */
-    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
-        return new ResponseEntity<>(new ApiErrorResponse(apiError), apiError.getStatus());
+    private ResponseEntity<Object> buildResponseEntity(ApiErrorPayload apiErrorPayload) {
+        return new ResponseEntity<>(new ApiErrorResponse(apiErrorPayload), apiErrorPayload.getStatus());
     }
 
     /**
@@ -55,9 +60,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        ErrorCode errorCode = ErrorCode.DATA_STRUCTURE_INVALID;
-        String errorMessage = ErrorCode.DATA_STRUCTURE_INVALID.getDetails();
-        return buildResponseEntity(ApiError.from(errorCode, HttpStatus.BAD_REQUEST, errorMessage, ex));
+        return buildResponseEntity(ApiErrorPayload.builder().errorCode(DATA_STRUCTURE_INVALID)
+                .status(BAD_REQUEST)
+                .message(DATA_STRUCTURE_INVALID.getDetails())
+                .debugMessage(ex.getLocalizedMessage())
+                .build()
+        );
     }
 
     @Override
@@ -77,22 +85,33 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     .computeIfAbsent(error.getObjectName(), key -> new ArrayList<>())
                     .add(error.getDefaultMessage());
         }
-        return buildResponseEntity(ApiError.from(ErrorCode.DATA_STRUCTURE_INVALID, HttpStatus.BAD_REQUEST, ErrorCode.DATA_STRUCTURE_INVALID.getDetails(), validationErrors, ex));
+        return buildResponseEntity(ApiErrorPayload.builder().errorCode(DATA_STRUCTURE_INVALID).status(BAD_REQUEST)
+                .message(DATA_STRUCTURE_INVALID.getDetails())
+                .validationErrors(validationErrors)
+                .debugMessage(ex.getLocalizedMessage())
+                .build());
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        ErrorCode errorCode = ErrorCode.UNSUPPORTED_MEDIA_TYPE;
-        String errorMessage = String.format("Expected content type(s) %s but received '%s'",
+        String errorMessage = String.format("Supported content type(s) %s but received '%s'",
                 ex.getSupportedMediaTypes(), ex.getContentType());
-        return buildResponseEntity(ApiError.from(errorCode, HttpStatus.UNSUPPORTED_MEDIA_TYPE, errorMessage, ex));
+        return buildResponseEntity(ApiErrorPayload.builder()
+                .errorCode(UNSUPPORTED_MEDIA_TYPE)
+                .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .message(errorMessage)
+                .debugMessage(ex.getLocalizedMessage())
+                .build());
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        ErrorCode errorCode = ErrorCode.UNSUPPORTED_OPERATION;
-        String errorMessage = String.format("Expected HTTP method %s but received %s", ex.getMethod(), ex.getSupportedHttpMethods());
-        return buildResponseEntity(ApiError.from(errorCode, HttpStatus.METHOD_NOT_ALLOWED, errorMessage, ex));
+        String errorMessage = String.format("Supported HTTP method(s) %s but received %s", ex.getSupportedHttpMethods(), ex.getMethod());
+        return buildResponseEntity(ApiErrorPayload.builder().errorCode(UNSUPPORTED_OPERATION)
+                .status(METHOD_NOT_ALLOWED)
+                .message(errorMessage)
+                .debugMessage(ex.getLocalizedMessage())
+                .build());
     }
 
     /**
@@ -104,7 +123,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(ApiException.class)
     protected ResponseEntity<Object> handleApiException(ApiException apiEx) {
-        ApiError apiError = ApiError.from(apiEx.getErrorCode(), apiEx.getStatus(), apiEx.getErrorMessage(), apiEx);
-        return buildResponseEntity(apiError);
+        return buildResponseEntity(apiEx.getError());
     }
 }

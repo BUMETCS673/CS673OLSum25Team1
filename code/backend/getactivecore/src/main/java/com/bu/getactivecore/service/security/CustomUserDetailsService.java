@@ -3,6 +3,7 @@ package com.bu.getactivecore.service.security;
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.UserRepository;
+import com.bu.getactivecore.service.users.entity.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -38,6 +39,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             log.warn("User not found with username: {}", username);
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        return new UserPrincipal(user.get());
+        return new UserPrincipal(UserDto.of(user.get()));
     }
 }

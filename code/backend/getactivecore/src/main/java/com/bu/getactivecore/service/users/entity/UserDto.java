@@ -1,5 +1,6 @@
 package com.bu.getactivecore.service.users.entity;
 
+import com.bu.getactivecore.model.users.AccountState;
 import com.bu.getactivecore.model.users.Users;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,11 @@ import lombok.Data;
 @Builder
 @Data
 public class UserDto {
+
+    /**
+     * UUID of the user.
+     */
+    private String userId;
 
     /**
      * The email of the user.
@@ -28,6 +34,12 @@ public class UserDto {
      */
     private String password;
 
+
+    /**
+     * The state of this user's account.
+     */
+    private AccountState accountState;
+
     /**
      * Converts a Users entity to a UserDto.
      *
@@ -35,18 +47,23 @@ public class UserDto {
      * @return the UserDto
      */
     public static UserDto of(Users user) {
-        return new UserDto(user.getEmail(), user.getUsername(), user.getPassword());
+        return new UserDto(user.getUserId(), user.getEmail(), user.getUsername(), user.getPassword(), user.getAccountState());
     }
 
     /**
-     * Converts a UserDto to a Users entity.
+     * Builds an unverified {@link Users} entity from the provided information.
      *
-     * @return the Users entity
+     * @param email           the email of the user
+     * @param username        the username of the user
+     * @param encodedPassword the encoded password of the user
+     * @return an unverified Users entity
      */
-    public static Users from(String email, String username) {
+    public static Users from(String email, String username, String encodedPassword) {
         return Users.builder()
                 .email(email)
                 .username(username)
+                .password(encodedPassword)
+                .accountState(AccountState.UNVERIFIED)
                 .build();
     }
 }

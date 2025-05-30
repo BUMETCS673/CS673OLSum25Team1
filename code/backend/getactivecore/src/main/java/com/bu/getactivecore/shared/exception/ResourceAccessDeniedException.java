@@ -1,10 +1,10 @@
 package com.bu.getactivecore.shared.exception;
 
+import com.bu.getactivecore.shared.ApiErrorPayload;
 import lombok.Getter;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.util.List;
-import java.util.Map;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 /**
  * ResourceAccessDeniedException is a custom exception that extends AccessDeniedException.
@@ -16,16 +16,16 @@ import java.util.Map;
  */
 @Getter
 public class ResourceAccessDeniedException extends AccessDeniedException {
-    private final Map<String, List<String>> validationErrors;
+
+    private final ApiErrorPayload error;
 
     /**
-     * Constructs a ResourceAccessDeniedException with a reason and validation errors.
+     * Specific exception thrown when access to a resource is denied.
      *
-     * @param reason           the reason for the access denial
-     * @param validationErrors a map containing validation errors, if any
+     * @param error the ApiErrorPayload containing error details
      */
-    public ResourceAccessDeniedException(String reason, Map<String, List<String>> validationErrors) {
-        super(reason);
-        this.validationErrors = validationErrors;
+    public ResourceAccessDeniedException(ApiErrorPayload error) {
+        super(error.getMessage());
+        this.error = error.toBuilder().status(FORBIDDEN).build();
     }
 }

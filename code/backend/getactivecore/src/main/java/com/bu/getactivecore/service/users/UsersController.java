@@ -3,8 +3,6 @@ package com.bu.getactivecore.service.users;
 import com.bu.getactivecore.service.users.api.UserInfoApi;
 import com.bu.getactivecore.service.users.entity.LoginRequestDto;
 import com.bu.getactivecore.service.users.entity.LoginResponseDto;
-import com.bu.getactivecore.service.users.entity.RegistrationRequestDto;
-import com.bu.getactivecore.service.users.entity.RegistrationResponseDto;
 import com.bu.getactivecore.service.users.entity.TestResponseDto;
 import com.bu.getactivecore.shared.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,12 +43,5 @@ public class UsersController {
     public LoginResponseDto loginUser(@Valid @RequestBody LoginRequestDto loginUserDto) throws ApiException {
         log.debug("Got request at /login");
         return m_userInfoApi.loginUser(loginUserDto);
-    }
-
-
-    @PostMapping(path = "/register", consumes = "application/json")
-    public RegistrationResponseDto registerUser(@Valid @RequestBody RegistrationRequestDto registerUserDto) throws ApiException {
-        log.debug("Got request at /register");
-        return m_userInfoApi.registerUser(registerUserDto);
     }
 }

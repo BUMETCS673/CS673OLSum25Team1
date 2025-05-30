@@ -1,7 +1,7 @@
 package com.bu.getactivecore.util;
 
+import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.users.entity.LoginRequestDto;
-import com.bu.getactivecore.service.users.entity.RegistrationRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;

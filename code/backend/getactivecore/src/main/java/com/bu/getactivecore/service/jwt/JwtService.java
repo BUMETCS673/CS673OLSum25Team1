@@ -36,7 +36,7 @@ public class JwtService implements JwtApi {
      *
      * @param jwtProperties used for token generation and validation.
      */
-    public JwtService(JwtProperties jwtProperties) throws NoSuchAlgorithmException {
+    public JwtService(JwtProperties jwtProperties) {
         jwtProp = jwtProperties;
     }
 
@@ -70,8 +70,9 @@ public class JwtService implements JwtApi {
      * @param claimResolver the function to extract the claim
      * @param <T>           the type of the claim
      * @return the extracted claim
+     * @throws JwtException if token parsing fails or the claim is not found
      */
-    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) throws JwtException {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
@@ -98,7 +99,7 @@ public class JwtService implements JwtApi {
      * @return true if the token is expired, false otherwise
      */
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return getExpiration(token).before(new Date());
     }
 
     /**
@@ -107,12 +108,17 @@ public class JwtService implements JwtApi {
      * @param token the JWT token
      * @return the expiration date as a {@link Date}
      */
-    private Date extractExpiration(String token) {
+    private Date getExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
     @Override
     public String generateToken(String username) {
+        if (username == null || username.isBlank()) {
+            throw new ApiException("Username must not be blank");
+        }
+
+
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .claims()
@@ -138,7 +144,13 @@ public class JwtService implements JwtApi {
     }
 
     @Override
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token) throws JwtException {
+        extractAllClaims(token);
+        return true;
+    }
+
+    @Override
+    public boolean validateToken(String token, UserDetails userDetails) throws JwtException {
         final String username = extractClaim(token, Claims::getSubject);
         if (!username.equals(userDetails.getUsername())) {
             log.error("Invalid JWT token: expected {}, got {}", userDetails.getUsername(), username);

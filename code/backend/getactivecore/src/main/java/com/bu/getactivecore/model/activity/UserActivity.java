@@ -6,8 +6,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -33,9 +31,9 @@ public class UserActivity {
 
     @Id
     @UuidGenerator
-    private String id;     
+    private String id;
 
-    @Column(name = "user_id", nullable = false)    
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
     @Column(name = "activity_id", nullable = false)

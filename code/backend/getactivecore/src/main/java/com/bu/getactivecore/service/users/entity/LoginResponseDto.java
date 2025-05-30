@@ -1,6 +1,5 @@
 package com.bu.getactivecore.service.users.entity;
 
-import com.bu.getactivecore.model.users.Users;
 import lombok.Value;
 
 /**

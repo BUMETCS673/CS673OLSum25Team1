@@ -1,16 +1,16 @@
 package com.bu.getactivecore.config;
 
 import com.bu.getactivecore.model.activity.Activity;
+import com.bu.getactivecore.model.users.AccountState;
 import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.LocalDateTime;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.LocalDateTime;
 
 
 @Slf4j
@@ -42,11 +42,13 @@ public class LoadDatabase {
                     .email("arsh@")
                     .username("arsh")
                     .password("arsh")
+                    .accountState(AccountState.UNVERIFIED)
                     .build();
             Users user2 = Users.builder()
                     .email("arsh2@")
                     .username("arsh2")
                     .password("arsh2")
+                    .accountState(AccountState.VERIFIED)
                     .build();
 
             log.info("Preloading {}", activityRepo.save(act1));

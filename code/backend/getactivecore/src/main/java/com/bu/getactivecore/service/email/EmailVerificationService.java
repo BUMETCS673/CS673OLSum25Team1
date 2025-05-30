@@ -1,17 +1,20 @@
 package com.bu.getactivecore.service.email;
 
 import com.bu.getactivecore.service.email.api.EmailApi;
-import com.bu.getactivecore.shared.ErrorCode;
+import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailParseException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import static com.bu.getactivecore.shared.ErrorCode.EMAIL_INVALID;
+import static com.bu.getactivecore.shared.ErrorCode.EMAIL_SEND_FAILED;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 /**
  * Service for sending email verifications.
@@ -47,12 +50,18 @@ public class EmailVerificationService implements EmailApi {
             m_javaEmailSender.send(msg);
         } catch (MailParseException e) {
             log.error("Failed to send verification email to: {}", email, e);
-            throw new ApiException(HttpStatus.BAD_REQUEST, ErrorCode.EMAIL_INVALID, "Unable to send verification email to email address: '" + email + "'", e);
+            throw new ApiException(ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(EMAIL_INVALID)
+                    .message("Unable to send verification email to email address: '" + email + "'")
+                    .debugMessage(e.getLocalizedMessage())
+                    .build()
+            );
         } catch (MailSendException e) {
             log.error("Failed to send verification email to: {}", email, e);
-            throw new ApiException(HttpStatus.BAD_REQUEST, ErrorCode.EMAIL_SEND_FAILED, "Unable to send verification email to email address: '" + email + "'", e);
+            throw new ApiException(ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(EMAIL_SEND_FAILED)
+                    .message("Unable to send verification email to email address: '" + email + "'")
+                    .debugMessage(e.getLocalizedMessage())
+                    .build()
+            );
         }
     }
-
-
 }

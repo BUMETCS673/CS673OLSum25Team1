@@ -1,8 +1,8 @@
 package com.bu.getactivecore.shared.exception;
 
+import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.ErrorCode;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 /**
  * ApiException is a custom exception class used to represent application-specific
@@ -15,51 +15,28 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class ApiException extends RuntimeException {
 
-    private final ErrorCode errorCode;
-    private final HttpStatus status;
-    private final String errorMessage;
+    private final ApiErrorPayload error;
 
     /**
-     * Constructs a new ApiException.
+     * Constructs a new ApiException with a default error code and message.
      *
-     * @param httpStatus   the HTTP status associated with the error
-     * @param errorCode    the application-specific error code
-     * @param errorMessage a user-friendly error message
-     * @param debugMessage a detailed debug message (usually for logging purposes)
+     * @param message detailed error message
      */
-    public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String errorMessage, Throwable debugMessage) {
-        super(debugMessage.getLocalizedMessage());
-        this.errorCode = errorCode;
-        this.status = httpStatus;
-        this.errorMessage = errorMessage;
+    public ApiException(String message) {
+        super(message);
+        this.error = ApiErrorPayload.builder()
+                .errorCode(ErrorCode.GENERAL_ERROR)
+                .message(message)
+                .build();
     }
 
     /**
-     * Constructs a new ApiException.
+     * Constructs a new ApiException with the specified error payload.
      *
-     * @param httpStatus   the HTTP status associated with the error
-     * @param errorCode    the application-specific error code
-     * @param errorMessage a user-friendly error message
-     * @param debugMessage a detailed debug message (for logging purposes)
+     * @param error the ApiErrorPayload containing structured details about the exception
      */
-    public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String errorMessage, String debugMessage) {
-        super(debugMessage);
-        this.errorCode = errorCode;
-        this.status = httpStatus;
-        this.errorMessage = errorMessage;
-    }
-
-    /**
-     * Constructs a new ApiException.
-     *
-     * @param httpStatus   the HTTP status associated with the error
-     * @param errorCode    the application-specific error code
-     * @param errorMessage a user-friendly error message
-     */
-    public ApiException(HttpStatus httpStatus, ErrorCode errorCode, String errorMessage) {
-        super(errorMessage);
-        this.errorCode = errorCode;
-        this.status = httpStatus;
-        this.errorMessage = errorMessage;
+    public ApiException(ApiErrorPayload error) {
+        super(error.getMessage());
+        this.error = error;
     }
 }

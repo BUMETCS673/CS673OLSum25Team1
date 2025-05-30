@@ -5,5 +5,5 @@ package com.bu.getactivecore.shared;
  *
  * @param errors the error details
  */
-public record ApiErrorResponse(ApiError errors) {
+public record ApiErrorResponse(ApiErrorPayload errors) {
 }

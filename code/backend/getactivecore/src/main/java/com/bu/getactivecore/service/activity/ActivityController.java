@@ -1,14 +1,11 @@
 package com.bu.getactivecore.service.activity;
 
-import com.bu.getactivecore.model.activity.Activity;
 import com.bu.getactivecore.model.users.UserPrincipal;
-import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
-import com.bu.getactivecore.shared.exception.ApiException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -55,13 +52,14 @@ public class ActivityController {
      */
     @GetMapping("/activities")
     public List<ActivityDto> getActivities() {
+        log.info("Got request: /v1/activities");
         return m_activityApi.getAllActivities();
     }
 
     /**
      * Get activities by name.
      *
-     * @param activityName Name of the activity
+     * @param name Name of the activity
      * @return List of activities matching the name
      */
     @GetMapping("/activity/{name}")
@@ -98,31 +96,29 @@ public class ActivityController {
         response.put("status", "UP");
         response.put("message", "Service is running");
         response.put("timestamp", String.valueOf(System.currentTimeMillis()));
-        
+
         return ResponseEntity.ok(response);
     }
-    
+
     /**
-    @ai-generated,
-    Tool: Google Gemini,
-    Prompt: "how to create a Post API in spring boot",
-    Generated on: 2025-05-22,
-    Modified by: Jin Hao,
-    Modifications: change the return type and add validation to the input,
-    Verified: ✅ Unit tested, reviewed
-    */
+     @ai-generated, Tool: Google Gemini,
+     Prompt: "how to create a Post API in spring boot",
+     Generated on: 2025-05-22,
+     Modified by: Jin Hao,
+     Modifications: change the return type and add validation to the input,
+     Verified: ✅ Unit tested, reviewed
+     */
 
     /**
      * create an activity
      *
-     * @param activity requested activity
+     * @param requestDto requested activity
      * @return an activity
      */
     @PostMapping("/activity")
-    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user, @RequestBody @Valid ActivityCreateRequestDto request) throws Exception {
-        Users user1 = user.getUser();
-        String userId = user1.getUserId();
-        m_activityApi.createActivity(userId, ActivityCreateRequestDto.from(request));
+    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user, @RequestBody @Valid ActivityCreateRequestDto requestDto) {
+        String userId = user.getUserDto().getUserId();
+        m_activityApi.createActivity(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

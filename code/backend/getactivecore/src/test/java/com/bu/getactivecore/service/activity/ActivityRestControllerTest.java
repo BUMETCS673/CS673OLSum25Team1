@@ -1,30 +1,28 @@
 package com.bu.getactivecore.service.activity;
 
+import com.bu.getactivecore.model.activity.Activity;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
-import com.bu.getactivecore.model.activity.Activity;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class ActivityRestControllerTest {
@@ -38,21 +36,9 @@ class ActivityRestControllerTest {
     @Autowired
     private ActivityApi m_activityApi;
 
-    @Autowired
-	private WebApplicationContext context;
-    
-
-    @BeforeEach
-	public void setup() {
-		m_mvc = MockMvcBuilders
-				.webAppContextSetup(context)
-				.apply(SecurityMockMvcConfigurers.springSecurity()) 
-				.build();
-	}
-
     @WithMockUser
     @Test
-    public void givenActivities_expectedActivitiesReturned() throws Exception {
+    void givenActivities_expectedActivitiesReturned() throws Exception {
 
         List<ActivityDto> mockedActivities = List.of(
                 ActivityDto.builder().name("Running").build(),
@@ -71,7 +57,7 @@ class ActivityRestControllerTest {
 
     @WithMockUser
     @Test
-    public void givenNoActivities_then_200Returned() throws Exception {
+    void givenNoActivities_then_200Returned() throws Exception {
 
         List<ActivityDto> mockedActivities = Collections.emptyList();
         given(m_activityApi.getAllActivities()).willReturn(mockedActivities);
@@ -84,19 +70,19 @@ class ActivityRestControllerTest {
 
     @WithMockUser
     @Test
-    public void givenActivityFound_then_200Returned() throws Exception {
+    void givenActivityFound_then_200Returned() throws Exception {
 
         Activity act1 = Activity.builder()
-                    .name("Rock Climbing")
-                    .startDateTime(LocalDateTime.now())
-                    .location("Location")
-                    .endDateTime(LocalDateTime.now())
-                    .build();
+                .name("Rock Climbing")
+                .startDateTime(LocalDateTime.now())
+                .location("Location")
+                .endDateTime(LocalDateTime.now())
+                .build();
         List<ActivityDto> mockedActivities = new ArrayList<>();
         mockedActivities.add(ActivityDto.of(act1));
         given(m_activityApi.getActivityByName("Rock Climbing")).willReturn(mockedActivities);
         m_mvc.perform(
-                        get("/v1/activity/{name}","Rock Climbing").accept(MediaType.APPLICATION_JSON))
+                        get("/v1/activity/{name}", "Rock Climbing").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("data[0].name").value("Rock Climbing"));
@@ -104,21 +90,21 @@ class ActivityRestControllerTest {
 
     @WithMockUser
     @Test
-    public void givenActivityNotFound_then_200Returned() throws Exception {
+    void givenActivityNotFound_then_200Returned() throws Exception {
 
         List<ActivityDto> mockedActivities = Collections.emptyList();
         given(m_activityApi.getActivityByName("Rock Climbing")).willReturn(mockedActivities);
         m_mvc.perform(
-                        get("/v1/activity/{name}","Rock Climbing").accept(MediaType.APPLICATION_JSON))
+                        get("/v1/activity/{name}", "Rock Climbing").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-;
+        ;
     }
 
     // TODO: fix tests
     /*@WithMockUser
     @Test
-    public void givenCreateActivitySuccessfully_then_201Returned() throws Exception {
+    void givenCreateActivitySuccessfully_then_201Returned() throws Exception {
         UserDetails userDetails = User.withUsername("testuser").password("password").roles("USER").build();
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -153,7 +139,7 @@ class ActivityRestControllerTest {
 
     @WithMockUser
     @Test
-    public void givenCreateActivityFailed_then_400Returned() throws Exception {
+    void givenCreateActivityFailed_then_400Returned() throws Exception {
         Activity act1 = Activity.builder()
                     .name("Rock Climbing")
                     .startDateTime(LocalDateTime.now())
@@ -178,5 +164,5 @@ class ActivityRestControllerTest {
 	      .accept(MediaType.APPLICATION_JSON))
           .andExpect(status().isBadRequest());
     }*/
-    
+
 }

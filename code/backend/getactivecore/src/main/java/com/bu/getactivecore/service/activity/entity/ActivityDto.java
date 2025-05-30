@@ -1,18 +1,10 @@
 package com.bu.getactivecore.service.activity.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.UuidGenerator;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-
 import com.bu.getactivecore.model.activity.Activity;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 /**
  * Activity DTO for exposing activity data.
@@ -47,6 +39,6 @@ public class ActivityDto {
                 .startDateTime(activity.getStartDateTime())
                 .endDateTime(activity.getEndDateTime())
                 .description(activity.getDescription())
-                .build();     
+                .build();
     }
 }
