@@ -12,7 +12,6 @@ env:
   DB_IMAGE: bumetcs673/cs673olsum25team1/db
   BACKEND_IMAGE: bumetcs673/cs673olsum25team1/backend
   FRONTEND_IMAGE: bumetcs673/cs673olsum25team1/frontend
-  NGINX_IMAGE: bumetcs673/cs673olsum25team1/nginx
   TAG: ${{ github.ref_name }}
 
 jobs:
@@ -35,8 +34,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
 
       - name: Build and push database image
         uses: docker/build-push-action@v5
@@ -59,26 +56,10 @@ jobs:
         with:
           context: ./code/frontend
           file: ./code/frontend/Dockerfile
-          push: false
-          tags: getactive-frontend:latest
-          load: true
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
           build-args: |
             NODE_ENV=production
-            
-      - name: List local Docker images after frontend build
-        run: docker images
-
-      - name: Build and push nginx image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code/nginx
-          file: ./code/nginx/Dockerfile
-          push: true
-          no-cache: true
-          tags: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
-
-      - name: List local Docker images after nginx build
-        run: docker images
 
   deploy:
     needs: build-and-push
@@ -104,15 +85,32 @@ jobs:
             echo "Pulling latest images..."
             docker pull ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}
             docker pull ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}
-            docker pull ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}
+            docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}
             
             echo "Updating image tags in docker-compose.yml..."
             sed -i "s|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.DB_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
             sed -i "s|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
-            sed -i "s|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.NGINX_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
+            sed -i "s|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ env.TAG }}|" docker-compose.yml
             
             echo "Restarting services using docker-compose..."
-            docker-compose down
+            docker stop getactive-frontend || echo "Frontend container already stopped or does not exist."
+            sleep 10
+            docker stop getactive-backend || echo "Backend container already stopped or does not exist."
+            sleep 10
+            docker rm getactive-frontend || echo "Frontend container already removed or does not exist."
+            sleep 10
+            docker rm getactive-backend || echo "Backend container already removed or does not exist."
+            sleep 10
+            docker stop getactive-db || echo "Database container already stopped or does not exist."
+            sleep 10
+            docker rm getactive-db || echo "Database container already removed or does not exist."
+            sleep 10
+            docker network rm frontend-network || echo "Frontend network already removed or does not exist."
+            sleep 10
+            docker network rm backend-network || echo "Backend network already removed or does not exist."
+            sleep 10
+            docker volume rm mysql_data || echo "Database volume already removed or does not exist."
+            sleep 10
             docker-compose up -d
             
             echo "Cleaning up old Docker images..."
