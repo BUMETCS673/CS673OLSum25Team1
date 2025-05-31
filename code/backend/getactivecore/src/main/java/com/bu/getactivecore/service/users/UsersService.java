@@ -55,7 +55,8 @@ public class UsersService implements UserInfoApi {
         }
 
         // Only verified users can access resources
-        m_accountStateChecker.assertVerified(authentication);
+        //TODO uncomment this line when url is setup
+        //m_accountStateChecker.assertVerified(authentication);
 
         String token = m_jwtApi.generateToken(requestDto.getUsername());
         UserDto userDto = ((UserPrincipal) authentication.getPrincipal()).getUserDto();
