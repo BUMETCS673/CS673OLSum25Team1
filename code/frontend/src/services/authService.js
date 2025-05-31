@@ -24,6 +24,7 @@ export const authService = {
       
       jwtUtils.setToken('auth_token', data.token);
       //jwtUtils.setToken('refresh_token', refreshToken);
+      localStorage.setItem('userData', JSON.stringify({userId: data.userId, username: data.username, userEmail: data.email}));
       
       return { success: true, userData: {userId: data.userId, username: data.username, userEmail: data.email}, error: null};
     } catch (error) {
@@ -40,20 +41,31 @@ export const authService = {
     } finally {
       jwtUtils.removeToken('auth_token');
       jwtUtils.removeToken('refresh_token');
+      localStorage.removeItem('userData');
     }
   },
 
   getCurrentUser: async () => {
-    try {
-      const response = await api.get('/auth/verify');
-      return response.data;
-    } catch (error) {
+    const storedUserData = localStorage.getItem('userData');
+    const token = jwtUtils.getToken('auth_token');
+
+    if (storedUserData && token && !jwtUtils.isTokenExpired(token)) {
+      try {
+        return JSON.parse(storedUserData);
+      } catch (error) {
+        jwtUtils.removeToken('auth_token');
+        localStorage.removeItem('userData');
+        return null;
+      }
+    } else {
+      jwtUtils.removeToken('auth_token');
+      localStorage.removeItem('userData');
       return null;
     }
   },
 
   isAuthenticated: () => {
-    const token = jwtUtils.getToken();
+    const token = jwtUtils.getToken('auth_token');
     return token && !jwtUtils.isTokenExpired(token);
   }
 };

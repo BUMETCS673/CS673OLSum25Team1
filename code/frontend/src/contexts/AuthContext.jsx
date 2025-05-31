@@ -8,18 +8,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // const initAuth = async () => {
-    //   if (authService.isAuthenticated()) {
-    //     try {
-    //         const userData = await authService.getCurrentUser();
-    //         setUser(userData);
-    //     } catch (error) {
-    //       authService.logout();
-    //     }
-    //   }
-    //   setLoading(false);
-    // };
-    // initAuth();
+    const initAuth = async () => {
+      if (authService.isAuthenticated()) {
+        try {
+            const userData = await authService.getCurrentUser();
+            setUser(userData);
+        } catch (error) {
+          authService.logout();
+        }
+      }
+      setLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (username, password) => {
