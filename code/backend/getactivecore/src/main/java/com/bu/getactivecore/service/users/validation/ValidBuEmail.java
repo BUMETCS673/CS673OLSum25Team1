@@ -1,4 +1,4 @@
-package com.bu.getactivecore.service.users.entity;
+package com.bu.getactivecore.service.users.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

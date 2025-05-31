@@ -4,9 +4,10 @@ package com.bu.getactivecore.util;
  * Helper enum which contains REST API endpoints used in tests.
  */
 public enum RestEndpoint {
-    REGISTER("/v1/register"),
+    ACTIVITY("/v1/activity"),
+    CONFIRM_REGISTRATION("/v1/register/confirm"),
     LOGIN("/v1/login"),
-    ACTIVITY("/v1/activity");
+    REGISTER("/v1/register");
 
     private final String endpoint;
 

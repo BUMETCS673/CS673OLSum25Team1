@@ -1,11 +1,12 @@
 package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.model.activity.RoleType;
-import com.bu.getactivecore.model.activity.UserActivity;
 import com.bu.getactivecore.model.users.UserPrincipal;
-import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.UserActivityRepository;
+import com.bu.getactivecore.shared.ApiErrorPayload;
+import com.bu.getactivecore.shared.ErrorCode;
 import com.bu.getactivecore.shared.exception.ResourceAccessDeniedException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ public class ActivityPermissionEvaluator {
     /**
      * Constructs the permission evaluator with the provided {@link UserActivityRepository}.
      *
-     * @param userActivityRepository used to fetch user roles for activities
+     * @param userActivityRepo used to fetch user roles for activities
      */
     public ActivityPermissionEvaluator(UserActivityRepository userActivityRepo) {
         this.userActivityRepo = userActivityRepo;
@@ -39,8 +40,7 @@ public class ActivityPermissionEvaluator {
      * @throws ResourceAccessDeniedException if the user is not an admin of the activity
      */
     public boolean isAuthorizedToUpdateActivity(Authentication authentication, String activityId) {
-        Users user = ((UserPrincipal) authentication.getPrincipal()).getUser();
-        String userId = user.getUserId();
+        String userId = ((UserPrincipal) authentication.getPrincipal()).getUserDto().getUserId();
         return userActivityRepo.findByUserIdAndActivityId(userId, activityId)
                 .map(role -> RoleType.ADMIN == role.getRole())
                 .orElseThrow(() -> {
@@ -48,7 +48,13 @@ public class ActivityPermissionEvaluator {
                     Map<String, List<String>> validationErrors = Map.of(
                             "permission", List.of("User is not the admin of given activity")
                     );
-                    return new ResourceAccessDeniedException(reason, validationErrors);
+                    ApiErrorPayload error = ApiErrorPayload.builder()
+                            .status(HttpStatus.FORBIDDEN)
+                            .errorCode(ErrorCode.RESOURCE_ACCESS_DENIED)
+                            .message(reason)
+                            .validationErrors(validationErrors)
+                            .build();
+                    return new ResourceAccessDeniedException(error);
                 });
     }
 }

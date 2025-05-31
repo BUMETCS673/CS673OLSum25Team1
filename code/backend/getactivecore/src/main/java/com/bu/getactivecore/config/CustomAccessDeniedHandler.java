@@ -1,7 +1,7 @@
 package com.bu.getactivecore.config;
 
 
-import com.bu.getactivecore.shared.ApiError;
+import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.ApiErrorResponse;
 import com.bu.getactivecore.shared.ErrorCode;
 import com.bu.getactivecore.shared.exception.ResourceAccessDeniedException;
@@ -15,12 +15,34 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
- * A custom {@link AccessDeniedHandler} implementation that handles access denied exceptions by returning a structured
- * JSON response with error details.
+ * CustomAccessDeniedHandler is a Spring Security component that handles access-denied exceptions
+ * thrown during the **authorization phase** within the Spring Security filter chain.
+ *
+ * <h2>When This Handler is Invoked:</h2>
+ * <ul>
+ *   <li>User is <strong>authenticated</strong>, but lacks required permissions or roles.</li>
+ *   <li>Access is denied due to `@PreAuthorize`, method-level security, or URL-level authorization.</li>
+ *   <li>Thrown exception is of type {@link org.springframework.security.access.AccessDeniedException}.</li>
+ * </ul>
+ *
+ * <h2>When This Handler is <strong>Not</strong> Invoked:</h2>
+ * <ul>
+ *   <li>Exceptions thrown in the controller, service or application logic (i.e: business logic exceptions).</li>
+ *   <li>Authentication failures (e.g: bad credentials) — those are handled by the {@code AuthenticationEntryPoint}.</li>
+ *   <li>Manual throwing of custom exceptions like {@code ResourceAccessDeniedException} from service/controller.</li>
+ * </ul>
+ *
+ * <h2>Handling Exceptions in Application Code</h2>
+ * <p>
+ * If you want to convert custom exceptions (like {@code ResourceAccessDeniedException}) thrown from controllers
+ * or service methods into proper HTTP responses, use a {@code @RestControllerAdvice} with {@code @ExceptionHandler}.
+ * </p>
+ *
+ * <h2>Error Format</h2>
+ * This handler serializes an {@link ApiErrorPayload} into JSON and returns it as the response body with a
+ * {@code 403 Forbidden} HTTP status.
  */
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
@@ -33,18 +55,18 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex) throws IOException {
-        Map<String, List<String>> validationErrors = null;
+        ApiErrorPayload apiErrorPayload;
         if (ex instanceof ResourceAccessDeniedException resourceEx) {
-            validationErrors = resourceEx.getValidationErrors();
+            apiErrorPayload = resourceEx.getError();
+        } else {
+            apiErrorPayload = ApiErrorPayload.builder()
+                    .status(HttpStatus.FORBIDDEN)
+                    .errorCode(ErrorCode.RESOURCE_ACCESS_DENIED)
+                    .message(ex.getMessage() != null ? "Access Denied: " + ex.getMessage() : "Access Denied")
+                    .debugMessage(ex.getLocalizedMessage())
+                    .build();
         }
-        ApiError apiError = ApiError.from(
-                ErrorCode.RESOURCE_ACCESS_DENIED,
-                HttpStatus.FORBIDDEN,
-                ex.getMessage() != null ? "Access Denied: " + ex.getMessage() : "Access Denied",
-                validationErrors,
-                ex
-        );
-        ApiErrorResponse errorResponse = new ApiErrorResponse(apiError);
+        ApiErrorResponse errorResponse = new ApiErrorResponse(apiErrorPayload);
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

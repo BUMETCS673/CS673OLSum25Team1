@@ -1,5 +1,6 @@
 package com.bu.getactivecore.service.jwt;
 
+import com.bu.getactivecore.shared.exception.ApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,6 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JwtServiceTest {
@@ -69,7 +71,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void given_valid_token_then_token_is_valid() throws NoSuchAlgorithmException {
+    void verify_valid_token_are_generated() throws NoSuchAlgorithmException {
         jwtProperties.setExpirationMs(10 * 1000L);
         jwtService.init();
 
@@ -80,7 +82,14 @@ class JwtServiceTest {
     }
 
     @Test
-    void given_invalid_token_then_exception_is_thrown() throws NoSuchAlgorithmException {
+    void given_blank_username_then_exception_is_thrown() throws NoSuchAlgorithmException {
+        jwtProperties.setExpirationMs(10 * 1000L);
+        jwtService.init();
+        assertThrows(ApiException.class, () -> jwtService.generateToken(""));
+    }
+
+    @Test
+    void given_valid_token_then_another_user_cannot_access() throws NoSuchAlgorithmException {
         jwtProperties.setExpirationMs(10 * 1000L);
         jwtService.init();
 

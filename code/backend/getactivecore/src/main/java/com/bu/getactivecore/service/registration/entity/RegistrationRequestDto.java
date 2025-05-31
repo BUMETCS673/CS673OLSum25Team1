@@ -1,5 +1,6 @@
-package com.bu.getactivecore.service.users.entity;
+package com.bu.getactivecore.service.registration.entity;
 
+import com.bu.getactivecore.service.users.validation.ValidBuEmail;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Value;

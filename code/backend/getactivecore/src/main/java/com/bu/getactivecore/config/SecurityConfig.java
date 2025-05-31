@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,9 +37,9 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService m_userDetailsService;
 
-    private final JwtFilter jwtFilter;
+    private final JwtFilter m_jwtFilter;
 
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAccessDeniedHandler m_customAccessDeniedHandler;
 
     /**
      * Constructs the SecurityConfig.
@@ -48,10 +49,9 @@ public class SecurityConfig {
      * @param customAccessDeniedHandler used to wrap access denied exceptions in a custom response
      */
     public SecurityConfig(CustomUserDetailsService userDetailsService, JwtFilter jwtFilter, CustomAccessDeniedHandler customAccessDeniedHandler) {
-        this.m_userDetailsService = userDetailsService;
-        this.jwtFilter = jwtFilter;
-        this.customAccessDeniedHandler = customAccessDeniedHandler;
-
+        m_userDetailsService = userDetailsService;
+        m_jwtFilter = jwtFilter;
+        m_customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     /**
@@ -64,23 +64,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions().disable()) // Allow H2 Console to load in frame
                 .exceptionHandling(accessDenied -> accessDenied
-                        .accessDeniedHandler(customAccessDeniedHandler))
+                        .accessDeniedHandler(m_customAccessDeniedHandler))
                 .authorizeHttpRequests(request -> request
-                        
+
                         // Permit following endpoints without authentication
                         .requestMatchers("/h2-console/**", "/v1/register",
+                                "/v1/register/confirm",
                                 "/v1/health",
                                 "/v1/login"
-                                ).permitAll()
+                        ).permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(m_jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -110,6 +111,11 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Configures CORS settings for the application.
+     *
+     * @return a {@link CorsConfigurationSource} instance with the defined CORS settings
+     */
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

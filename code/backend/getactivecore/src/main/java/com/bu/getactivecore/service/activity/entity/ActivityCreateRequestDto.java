@@ -1,19 +1,15 @@
 package com.bu.getactivecore.service.activity.entity;
 
-import java.time.LocalDateTime;
-
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-
 import com.bu.getactivecore.model.activity.Activity;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Value;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import java.time.LocalDateTime;
 
 /**
  * The DTO for creating a new activity.
@@ -47,6 +43,6 @@ public class ActivityCreateRequestDto {
                 .startDateTime(request.getStartDateTime())
                 .endDateTime(request.getEndDateTime())
                 .description(request.getDescription())
-                .build();          
+                .build();
     }
 }

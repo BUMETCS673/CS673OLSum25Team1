@@ -5,10 +5,9 @@ import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
-import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.email.EmailVerificationService;
-import com.bu.getactivecore.service.users.entity.RegistrationRequestDto;
-import com.bu.getactivecore.shared.ErrorCode;
+import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
+import com.bu.getactivecore.shared.validation.AccountStateChecker;
 import com.bu.getactivecore.util.RestEndpoint;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -25,9 +25,8 @@ import java.util.Map;
 
 import static com.bu.getactivecore.util.RestUtil.getToken;
 import static com.bu.getactivecore.util.RestUtil.sendPost;
-import static com.bu.getactivecore.util.RestUtil.sendPut;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -35,6 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ActivityTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @MockitoBean
+    private AccountStateChecker accountChecker;
 
     @MockitoBean
     private EmailVerificationService emailVerificationService;
@@ -66,6 +68,7 @@ class ActivityTest {
 
     @Test
     void given_user_who_activity_post_requested_without_admin_permission_then_403_returned() throws Exception {
+        when(accountChecker.assertVerified(any(Authentication.class))).thenReturn(true);
 
         // Register & login user1 to get its token
         RegistrationRequestDto requestDto = new RegistrationRequestDto("user1@bu.edu", "user1", "testpassword");
