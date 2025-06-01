@@ -28,7 +28,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { success, error: loginError } = await login(username, password, rememberMe);
+      const { success, error: loginError } = await login(username, password);
       console.log("success", success);
       console.log("loginError", loginError);
       if (success) {
