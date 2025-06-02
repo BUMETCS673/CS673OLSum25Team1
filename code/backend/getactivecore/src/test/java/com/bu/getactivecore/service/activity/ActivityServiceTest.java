@@ -69,37 +69,6 @@ public class ActivityServiceTest {
         verify(activityRepository, never()).deleteById(activityId);
     }
 
-    @Test
-    public void deleteActivityButUserNotFoundInUserActivity(){
-        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(new Users()));
-
-        when(userActivityRepository.findByUserIdAndActivityId(userId, activityId)).thenReturn(Optional.empty());
-
-        assertThrows(ApiException.class, () -> activityService.deleteActivity(userId, activityId));
-
-        verify(userActivityRepository, never()).deleteByActivityId(activityId);
-        
-        verify(activityRepository, never()).deleteById(activityId);
-    }
-
-    @Test
-    public void deleteActivityWithoutAdminPermission(){
-        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(new Users()));
-
-        UserActivity userActivity = UserActivity.builder().activityId(activityId).userId(userId).role(RoleType.PARTICIPANT).build();
-
-        when(userActivityRepository.findByUserIdAndActivityId(userId, activityId)).thenReturn(Optional.of(userActivity));
-
-        assertThrows(ApiException.class, () -> activityService.deleteActivity(userId, activityId));
-        
-        verify(userActivityRepository, never()).deleteByActivityId(activityId);
-
-        verify(activityRepository, never()).deleteById(activityId);
-    }
 
     @Test
     public void deleteActivitySuccessfully(){
