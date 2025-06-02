@@ -51,7 +51,4 @@ public class Activity {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime endDateTime;
-
-    @OneToMany(mappedBy = "activity", cascade = CascadeType.REMOVE)
-    private List<UserActivity> userActivities;
 }

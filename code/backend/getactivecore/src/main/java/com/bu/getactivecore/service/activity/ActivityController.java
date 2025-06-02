@@ -116,6 +116,7 @@ public class ActivityController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Transactional
     @DeleteMapping("/activity/{id}")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
     public ResponseEntity<Object> deleteActivity(@AuthenticationPrincipal UserPrincipal user, @PathVariable String id, @Valid ActivityDeleteRequestDto requestDto) {

@@ -37,13 +37,11 @@ public class UserActivity {
     @UuidGenerator
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "activity_id")
-    private Activity activity;
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user;
+    @Column(name = "activity_id", nullable = false)
+    private String activityId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
