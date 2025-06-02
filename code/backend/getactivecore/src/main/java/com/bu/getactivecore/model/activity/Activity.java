@@ -19,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -51,6 +52,6 @@ public class Activity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime endDateTime;
 
-   // @OneToMany(mappedBy = "activities", cascade = CascadeType.REMOVE)
-   // private List<Users> users;
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.REMOVE)
+    private Set<UserActivity> userActivities;
 }

@@ -14,11 +14,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.UuidGenerator;
 
 import com.bu.getactivecore.model.activity.Activity;
+import com.bu.getactivecore.model.activity.UserActivity;
 
 
 @Data
@@ -48,6 +51,6 @@ public class Users {
     @Column(name = "account_state", nullable = false)
     private AccountState accountState;
 
-   // @OneToMany(mappedBy = "users")
-    //private List<Activity> activities;
+    @OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+    private Set<UserActivity> userActivities;
 }
