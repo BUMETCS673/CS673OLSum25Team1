@@ -3,6 +3,7 @@ package com.bu.getactivecore.service.activity;
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
@@ -13,12 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -51,9 +54,9 @@ public class ActivityController {
      * @return List of activities
      */
     @GetMapping("/activities")
-    public List<ActivityDto> getActivities() {
+    public List<ActivityDto> getActivities(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Got request: /v1/activities");
-        return m_activityApi.getAllActivities();
+        return m_activityApi.getAllActivities(page, size);
     }
 
     /**
@@ -63,20 +66,8 @@ public class ActivityController {
      * @return List of activities matching the name
      */
     @GetMapping("/activity/{name}")
-    public List<ActivityDto> getActivityByName(@PathVariable String name) {
-        return m_activityApi.getActivityByName(name);
-    }
-
-
-    @PutMapping("/activity")
-    @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #request.activityId)")
-    public ActivityResponseDto updateActivity(@Valid @RequestBody ActivityUpdateRequestDto request) {
-        log.info("Got request: /v1/activity/update");
-
-        // TODO implement the logic to update an activity
-        return new ActivityResponseDto(
-                ActivityDto.builder().build()
-        );
+    public List<ActivityDto> getActivityByName(@PathVariable String name, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size) {
+        return m_activityApi.getActivityByName(name, page, size);
     }
 
     @PutMapping("/activity/join")
@@ -120,5 +111,21 @@ public class ActivityController {
         String userId = user.getUserDto().getUserId();
         m_activityApi.createActivity(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/activity/{id}")
+    @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
+    public ResponseEntity<Object> deleteActivity(@AuthenticationPrincipal UserPrincipal user, @PathVariable String id, @Valid ActivityDeleteRequestDto requestDto) {
+        String userId = user.getUserDto().getUserId();
+        m_activityApi.deleteActivity(userId, id, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    @PutMapping("/activity/{id}")
+    @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
+    public ActivityDto updateActivity(@AuthenticationPrincipal UserPrincipal user, @PathVariable String id, @Valid @RequestBody ActivityUpdateRequestDto request) {
+         String userId = user.getUserDto().getUserId();
+         return m_activityApi.updateActivity(userId, id, request);
     }
 }

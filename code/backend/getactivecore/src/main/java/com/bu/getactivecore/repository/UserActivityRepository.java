@@ -1,8 +1,10 @@
 package com.bu.getactivecore.repository;
 
+import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.activity.UserActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,4 +20,8 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Stri
      * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
      */
     Optional<UserActivity> findByUserIdAndActivityId(String userId, String activityId);
+
+    Optional<List<UserActivity>> findByActivityIdAndRole(String activityId, RoleType role);
+
+    void deleteByActivityId(String activityId);
 }
