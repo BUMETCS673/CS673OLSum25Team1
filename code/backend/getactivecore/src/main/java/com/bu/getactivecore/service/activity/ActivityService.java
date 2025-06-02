@@ -95,8 +95,8 @@ public class ActivityService implements ActivityApi {
 
         Activity createdActivity = m_activityRepo.save(ActivityCreateRequestDto.from(requestDto));
         UserActivity userActivityRole = UserActivity.builder()
-                .userId(userId)
-                .activityId(createdActivity.getId())
+                .user(Users.builder().userId(userId).build())
+                .activity(createdActivity)
                 .role(RoleType.ADMIN)
                 .build();
         m_userActivityRepo.save(userActivityRole);
@@ -110,12 +110,10 @@ public class ActivityService implements ActivityApi {
               throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build());
         }
 
-        Optional<List<UserActivity>> userActivities= m_userActivityRepo.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT);
+        Optional<List<UserActivity>> userActivities= m_userActivityRepo.findByActivity_IdAndRole(activityId, RoleType.PARTICIPANT);
         if(requestDto.isForce() == false && !userActivities.isEmpty() && !userActivities.get().isEmpty()) {
-            throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.FORBIDDEN).message("Force is set to false. There are participants in the activities. ").build());
+            throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.FORBIDDEN).message("Force is set to false. There are participants in this activity. ").build());
         }
-
-        m_userActivityRepo.deleteByActivityId(activityId);
 
         m_activityRepo.deleteById(activityId);
     }

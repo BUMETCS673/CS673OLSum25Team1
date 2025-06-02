@@ -53,5 +53,5 @@ public class Activity {
     private LocalDateTime endDateTime;
 
     @OneToMany(mappedBy = "activity", cascade = CascadeType.REMOVE)
-    private Set<UserActivity> userActivities;
+    private List<UserActivity> userActivities;
 }

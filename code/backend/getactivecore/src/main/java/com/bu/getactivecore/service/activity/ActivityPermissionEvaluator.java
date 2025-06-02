@@ -41,7 +41,7 @@ public class ActivityPermissionEvaluator {
      */
     public boolean isAuthorizedToUpdateActivity(Authentication authentication, String activityId) {
         String userId = ((UserPrincipal) authentication.getPrincipal()).getUserDto().getUserId();
-        return userActivityRepo.findByUserIdAndActivityId(userId, activityId)
+        return userActivityRepo.findByUser_UserIdAndActivity_Id(userId, activityId)
                 .map(role -> RoleType.ADMIN == role.getRole())
                 .orElseThrow(() -> {
                     String reason = String.format("User %s is not an admin of activity %s", userId, activityId);

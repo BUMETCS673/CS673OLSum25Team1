@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    user_id CHAR(36) PRIMARY KEY,
+    id CHAR(36) PRIMARY KEY,
     name VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

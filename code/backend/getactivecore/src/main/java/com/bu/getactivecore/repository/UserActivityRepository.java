@@ -19,9 +19,8 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Stri
      * @param activityId The ID of the activity to search the given user's role in.
      * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
      */
-    Optional<UserActivity> findByUserIdAndActivityId(String userId, String activityId);
+    Optional<UserActivity> findByUser_UserIdAndActivity_Id(String userId, String activityId);
 
-    Optional<List<UserActivity>> findByActivityIdAndRole(String activityId, RoleType role);
+    Optional<List<UserActivity>> findByActivity_IdAndRole(String activityId, RoleType role);
 
-    void deleteByActivityId(String activityId);
 }

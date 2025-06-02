@@ -51,6 +51,6 @@ public class Users {
     @Column(name = "account_state", nullable = false)
     private AccountState accountState;
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
-    private Set<UserActivity> userActivities;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<UserActivity> userActivities;
 }
