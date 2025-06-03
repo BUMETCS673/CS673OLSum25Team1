@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Login from '../../pages/Login';
 import Home from '../../pages/Home';
-import { AuthProvider } from '../../contexts/AuthContext';
+import { useAuth, AuthProvider } from '../../contexts/AuthContext';
 import userEvent from '@testing-library/user-event';
 
 const mockNavigate = vi.fn(); 
@@ -16,14 +16,15 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 const mockLoginInUseAuth = vi.fn();
-vi.mock('../../contexts/AuthContext', () => ({ 
+vi.mock('../../contexts/AuthContext', () => { return {
   useAuth: () => ({ 
     login: mockLoginInUseAuth, 
     user: { userId: '1', username: 'testuser', userEmail: 'test@test.com' }, 
     logout: vi.fn(), 
   }),
   AuthProvider: ({ children }) => <div data-testid="MockAuthProvider">{children}</div>
-}));
+}}
+);
 
 describe('LoginPage Unit Test', () => {
     beforeEach(() => {
