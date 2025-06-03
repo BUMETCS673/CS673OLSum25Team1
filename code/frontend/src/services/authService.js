@@ -37,7 +37,9 @@ export const authService = {
 
   logout: async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/logout');
+    } catch (error) {
+      throw new Error('API logout failed');
     } finally {
       jwtUtils.removeToken('auth_token');
       jwtUtils.removeToken('refresh_token');
@@ -66,6 +68,6 @@ export const authService = {
 
   isAuthenticated: () => {
     const token = jwtUtils.getToken('auth_token');
-    return token && !jwtUtils.isTokenExpired(token);
+    return Boolean(token && !jwtUtils.isTokenExpired(token));
   }
 };
