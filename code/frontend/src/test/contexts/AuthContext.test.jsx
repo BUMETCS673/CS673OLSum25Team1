@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, waitFor } from '@testing-library/react';
-import { AuthProvider, useAuth } from './AuthContext';
-import { authService } from '../services/authService';
+import { AuthProvider, useAuth } from '../../contexts/AuthContext';
+import { authService } from '../../services/authService';
 
 // Mock authService
-vi.mock('../services/authService', () => ({
+vi.mock('../../services/authService', () => ({
   authService: {
     isAuthenticated: vi.fn(),
     getCurrentUser: vi.fn(),

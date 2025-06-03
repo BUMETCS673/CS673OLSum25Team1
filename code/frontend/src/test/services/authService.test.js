@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { authService } from './authService';
-import api from './api'; // Dependency to be mocked
-import { jwtUtils } from '../utils/jwt'; // Dependency to be mocked
+import { authService } from '../../services/authService';
+import api from '../../services/api'; // Dependency to be mocked
+import { jwtUtils } from '../../utils/jwt'; // Dependency to be mocked
 
 // Mock dependencies
-vi.mock('./api', () => ({
+vi.mock('../../services/api', () => ({
   default: {
     post: vi.fn(),
   },
 }));
 
-vi.mock('../utils/jwt', () => ({
+vi.mock('../../utils/jwt', () => ({
   jwtUtils: {
     setToken: vi.fn(),
     removeToken: vi.fn(),
