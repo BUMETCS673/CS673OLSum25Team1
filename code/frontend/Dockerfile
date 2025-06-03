@@ -21,5 +21,9 @@ WORKDIR /build-output
 # Copy only the built files from the builder stage
 COPY --from=builder /app/dist ./dist
 
+RUN npm install
+
+RUN npx vitest --run
+
 # This image doesn't need to run anything
 # It's just a way to pass the build output to other images

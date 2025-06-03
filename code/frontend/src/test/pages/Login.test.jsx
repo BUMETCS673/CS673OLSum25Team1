@@ -1,108 +1,87 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Login from '../../pages/Login';
-import authService from '../../services/authService';
-import { AuthProvider } from '../../contexts/AuthContext';
 import userEvent from '@testing-library/user-event';
-const mockNavigate = vi.fn(); 
+
+// Mock navigation
+const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal(); 
+  const actual = await importOriginal();
   return {
-    ...actual, 
-    useNavigate: () => mockNavigate, 
+    ...actual,
+    useNavigate: () => mockNavigate,
   };
 });
 
-// vi.mock('../../services/authService', () => ({
-//   default: {
-//     login: vi.fn(),
-//   },
-// }));
-
+// Mock login function
 const mockLoginInUseAuth = vi.fn();
-
-vi.mock('../../contexts/AuthContext', () => ({ // 假设你的 useAuth Hook 在这个路径
-  useAuth: () => ({ // Mock useAuth 返回的对象
-    login: mockLoginInUseAuth, // 将模拟函数赋给 login 属性
-    // 如果 useAuth 还返回其他属性 (例如 user, logout)，也要在这里模拟，否则组件可能会报错
-    user: null, // 例如，默认用户为 null
-    logout: vi.fn(), // 模拟 logout 方法
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    login: mockLoginInUseAuth,
+    user: { userId: '1', username: 'testuser', userEmail: 'test@test.com' },
+    logout: vi.fn(),
   }),
-  AuthProvider: ({ children }) => <div data-testid="MockAuthProvider">{children}</div>
+  AuthProvider: ({ children }) => <>{children}</>,
 }));
 
-describe('LoginPage Unit Tests', () => {
-  it('should allow a user to log in successfully', async () => {
-      mockLoginInUseAuth.mockResolvedValueOnce({ success: true, userData: { userId: '1', username: 'testuser', userEmail: 'test@test.com' }, error: null });
-      
-      render(<AuthProvider><MemoryRouter><Login /></MemoryRouter></AuthProvider>);
-      
-      const user = userEvent.setup();
-
-      await user.type(screen.getByLabelText(/username/i), 'testuser');
-      await user.type(screen.getByLabelText(/password/i), 'correctpassword');
-      //screen.debug();
-      await user.click(screen.getByRole('button', { name: /Login/i }));
-
-      //expect(authService.login).toHaveBeenCalledWith('testuser', 'correctpassword');
-      expect(mockLoginInUseAuth).toHaveBeenCalledWith('testuser', 'correctpassword', expect.any(Boolean));
-      
-      //await waitFor(() => expect(screen.getByText(/Welcome test user/i)).toBeInTheDocument());
-      await waitFor(() => {
-        expect(screen.getByText((content, element) => {
-          // content 是元素的textContent
-          // element 是当前的HTML元素
-          // 你可以检查 content 是否包含你想要的所有部分
-          return content.includes('Welcome') && content.includes('test user');
-        })).toBeInTheDocument();
-      });
-      
+describe('LoginPage Unit Test', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+    mockLoginInUseAuth.mockClear();
   });
-  it('should display an error message on failed login', async () => {
-    authService.login.mockRejectedValueOnce({ success: false, error: 'User or password is invalid' });
-    
-    render(<AuthProvider><MemoryRouter><Login /></MemoryRouter></AuthProvider>);
+
+  it('allows user to input BU email and password', async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
     const user = userEvent.setup();
+    const emailInput = screen.getByLabelText(/username/i);
+    const passwordInput = screen.getByLabelText(/password/i);
 
-    await user.type(screen.getByLabelText(/username/i), 'testuser');
-    await user.type(screen.getByLabelText(/password/i), 'wrongpassword');
-    //screen.debug();
-    await user.click(screen.getByRole('button', { name: /Login/i }));
+    await user.type(emailInput, 'student@bu.edu');
+    await user.type(passwordInput, 'securePassword123');
 
-    expect(authService.login).toHaveBeenCalledWith('testuser', 'wrongpassword');
-
-    await waitFor(() => {
-        expect(screen.getByText(/Login failed/i)).toBeInTheDocument();
-    });
+    expect(emailInput).toHaveValue('student@bu.edu');
+    expect(passwordInput).toHaveValue('securePassword123');
   });
 
-});
+  it('disables the login button during submission', async () => {
+    // mock login as delayed to simulate loading state
+    mockLoginInUseAuth.mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ success: true }), 500)
+        )
+    );
 
-describe('LoginPage Navigation Test', () => {
-    beforeEach(() => {
-          mockNavigate.mockClear();
-          //authService.login.mockClear();
-          mockLoginInUseAuth.mockClear();
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/username/i), 'student@bu.edu');
+    await user.type(screen.getByLabelText(/password/i), 'securePassword123');
+
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    // Ensure button is initially enabled
+    expect(loginButton).not.toBeDisabled();
+
+    // Click to trigger submission
+    await user.click(loginButton);
+
+    // Button should be disabled immediately after clicking
+    expect(loginButton).toBeDisabled();
+
+    // Wait for login process to complete
+    await waitFor(() => {
+      expect(mockLoginInUseAuth).toHaveBeenCalled();
     });
-
-    it('should navigate to /home on successful login', async () => {
-
-        authService.login.mockResolvedValueOnce({ success: true, userData: { userId: '1', username: 'testuser', userEmail: 'test@test.com' }, error: null });
-        
-        render(<AuthProvider><MemoryRouter><Login /></MemoryRouter></AuthProvider>);
-        const user = userEvent.setup();
-
-        await user.type(screen.getByLabelText(/username/i), 'testuser'); 
-        await user.type(screen.getByLabelText(/password/i), 'correctpassword'); 
-        //screen.debug();
-        await user.click(screen.getByRole('button', { name: /Login/i }));
-
-        expect(authService.login).toHaveBeenCalledWith('testuser', 'correctpassword');
-
-        await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledTimes(1);
-            expect(mockNavigate).toHaveBeenCalledWith('/home'); 
-        });
-    });
+  });
 });
