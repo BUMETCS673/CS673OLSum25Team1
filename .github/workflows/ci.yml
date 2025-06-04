@@ -98,29 +98,7 @@ jobs:
         working-directory: ./code/frontend/
         run: |
           npm ci
-
-      # - name: Build Frontend Application
-      #   working-directory: ./code/frontend
-      #   run: npm run build 
-
-      # - name: Serve Frontend Application (using serve package)
-      #   working-directory: ./code/frontend
-      #   run: |
-      #     npm install -g serve
-      #     serve -s build -l 5173 &
-      #     echo "Waiting for frontend service to start..."
-      #     for i in {1..30}; do
-      #       if curl -s http://localhost:5173; then
-      #         echo "Frontend service is up!"
-      #         break
-      #       fi
-      #       if [ $i -eq 30 ]; then
-      #         echo "Frontend service failed to start within timeout"
-      #         exit 1
-      #       fi
-      #       echo "Waiting... ($i/30)"
-      #       sleep 1
-      #     done
+          npm run test
 
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6
@@ -141,12 +119,12 @@ jobs:
             ./code/frontend/cypress/screenshots
             ./code/frontend/cypress/reports/junit.xml
       
-      # - name: Upload Frontend JUnit Report
-      #   uses: actions/upload-artifact@v4
-      #   if: always() 
-      #   with:
-      #     name: frontend-junit-report
-      #     path: code/frontend/test-results/junit.xml 
+      - name: Upload Frontend JUnit Report
+        uses: actions/upload-artifact@v4
+        if: always() 
+        with:
+          name: frontend-junit-report
+          path: code/frontend/test-results/junit.xml 
 
       # - name: Upload Frontend Coverage Report
       #   uses: actions/upload-artifact@v4

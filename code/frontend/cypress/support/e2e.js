@@ -14,6 +14,6 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands"
 // cypress/support/e2e.js
-import '@testing-library/cypress/add-commands';
+import "@testing-library/cypress/add-commands";

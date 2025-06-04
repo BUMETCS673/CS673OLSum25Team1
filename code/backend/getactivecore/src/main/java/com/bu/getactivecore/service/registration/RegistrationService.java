@@ -6,7 +6,8 @@ import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.email.api.EmailApi;
 import com.bu.getactivecore.service.jwt.api.JwtApi;
 import com.bu.getactivecore.service.registration.api.RegistrationApi;
-import com.bu.getactivecore.service.registration.entity.ConfirmRegistrationRequestDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationResponseDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationStatus;
@@ -20,8 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.bu.getactivecore.service.jwt.api.JwtApi.TOKEN_CLAIM_TYPE_KEY;
 import static com.bu.getactivecore.service.jwt.api.JwtApi.TokenClaimType;
@@ -86,12 +85,19 @@ public class RegistrationService implements RegistrationApi {
         String username = requestDto.getUsername();
 
         synchronized (REGISTRATION_LOCK) {
-            Optional<Users> existingUser = m_userRepo.findByEmailOrUserName(email, username);
-            if (existingUser.isPresent()) {
-                String msg = String.format("Email '%s' or username '%s' is already taken", email, username);
-                String debugMessage = buildDebugMessage(existingUser.get(), email, username);
+            boolean emailExists = m_userRepo.findByEmail(email).isPresent();
+            boolean usernameExists = m_userRepo.findByUsername(username).isPresent();
+            String debugMessage = null;
+            if (emailExists && usernameExists) {
+                debugMessage = String.format("Email '%s' and username '%s' are already taken", email, username);
+            } else if (emailExists) {
+                debugMessage = String.format("Email '%s' is already taken", email);
+            } else if (usernameExists) {
+                debugMessage = String.format("Username '%s' is already taken", username);
+            }
+            if (debugMessage != null) {
                 ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(EMAIL_USERNAME_TAKEN)
-                        .message(msg)
+                        .message("Email or username already taken")
                         .debugMessage(debugMessage)
                         .build();
                 throw new ApiException(error);
@@ -102,17 +108,17 @@ public class RegistrationService implements RegistrationApi {
         Users user = UserDto.from(email, username, encodedPassword);
         m_userRepo.save(user);
 
-        // TODO: implement the registration url logic
-        m_emailApi.sendVerificationEmail(email, "test_registration_url");
+        String registrationToken = m_jwtApi.generateToken(username, TokenClaimType.REGISTRATION_CONFIRMATION);
+        m_emailApi.sendVerificationEmail(email, registrationToken);
         return RegistrationResponseDto.builder()
-                .status(RegistrationStatus.SUCCESS)
+                .token(registrationToken)
                 .build();
     }
 
 
     @Override
     @Transactional
-    public RegistrationResponseDto confirmRegistration(ConfirmRegistrationRequestDto verificationDto) {
+    public ConfirmationResponseDto confirmRegistration(ConfirmationRequestDto verificationDto) {
         String username = validateConfirmationToken(verificationDto);
         synchronized (VERIFICATION_LOCK) {
             Users user = m_userRepo.findByUsername(username).orElseThrow(() -> {
@@ -139,7 +145,7 @@ public class RegistrationService implements RegistrationApi {
                 }
             }
         }
-        return RegistrationResponseDto.builder()
+        return ConfirmationResponseDto.builder()
                 .status(RegistrationStatus.SUCCESS)
                 .build();
     }
@@ -151,7 +157,7 @@ public class RegistrationService implements RegistrationApi {
      * @return the username extracted from the token.
      * @throws ApiException if the token is invalid or expired.
      */
-    private String validateConfirmationToken(ConfirmRegistrationRequestDto confirmRegistrationDto) {
+    private String validateConfirmationToken(ConfirmationRequestDto confirmRegistrationDto) {
         String username;
         try {
             m_jwtApi.validateToken(confirmRegistrationDto.getToken());
