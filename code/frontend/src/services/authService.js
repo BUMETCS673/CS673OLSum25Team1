@@ -66,8 +66,6 @@ export const authService = {
       //jwtUtils.setToken('refresh_token', refreshToken);
       localStorage.setItem('userData', JSON.stringify({userId: data.userId, username: data.username, userEmail: data.email}));
 
-      return { success: true, userData: {userId: data.userId, username: data.username, userEmail: data.email}, error: null};
-
       return {
         success: true,
         userData: {

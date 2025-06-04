@@ -47,23 +47,53 @@ describe('authService', () => {
 
   describe('register', () => {
     it('should return success on successful registration', async () => {
-      api.post.mockResolvedValue({}); // Simulate a successful API call
+      api.post.mockResolvedValue({data: {
+        data: {
+          token: "mock-jwt-token"
+        }
+      }}); // Simulate a successful API call
       const result = await authService.register('testuser', 'test@bu.edu', 'password');
       expect(api.post).toHaveBeenCalledWith('/register', { username: 'testuser', email: 'test@bu.edu', password: 'password' });
-      expect(result).toEqual({ success: true, error: null });
+      expect(result).toEqual({ success: true, token: 'mock-jwt-token', error: null });
     });
 
     it('should return error message from API on registration failure', async () => {
       const errorMessage = 'Email already taken';
-      api.post.mockRejectedValue({ response: { data: { message: errorMessage } } });
+      api.post.mockRejectedValue({ response: { data: { errors: errorMessage } } });
       const result = await authService.register('testuser', 'test@bu.edu', 'password');
       expect(result).toEqual({ success: false, error: errorMessage });
     });
 
     it('should return default error message on generic registration failure', async () => {
-      api.post.mockRejectedValue(new Error('Network error'));
+      const networkError = new Error('Network error');
+      networkError.request = { message: 'Network error' };
+      api.post.mockRejectedValue(networkError);
       const result = await authService.register('testuser', 'test@bu.edu', 'password');
-      expect(result).toEqual({ success: false, error: 'Register failed' });
+      expect(result).toEqual({ success: false, error: 'Registration is currently unavailable. Please try again later.' });
+    });
+  });
+
+  describe('registerConfirm', () => {
+    it('should return success on successful registration', async () => {
+      api.post.mockResolvedValue({}); // Simulate a successful API call
+      const result = await authService.registerConfirm('token');
+      expect(api.post).toHaveBeenCalledWith('/register/confirm', { token: 'token' });
+      expect(result).toEqual({ success: true, error: null });
+    });
+
+    it('should return error message from API on registration confirmation failure', async () => {
+      const errorMessage = 'Token already taken';
+      api.post.mockRejectedValue({ response: { data: { errors: errorMessage } } });
+      const result = await authService.registerConfirm('token');
+      expect(result).toEqual({ success: false, error: errorMessage });
+    });
+
+    it('should return default error message on generic registration confirmation failure', async () => {
+      const networkError = new Error('Network error');
+      networkError.request = { message: 'Network error' };
+      api.post.mockRejectedValue(networkError);
+      const result = await authService.registerConfirm('token');
+      expect(result).toEqual({ success: false, error: 'Registration is currently unavailable. Please try again later.' });
     });
   });
 
