@@ -22,8 +22,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static com.bu.getactivecore.service.jwt.api.JwtApi.TOKEN_CLAIM_TYPE_KEY;
 import static com.bu.getactivecore.service.jwt.api.JwtApi.TokenClaimType;
 import static com.bu.getactivecore.shared.Constants.PASSWORD_ENCODER_STRENGTH;
@@ -87,12 +85,19 @@ public class RegistrationService implements RegistrationApi {
         String username = requestDto.getUsername();
 
         synchronized (REGISTRATION_LOCK) {
-            Optional<Users> existingUser = m_userRepo.findByEmailOrUserName(email, username);
-            if (existingUser.isPresent()) {
-                String msg = String.format("Email '%s' or username '%s' is already taken", email, username);
-                String debugMessage = buildDebugMessage(existingUser.get(), email, username);
+            boolean emailExists = m_userRepo.findByEmail(email).isPresent();
+            boolean usernameExists = m_userRepo.findByUsername(username).isPresent();
+            String debugMessage = null;
+            if (emailExists && usernameExists) {
+                debugMessage = String.format("Email '%s' and username '%s' are already taken", email, username);
+            } else if (emailExists) {
+                debugMessage = String.format("Email '%s' is already taken", email);
+            } else if (usernameExists) {
+                debugMessage = String.format("Username '%s' is already taken", username);
+            }
+            if (debugMessage != null) {
                 ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(EMAIL_USERNAME_TAKEN)
-                        .message(msg)
+                        .message("Email or username already taken")
                         .debugMessage(debugMessage)
                         .build();
                 throw new ApiException(error);
