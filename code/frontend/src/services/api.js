@@ -1,6 +1,6 @@
 // src/services/api.js
-import axios from 'axios';
-import { jwtUtils } from '../utils/jwt';
+import axios from "axios";
+import { jwtUtils } from "../utils/jwt";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,

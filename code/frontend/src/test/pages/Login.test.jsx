@@ -7,7 +7,7 @@ import { useAuth, AuthProvider } from '../../contexts/AuthContext';
 import userEvent from '@testing-library/user-event';
 
 const mockNavigate = vi.fn(); 
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock("react-router-dom", async (importOriginal) => {
   const actual = await importOriginal(); 
   return {
     ...actual, 
