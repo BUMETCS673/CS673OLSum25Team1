@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 
 /**
- * DTO for updating an existing activity.
+ * DTO for deleting an activity.
  */
 @Value
 @Builder

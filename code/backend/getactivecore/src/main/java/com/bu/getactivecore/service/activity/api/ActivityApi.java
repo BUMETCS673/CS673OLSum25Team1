@@ -38,7 +38,22 @@ public interface ActivityApi {
      */
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
 
+     /**
+     * Delete an activity.
+     *
+     * @param userId     ID of the user creating the activity
+     * @param activityId   ID of a to be deleted activity
+     * @param requestDto Details of the activity to be deleted
+     */
     void deleteActivity(String userId, String activityId, @Valid ActivityDeleteRequestDto requestDto);
 
+    /**
+     * Update an activity.
+     *
+     * @param userId     ID of the user creating the activity
+     * @param activityId   ID of a to be deleted activity
+     * @param requestDto Details of the activity to be updated
+     * @return Response containing details of the updated activity
+     */
     ActivityDto updateActivity(String userId, String activityId, @Valid ActivityUpdateRequestDto requestDto);
 }
