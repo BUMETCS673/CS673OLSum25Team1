@@ -7,12 +7,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,12 +30,30 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtApi m_jwtApi;
+    private final JwtApi m_jwtApi;
 
-    @Autowired
-    private ApplicationContext m_appContext;
+    private final ApplicationContext m_appContext;
 
+    private final RequestMatcher m_publicPaths;
+
+    /**
+     * Constructs the JwtFilter.
+     *
+     * @param jwtApi     used to validate JWT tokens and extract user information
+     * @param appContext used to access application beans
+     * @param skipPaths  used to define public paths that do not require authentication
+     */
+    public JwtFilter(JwtApi jwtApi, ApplicationContext appContext, @Qualifier("skipPaths") RequestMatcher skipPaths) {
+        m_jwtApi = jwtApi;
+        m_appContext = appContext;
+        m_publicPaths = skipPaths;
+    }
+
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return m_publicPaths.matches(request);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
