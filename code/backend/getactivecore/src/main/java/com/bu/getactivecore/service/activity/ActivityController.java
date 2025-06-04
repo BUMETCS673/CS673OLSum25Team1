@@ -79,9 +79,9 @@ public class ActivityController {
         );
     }
 
-    @PutMapping("/activity/join")
-    public ActivityResponseDto join(@RequestBody ActivityCreateRequestDto request) {
-        log.info("Got request: /v1/activity/join");
+    @PostMapping("/activity/participant")
+    public ActivityParticipantResponseDto join(@RequestBody ActivityParticipantRequestDto request) {
+        log.info("Got request: /v1/activity/participant");
 
         // TODO implement the logic to join an activity
         return new ActivityResponseDto(
@@ -89,6 +89,14 @@ public class ActivityController {
         );
     }
 
+    @DeleteMapping("/activity/participant")
+    public ActivityParticipantResponseDto leave(@RequestBody ActivityParticipantRequestDto request) {
+        log.info("Got request: /v1/activity/participant");
+
+        // TODO implement the logic to leave an activity
+        return new ActivityResponseDto(
+                ActivityDto.builder().build()
+    }
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> healthCheck() {
