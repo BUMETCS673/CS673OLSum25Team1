@@ -36,23 +36,23 @@ describe("Login Page E2E Test", () => {
     });
   });
 
-  // it("should display an error message on failed login", () => {
-  //   cy.visit("/login");
-  //   cy.findByLabelText(/username/i).type("testuser");
-  //   cy.findByLabelText(/password/i).type("wrongpassword");
-  //   cy.findByRole("button", { name: /Login/i }).click();
+  it("should display an error message on failed login", () => {
+    cy.visit("/login");
+    cy.findByLabelText(/username/i).type("testuser");
+    cy.findByLabelText(/password/i).type("wrongpassword");
+    cy.findByRole("button", { name: /Login/i }).click();
 
-  //   cy.contains(/Login failed/i).should("be.visible");
-  //   cy.url().should("include", "/login");
-  // });
-
-    it('should allow a user to log in successfully', () => {
-      cy.visit('/login');
-      cy.findByLabelText(/username/i).type('testuser');
-      cy.findByLabelText(/password/i).type('Password123!');
-      cy.findByRole('button', { name: /Login/i }).click();
-  
-      cy.url().should('include', '/home');
-      cy.contains(/Welcome testuser/i).should('be.visible');
-    });
+    cy.contains(/Login failed/i).should("be.visible");
+    cy.url().should("include", "/login");
   });
+
+  it("should allow a user to log in successfully", () => {
+    cy.visit("/login");
+    cy.findByLabelText(/username/i).type("testuser");
+    cy.findByLabelText(/password/i).type("Password123!");
+    cy.findByRole("button", { name: /Login/i }).click();
+
+    cy.url().should("include", "/home");
+    cy.contains(/Welcome testuser/i).should("be.visible");
+  });
+});

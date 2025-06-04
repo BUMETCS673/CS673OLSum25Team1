@@ -118,7 +118,6 @@ const Register = () => {
       );
       if (success) {
         setRegisterSuccess(true);
-        console.log("Registration token", success);
         setTimeout(() => {
           navigate("/register/confirm", { replace: true });
         }, 1000);
