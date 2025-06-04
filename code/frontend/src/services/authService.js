@@ -66,8 +66,6 @@ export const authService = {
       //jwtUtils.setToken('refresh_token', refreshToken);
       localStorage.setItem('userData', JSON.stringify({userId: data.userId, username: data.username, userEmail: data.email}));
 
-      return { success: true, userData: {userId: data.userId, username: data.username, userEmail: data.email}, error: null};
-
       return {
         success: true,
         userData: {
@@ -87,7 +85,9 @@ export const authService = {
 
   logout: async () => {
     try {
-      await api.post("/auth/logout");
+      await api.post('/logout');
+    } catch (error) {
+      throw new Error('API logout failed');
     } finally {
       jwtUtils.removeToken("auth_token");
       jwtUtils.removeToken("refresh_token");
@@ -116,6 +116,6 @@ export const authService = {
 
   isAuthenticated: () => {
     const token = jwtUtils.getToken('auth_token');
-    return token && !jwtUtils.isTokenExpired(token);
-  },
+    return Boolean(token && !jwtUtils.isTokenExpired(token));
+  }
 };

@@ -30,8 +30,7 @@ const Login = () => {
     try {
       const { success, error: loginError } = await login(
         username,
-        password,
-        rememberMe
+        password
       );
       console.log("success", success);
       console.log("loginError", loginError);
