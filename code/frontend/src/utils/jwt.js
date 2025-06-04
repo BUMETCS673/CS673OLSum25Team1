@@ -14,11 +14,11 @@ export const jwtUtils = {
 
   parseJwt: (token) => {
     try {
-      const tokenPayload = token.split('.')[1];
-      const base64Payload = tokenPayload.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64Payload).split('').map(c => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+      const tokenPayload = token.split(".")[1];
+      const base64Payload = tokenPayload.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(atob(base64Payload).split("").map(c => {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(""));
       return JSON.parse(jsonPayload);
     } catch (e) {
       return null;
