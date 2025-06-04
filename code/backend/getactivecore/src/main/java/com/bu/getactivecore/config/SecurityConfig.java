@@ -1,6 +1,7 @@
 package com.bu.getactivecore.config;
 
 import com.bu.getactivecore.service.security.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -41,17 +43,21 @@ public class SecurityConfig {
 
     private final CustomAccessDeniedHandler m_customAccessDeniedHandler;
 
+    private final RequestMatcher m_skipPaths;
+
     /**
      * Constructs the SecurityConfig.
      *
      * @param userDetailsService        used to load user details for authentication
      * @param jwtFilter                 used to filter requests and validate JWT tokens
      * @param customAccessDeniedHandler used to wrap access denied exceptions in a custom response
+     * @param skipPaths                 used to define public paths that do not require authentication
      */
-    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtFilter jwtFilter, CustomAccessDeniedHandler customAccessDeniedHandler) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtFilter jwtFilter, CustomAccessDeniedHandler customAccessDeniedHandler, @Qualifier("skipPaths") RequestMatcher skipPaths) {
         m_userDetailsService = userDetailsService;
         m_jwtFilter = jwtFilter;
         m_customAccessDeniedHandler = customAccessDeniedHandler;
+        m_skipPaths = skipPaths;
     }
 
     /**
@@ -71,11 +77,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
 
                         // Permit following endpoints without authentication
-                        .requestMatchers("/h2-console/**", "/v1/register",
-                                "/v1/register/confirm",
-                                "/v1/health",
-                                "/v1/login"
-                        ).permitAll()
+                        .requestMatchers(m_skipPaths).permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
