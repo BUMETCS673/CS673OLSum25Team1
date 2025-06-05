@@ -24,7 +24,7 @@ describe("Login Page E2E Test", () => {
       expect(token).to.exist;
 
       // Wait for us to be redirected to the confirmation page
-      cy.url().should("include", "/register/confirm");
+      cy.url().should("include", "/register/confirmation");
 
       cy.findByLabelText(/Confirmation Code/i).type(token);
       cy.findByRole("button", { name: /Confirm/i }).click();
