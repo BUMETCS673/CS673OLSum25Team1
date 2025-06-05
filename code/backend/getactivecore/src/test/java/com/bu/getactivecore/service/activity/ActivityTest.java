@@ -86,8 +86,6 @@ class ActivityTest {
         MvcResult response = sendPost(mockMvc, RestEndpoint.ACTIVITY, createActivityReq, u1token)
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
-        JsonNode jsonNode = objectMapper.readTree(response.getResponse().getContentAsString());
-        String activityId = jsonNode.at("/data/activity/activityId").asText();
 
 
         // Then create user2 and get its token
