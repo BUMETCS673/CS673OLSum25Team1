@@ -36,6 +36,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
         if (body instanceof ApiResponse || body instanceof ApiErrorResponse) {
             return body;
         }
-        return new ApiResponse<>(body);
+        // If the body is null, return null to avoid wrapping
+        return body == null ? null : new ApiResponse<>(body);
     }
 }

@@ -182,4 +182,18 @@ public class RestUtil {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(confirmationRequest)));
     }
+
+    /**
+     * Resends the confirmation registration request.
+     *
+     * @param mockMvc             the MockMvc instance to perform the request
+     * @param confirmationRequest the confirmation request containing user details
+     * @return ResultActions containing the result of the resend action
+     * @throws Exception if an error occurs during request execution
+     */
+    public static ResultActions resendConfirmRegistration(MockMvc mockMvc, Object confirmationRequest) throws Exception {
+        return mockMvc.perform(post(RestEndpoint.RESEND_CONFIRMATION.get())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(confirmationRequest)));
+    }
 }
