@@ -5,6 +5,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,9 @@ import com.bu.getactivecore.model.activity.UserActivity;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
+import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.shared.exception.ApiException;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,7 +93,6 @@ public class ActivityServiceTest {
 
         when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(Optional.empty());
 
-
         activityService.deleteActivity(userId, activityId, ActivityDeleteRequestDto.builder().force(false).build());
         
         verify(userActivityRepository).deleteByActivityId(activityId);
@@ -121,18 +123,189 @@ public class ActivityServiceTest {
     }
 
     @Test
-    public void deleteActivitySuccessfully(){
-        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
+    public void createActivitySuccessfully(){
+        when(activityRepository.findByName("Rock Climbing")).thenReturn(Optional.empty());
 
-        when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(Optional.empty());
+        ActivityCreateRequestDto dtoRequest = ActivityCreateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now().plusHours(1))
+                                                                      .endDateTime(LocalDateTime.now().plusHours(2))
+                                                                      .build();
+
+        Activity createdActivity = ActivityCreateRequestDto.from(dtoRequest);
+        createdActivity.setId(activityId);
+
+        when(activityRepository.save(ActivityCreateRequestDto.from(dtoRequest))).thenReturn(createdActivity);
 
 
-        activityService.deleteActivity(userId, activityId, ActivityDeleteRequestDto.builder().force(false).build());
-        
-        verify(userActivityRepository).deleteByActivityId(activityId);
+        UserActivity userActivityRole = UserActivity.builder()
+                .userId(userId)
+                .activityId(activityId)
+                .role(RoleType.ADMIN)
+                .build();                                                                
+
+        activityService.createActivity(userId, dtoRequest);
+
+        verify(activityRepository).save(ActivityCreateRequestDto.from(dtoRequest));
        
-        verify(activityRepository).deleteById(activityId);
+        verify(userActivityRepository).save(userActivityRole);
     }
 
+    @Test
+    public void createActivityWithPastStartTime(){
+        when(activityRepository.findByName("Rock Climbing")).thenReturn(Optional.empty());
+
+        ActivityCreateRequestDto dtoRequest = ActivityCreateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now().minusHours(1))
+                                                                      .endDateTime(LocalDateTime.now().plusHours(2))
+                                                                      .build();
+
+        Activity createdActivity = ActivityCreateRequestDto.from(dtoRequest);
+        createdActivity.setId(activityId);
+
+        UserActivity userActivityRole = UserActivity.builder()
+                .userId(userId)
+                .activityId(activityId)
+                .role(RoleType.ADMIN)
+                .build();   
+                
+        assertThrows(ApiException.class, () ->  activityService.createActivity(userId, dtoRequest));        
+
+        verify(activityRepository,never()).save(ActivityCreateRequestDto.from(dtoRequest));
+       
+        verify(userActivityRepository, never()).save(userActivityRole);
+    }
+
+    @Test
+    public void createActivityWithPastEndTime(){
+        when(activityRepository.findByName("Rock Climbing")).thenReturn(Optional.empty());
+
+        ActivityCreateRequestDto dtoRequest = ActivityCreateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now())
+                                                                      .endDateTime(LocalDateTime.now().minusHours(2))
+                                                                      .build();
+
+        Activity createdActivity = ActivityCreateRequestDto.from(dtoRequest);
+        createdActivity.setId(activityId);
+
+        UserActivity userActivityRole = UserActivity.builder()
+                .userId(userId)
+                .activityId(activityId)
+                .role(RoleType.ADMIN)
+                .build();   
+                
+        assertThrows(ApiException.class, () ->  activityService.createActivity(userId, dtoRequest));        
+
+        verify(activityRepository,never()).save(ActivityCreateRequestDto.from(dtoRequest));
+       
+        verify(userActivityRepository, never()).save(userActivityRole);
+    }
+
+    @Test
+    public void createActivityWithEndTimeBeforeStartTime(){
+        when(activityRepository.findByName("Rock Climbing")).thenReturn(Optional.empty());
+
+        ActivityCreateRequestDto dtoRequest = ActivityCreateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now().plusHours(5))
+                                                                      .endDateTime(LocalDateTime.now().plusHours(4))
+                                                                      .build();
+
+        Activity createdActivity = ActivityCreateRequestDto.from(dtoRequest);
+        createdActivity.setId(activityId);
+
+        UserActivity userActivityRole = UserActivity.builder()
+                .userId(userId)
+                .activityId(activityId)
+                .role(RoleType.ADMIN)
+                .build();   
+                
+        assertThrows(ApiException.class, () ->  activityService.createActivity(userId, dtoRequest));        
+
+        verify(activityRepository,never()).save(ActivityCreateRequestDto.from(dtoRequest));
+       
+        verify(userActivityRepository, never()).save(userActivityRole);
+    }
+
+    @Test
+    public void updateActivityWithPastStartTime(){
+        ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now().minusHours(1))
+                                                                      .endDateTime(LocalDateTime.now().plusHours(2))
+                                                                      .build();
+
+        Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
+
+        assertThrows(ApiException.class, () ->   activityService.updateActivity(userId, activityId, dtoRequest));    
+                                                            
+        verify(activityRepository, never()).save(updateActivity);
+    }
+
+    @Test
+    public void updateActivityWithPastEndTime(){
+        ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now())
+                                                                      .endDateTime(LocalDateTime.now().minusDays(2))
+                                                                      .build();
+
+        Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
+
+        assertThrows(ApiException.class, () ->   activityService.updateActivity(userId, activityId, dtoRequest));    
+                                                            
+        verify(activityRepository, never()).save(updateActivity);
+    }
+
+
+    @Test
+    public void updateActivityWithEndTimeBeforeStartTime(){
+        ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now().plusHours(5))
+                                                                      .endDateTime(LocalDateTime.now().plusHours(4))
+                                                                      .build();
+
+        Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
+
+        assertThrows(ApiException.class, () ->   activityService.updateActivity(userId, activityId, dtoRequest));    
+                                                            
+        verify(activityRepository, never()).save(updateActivity);
+    }
+
+    @Test
+    public void updateActivitySuccessfully(){
+        ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
+                                                                      .name("Rock Climbing")
+                                                                      .description("")
+                                                                      .location("location")
+                                                                      .startDateTime(LocalDateTime.now().plusHours(1))
+                                                                      .endDateTime(LocalDateTime.now().plusHours(2))
+                                                                      .build();
+
+        Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
+
+        when(activityRepository.save(updateActivity)).thenReturn(updateActivity);
+                                                             
+        activityService.updateActivity(userId, activityId, dtoRequest);
+
+        verify(activityRepository).save(updateActivity);
+    }
 
 }

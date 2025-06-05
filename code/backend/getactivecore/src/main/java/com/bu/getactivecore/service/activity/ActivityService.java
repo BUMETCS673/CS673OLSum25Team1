@@ -117,6 +117,15 @@ public class ActivityService implements ActivityApi {
 
     @Override
     public ActivityDto updateActivity(String userId, String id, ActivityUpdateRequestDto requestDto) {
+        if (requestDto.getEndDateTime().isBefore(LocalDateTime.now())
+                || requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
+            throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST)
+                    .message("End date time cannot be in the past")
+                    .build()
+            );
+        }
+
+
         if (requestDto.getEndDateTime().isEqual(requestDto.getStartDateTime())
                 || requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
             throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST)
@@ -129,14 +138,6 @@ public class ActivityService implements ActivityApi {
                 || requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
             throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST)
                     .message("Start date time cannot be in the past")
-                    .build()
-            );
-        }
-
-        if (requestDto.getEndDateTime().isBefore(LocalDateTime.now())
-                || requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
-            throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST)
-                    .message("End date time cannot be in the past")
                     .build()
             );
         }
