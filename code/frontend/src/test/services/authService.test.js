@@ -77,7 +77,7 @@ describe('authService', () => {
     it('should return success on successful registration', async () => {
       api.post.mockResolvedValue({}); // Simulate a successful API call
       const result = await authService.registerConfirm('token');
-      expect(api.post).toHaveBeenCalledWith('/register/confirm', { token: 'token' });
+      expect(api.post).toHaveBeenCalledWith('/register/confirmation', { token: 'token' });
       expect(result).toEqual({ success: true, error: null });
     });
 
