@@ -24,7 +24,7 @@ class JwtServiceTest {
 
 
     @BeforeEach
-    void setup() throws NoSuchAlgorithmException {
+    void setup() {
         jwtProperties = new JwtProperties();
         jwtProperties.setSecretKey(Base64.getEncoder().encodeToString("This-is-a-very-secure-secret-key!".getBytes()));
         jwtService = new JwtService(jwtProperties);

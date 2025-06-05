@@ -7,6 +7,7 @@ import com.bu.getactivecore.service.email.api.EmailApi;
 import com.bu.getactivecore.service.jwt.api.JwtApi;
 import com.bu.getactivecore.service.registration.api.RegistrationApi;
 import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationResendRequestDto;
 import com.bu.getactivecore.service.registration.entity.ConfirmationResponseDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
@@ -39,10 +40,15 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class RegistrationService implements RegistrationApi {
 
     private static final Object VERIFICATION_LOCK = new Object();
+
     private static final Object REGISTRATION_LOCK = new Object();
+
     private final EmailApi m_emailApi;
+
     private final UserRepository m_userRepo;
+
     private final JwtApi m_jwtApi;
+
     private final BCryptPasswordEncoder m_passwordEncoder = new BCryptPasswordEncoder(PASSWORD_ENCODER_STRENGTH);
 
     /**
@@ -184,5 +190,21 @@ public class RegistrationService implements RegistrationApi {
             throw new ApiException(error);
         }
         return username;
+    }
+
+    @Override
+    public void resendConfirmation(ConfirmationResendRequestDto resendRequestDto) {
+        m_userRepo.findByEmailAndUsername(resendRequestDto.getEmail(), resendRequestDto.getUsername())
+                .ifPresentOrElse(user -> {
+                    if (user.getAccountState() == AccountState.UNVERIFIED) {
+                        String registrationToken = m_jwtApi.generateToken(user.getUsername(), TokenClaimType.REGISTRATION_CONFIRMATION);
+                        m_emailApi.sendVerificationEmail(user.getEmail(), registrationToken);
+                        log.info("Resent confirmation email to user '{}'", user.getUsername());
+                    } else {
+                        log.warn("Not resending confirmation email to user '{}', current state: {}",
+                                user.getUsername(), user.getAccountState());
+                    }
+                }, () -> log.debug("Cannot resend confirmation email, no user found with email/username '{}'/'{}'",
+                        resendRequestDto.getEmail(), resendRequestDto.getUsername()));
     }
 }

@@ -119,7 +119,7 @@ const Register = () => {
       if (success) {
         setRegisterSuccess(true);
         setTimeout(() => {
-          navigate("/register/confirm", { replace: true });
+          navigate("/register/confirmation", { replace: true });
         }, 1000);
       } else {
         console.error("Registration failed:", registerError);

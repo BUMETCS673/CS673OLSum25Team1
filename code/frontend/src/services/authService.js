@@ -35,7 +35,7 @@ export const authService = {
   },
   registerConfirm: async (token) => {
     try {
-      await api.post("/register/confirm", { token });
+      await api.post("/register/confirmation", { token });
       return { success: true, error: null };
     } catch (error) {
       let errorMessage = "";
