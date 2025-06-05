@@ -11,6 +11,8 @@ import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,9 +27,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,23 +55,41 @@ public class ActivityController {
     /**
      * Get all activities.
      *
-     * @return List of activities
+     * @param page current page number
+     * @param size page size
+     * @param sortBy sort by fields
+     * @param ascending ascending or descending
+     * @return Page of activities
      */
     @GetMapping("/activities")
-    public List<ActivityDto> getActivities(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.info("Got request: /v1/activities");
-        return m_activityApi.getAllActivities(page, size);
+    public ResponseEntity<Page<ActivityDto>> getActivities(@RequestParam(name = "page", defaultValue = "0") int page, 
+                                           @RequestParam(name = "size", defaultValue = "10") int size,
+                                           @RequestParam(defaultValue = "id") String sortBy,
+                                           @RequestParam(defaultValue = "true") boolean ascending
+                                           ) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();  
+        return ResponseEntity.ok(m_activityApi.getAllActivities(page, size, sort));                                         
     }
 
     /**
      * Get activities by name.
      *
      * @param name Name of the activity
-     * @return List of activities matching the name
+     * @param page current page number
+     * @param size page size
+     * @param sortBy sort by fields
+     * @param ascending ascending or descending
+     * @return Page of activities matching the name
      */
     @GetMapping("/activity/{name}")
-    public List<ActivityDto> getActivityByName(@PathVariable String name, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size) {
-        return m_activityApi.getActivityByName(name, page, size);
+    public ResponseEntity<Page<ActivityDto>> getActivityByName(@PathVariable String name, 
+                                               @RequestParam(name = "page", defaultValue = "0") int page, 
+                                               @RequestParam(name = "size", defaultValue = "10") int size,
+                                               @RequestParam(defaultValue = "id") String sortBy,
+                                               @RequestParam(defaultValue = "true") boolean ascending
+    ) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();  
+        return ResponseEntity.ok(m_activityApi.getActivityByName(name, page, size, sort));                
     }
 
     @PutMapping("/activity/join")
@@ -128,8 +148,8 @@ public class ActivityController {
 
     @PutMapping("/activity/{id}")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
-    public ActivityDto updateActivity(@AuthenticationPrincipal UserPrincipal user, @PathVariable String id, @Valid @RequestBody ActivityUpdateRequestDto request) {
+    public ResponseEntity<ActivityDto> updateActivity(@AuthenticationPrincipal UserPrincipal user, @PathVariable String id, @Valid @RequestBody ActivityUpdateRequestDto request) {
          String userId = user.getUserDto().getUserId();
-         return m_activityApi.updateActivity(userId, id, request);
+         return ResponseEntity.ok(m_activityApi.updateActivity(userId, id, request));
     }
 }

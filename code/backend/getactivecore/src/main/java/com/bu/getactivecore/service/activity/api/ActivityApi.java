@@ -9,6 +9,9 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+
 /**
  * Interface for managing activities.
  */
@@ -19,7 +22,7 @@ public interface ActivityApi {
      *
      * @return List of all activities
      */
-    List<ActivityDto> getAllActivities(int page, int size);
+    Page<ActivityDto> getAllActivities(int page, int size, Sort sort);
 
     /**
      * Retrieves activities by their name.
@@ -27,7 +30,7 @@ public interface ActivityApi {
      * @param activityName Name of the activity to search for
      * @return List of activities matching the given name
      */
-    List<ActivityDto> getActivityByName(String activityName, int page, int size);
+    Page<ActivityDto> getActivityByName(String activityName, int page, int size, Sort sort);
 
     /**
      * Creates a new activity.

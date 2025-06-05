@@ -10,6 +10,6 @@ import lombok.Value;
 @Builder
 public class ActivityDeleteRequestDto {
 
-    private boolean force = Boolean.FALSE;
+    private boolean force;
 
 }

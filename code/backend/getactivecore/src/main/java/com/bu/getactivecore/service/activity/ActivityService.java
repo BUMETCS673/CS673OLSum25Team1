@@ -14,6 +14,7 @@ import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,18 +44,18 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public List<ActivityDto> getActivityByName(String activityName, int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
+    public Page<ActivityDto> getActivityByName(String activityName, int page, int size, Sort sort) {
+        PageRequest pageable = PageRequest.of(page, size, sort);
         Page<Activity> activities = m_activityRepo.findByNameContaining(activityName, pageable);
-        return activities.stream().map(ActivityDto::of).toList();
+        return activities.map(ActivityDto::of);
     }
 
 
     @Override
-    public List<ActivityDto> getAllActivities(int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
+    public Page<ActivityDto> getAllActivities(int page, int size, Sort sort) {
+        PageRequest pageable = PageRequest.of(page, size, sort);
         Page<Activity> activities = m_activityRepo.findAll(pageable);
-        return activities.stream().map(ActivityDto::of).toList();
+        return activities.map(ActivityDto::of);
     }
 
     @Override
