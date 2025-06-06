@@ -53,6 +53,6 @@ describe("Login Page E2E Test", () => {
     cy.findByRole("button", { name: /Login/i }).click();
 
     cy.url().should("include", "/home");
-    cy.contains(/Welcome testuser/i).should("be.visible");
+    cy.contains(/ActivityHub/i).should("be.visible");
   });
 });
