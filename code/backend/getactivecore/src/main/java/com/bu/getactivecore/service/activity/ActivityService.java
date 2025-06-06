@@ -3,11 +3,14 @@ package com.bu.getactivecore.service.activity;
 import com.bu.getactivecore.model.activity.Activity;
 import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.activity.UserActivity;
+import com.bu.getactivecore.model.activity.ActivityParticipant;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
+import com.bu.getactivecore.repository.ActivityParticipantRepository;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
+import com.bu.getactivecore.service.activity.entity.ActivityParticipantDto;
 import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
@@ -26,14 +29,19 @@ public class ActivityService implements ActivityApi {
 
     private final ActivityRepository m_activityRepo;
 
+    private final ActivityParticipantRepository m_activityParticipantRepo;
+
     /**
      * Constructs the ActivityService.
      *
      * @param activityRepo used to fetch and manage activities
+     * @param userActivityRepo
+     * @param participantActivityRepo
      */
-    public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo) {
+    public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo, ActivityParticipantRepository activityParticipantRepo) {
         m_activityRepo = activityRepo;
         m_userActivityRepo = userActivityRepo;
+        m_activityParticipantRepo = activityParticipantRepo;
     }
 
     @Override
@@ -71,5 +79,31 @@ public class ActivityService implements ActivityApi {
                 .role(RoleType.ADMIN)
                 .build();
         m_userActivityRepo.save(userActivityRole);
+    }
+
+    @Override
+    public List<ActivityParticipantDto> getParticipantActivities(String userId) {
+        List<ActivityParticipant> participantActivities = m_activityParticipantRepo.findActivitiesByUserId(userId);
+        return participantActivities.stream().map(ActivityParticipantDto::of).toList();
+    }
+
+    @Override
+    public void joinActivity(String userId, String activityId) {
+        m_userActivityRepo.findByUserIdAndActivityId(userId, activityId).ifPresent(userActivity -> {
+            throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("User already joined activity").build());
+        });
+
+        m_userActivityRepo.save(UserActivity.builder()
+                .userId(userId)
+                .activityId(activityId)
+                .role(RoleType.PARTICIPANT)
+                .build());
+    }
+
+    @Override
+    public void leaveActivity(String userId, String activityId) {
+        m_userActivityRepo.findByUserIdAndActivityId(userId, activityId).ifPresent(userActivity -> {
+            m_userActivityRepo.delete(userActivity);
+        });
     }
 }

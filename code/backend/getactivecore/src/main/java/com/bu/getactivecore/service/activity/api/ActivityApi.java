@@ -2,6 +2,8 @@ package com.bu.getactivecore.service.activity.api;
 
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
+import com.bu.getactivecore.service.activity.entity.ActivityParticipantDto;
+import com.bu.getactivecore.model.activity.RoleType;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -34,4 +36,10 @@ public interface ActivityApi {
      * @return Response containing details of the created activity
      */
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
+
+    List<ActivityParticipantDto> getParticipantActivities(String userId);
+
+    void joinActivity(String userId, String activityId);
+
+    void leaveActivity(String userId, String activityId);
 }

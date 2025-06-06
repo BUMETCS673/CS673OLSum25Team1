@@ -6,6 +6,8 @@ import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityParticipantRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityParticipantResponseDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,23 +82,31 @@ public class ActivityController {
         );
     }
 
-    @PostMapping("/activity/participant")
-    public ActivityParticipantResponseDto join(@RequestBody ActivityParticipantRequestDto request) {
+    @GetMapping("/activity/participant")
+    public ActivityParticipantResponseDto getParticipantActivities(@AuthenticationPrincipal UserPrincipal user) {
         log.info("Got request: /v1/activity/participant");
 
-        // TODO implement the logic to join an activity
-        return new ActivityResponseDto(
-                ActivityDto.builder().build()
-        );
+        String userId = user.getUserDto().getUserId();
+        System.out.println("userId: " + userId);
+        return new ActivityParticipantResponseDto(m_activityApi.getParticipantActivities(userId));
+    }
+
+    @PostMapping("/activity/participant")
+    public ResponseEntity<Object> join(@AuthenticationPrincipal UserPrincipal user, @RequestBody ActivityParticipantRequestDto request) {
+        log.info("Got request: /v1/activity/participant");
+
+        String userId = user.getUserDto().getUserId();
+        m_activityApi.joinActivity(userId, request.getActivityId());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/activity/participant")
-    public ActivityParticipantResponseDto leave(@RequestBody ActivityParticipantRequestDto request) {
+    public ResponseEntity<Object> leave(@AuthenticationPrincipal UserPrincipal user, @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/participant");
 
-        // TODO implement the logic to leave an activity
-        return new ActivityResponseDto(
-                ActivityDto.builder().build()
+        String userId = user.getUserDto().getUserId();
+        m_activityApi.leaveActivity(userId, request.getActivityId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/health")
