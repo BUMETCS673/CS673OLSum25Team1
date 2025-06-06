@@ -12,10 +12,8 @@ const StyledTab = styled(Tab)({
   fontWeight: "600"
 });
 
-
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       hidden={value !== index}

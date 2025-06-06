@@ -7,8 +7,6 @@ export const activityService = {
     },
     getParticipantActivities: async () => {
         const response = await api.get("/activity/participant");
-        console.log("authService response", response);
-        console.log("authService response.data.activities", response.data.data.activities);
         return response.data.data.activities;
     },
     joinActivity: async (activityId) => {
