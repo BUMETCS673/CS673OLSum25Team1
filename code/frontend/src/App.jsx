@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import RegisterConfirm from "./pages/RegisterConfirm";
+import CreateActivity from "./pages/CreateActivity";
 
 function App() {
   return (
@@ -16,12 +17,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register/confirmation" element={<RegisterConfirm />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/create-activity" element={<CreateActivity />} />
           <Route
             path="/home"
             element={
-              <ProtectedRoute>
+              //<ProtectedRoute>
                 <Home />
-              </ProtectedRoute>
+              //</ProtectedRoute>
             }
           />
         </Routes>
