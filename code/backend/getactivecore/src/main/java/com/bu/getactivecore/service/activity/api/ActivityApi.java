@@ -3,7 +3,6 @@ package com.bu.getactivecore.service.activity.api;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityParticipantDto;
-import com.bu.getactivecore.model.activity.RoleType;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -37,9 +36,27 @@ public interface ActivityApi {
      */
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
 
+    /**
+     * Retrieves activities where the user is a participant.
+     *
+     * @param userId ID of the user
+     * @return List of activities where the user is a participant
+     */
     List<ActivityParticipantDto> getParticipantActivities(String userId);
 
+    /**
+     * Joins an activity.
+     *
+     * @param userId     ID of the user joining the activity
+     * @param activityId ID of the activity to join
+     */
     void joinActivity(String userId, String activityId);
 
+    /**
+     * Leaves an activity.
+     *
+     * @param userId     ID of the user leaving the activity
+     * @param activityId ID of the activity to leave
+     */
     void leaveActivity(String userId, String activityId);
 }
