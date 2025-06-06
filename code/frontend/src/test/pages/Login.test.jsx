@@ -50,7 +50,7 @@ describe('LoginPage Unit Test', () => {
           expect(mockNavigate).toHaveBeenCalledWith('/home', { replace: true }); 
       });
 
-      await waitFor(() => expect(screen.getByText(/Welcome testuser/i)).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByText(/ActivityHub/i)).toBeInTheDocument());
     });
 
     it('should display an error message on failed login', async () => {
