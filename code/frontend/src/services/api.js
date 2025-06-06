@@ -1,12 +1,13 @@
-// src/services/api.js
-import axios from 'axios';
-import { jwtUtils } from '../utils/jwt';
+import axios from "axios";
+import { jwtUtils } from "../utils/jwt";
 
+// Create the Axios instance with base URL from .env
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL, // e.g. http://localhost:3232/v1
   timeout: 5000,
 });
 
+// Automatically attach JWT token if available
 api.interceptors.request.use(
   (config) => {
     const token = jwtUtils.getToken("auth_token");
@@ -15,39 +16,28 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// Optionally handle response errors globally
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
-    // if (error.response?.status === 401 && !originalRequest._retry) {
-    //   originalRequest._retry = true;
-
-    //   // try {
-    //   //   const refreshToken = localStorage.getItem('refresh_token');
-    //   //   if (refreshToken) {
-    //   //     const response = await api.post('/auth/refresh', { refreshToken });
-    //   //     const { token } = response.data;
-          
-    //   //     jwtUtils.setToken(token);
-          
-    //   //     originalRequest.headers.Authorization = `Bearer ${token}`;
-    //   //     return api(originalRequest);
-    //   //   }
-    //   // } catch (refreshError) {
-    //   //   jwtUtils.removeToken();
-    //   //   localStorage.removeItem('refresh_token');
-    //   //   window.location.href = '/login';
-    //   // }
-    // }
-
     return Promise.reject(error);
   }
 );
 
+// Export the createActivity function for use in CreateActivityPage
+export const createActivity = async (activityData) => {
+  try {
+    const response = await api.post("/activities", activityData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating activity:", error);
+    throw error;
+  }
+};
+
+// Default export is the Axios instance
 export default api;
