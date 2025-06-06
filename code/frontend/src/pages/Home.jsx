@@ -1,12 +1,70 @@
 import { useAuth } from "../contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Tabs, Tab } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { activityService } from "../services/activityService";
+
+const StyledTab = styled(Tab)({
+  textTransform: 'none',
+  color: "#1f2937",
+  fontSize: "1.5rem",
+  fontWeight: "600"
+});
+
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      hidden={value !== index}
+      {...other}
+    >
+      {value === index && (
+          <div>{children}</div>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
+  const [value, setValue] = useState(0);
+  const [participantActivities, setParticipantActivities] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+
+  const handleChange = async (event, newValue) => {
+    setValue(newValue);
+    if (newValue === 0) {
+      const activities = await activityService.getRecentActivities();
+      setRecentActivities(activities);
+    }
+    if (newValue === 1) {
+      const activities = await activityService.getParticipantActivities();
+      setParticipantActivities(activities);
+    }
+  };
+
+  useEffect(() => {
+    activityService.getRecentActivities().then(setRecentActivities);
+    activityService.getParticipantActivities().then(setParticipantActivities);
+  }, []);
+
+  const handleJoinActivity = async (activityId) => {
+    await activityService.joinActivity(activityId);
+    const activities = await activityService.getParticipantActivities();
+    setParticipantActivities(activities);
+  }
+
+  const handleLeaveActivity = async (activityId) => {
+    await activityService.leaveActivity(activityId);
+    const activities = await activityService.getParticipantActivities();
+    setParticipantActivities(activities);
+  }
 
   // Example activity data - replace with actual data from API later
   const [activities] = useState([
@@ -124,9 +182,13 @@ export default function Home() {
 
         {/* Activities Section */}
         <div style={styles.activitiesSection}>
-          <h2 style={styles.sectionTitle}>Recent Activities</h2>
+        <Tabs value={value} onChange={handleChange}>
+          <StyledTab label="Recent Activities"/> 
+          <StyledTab label="Participated Activities"/>
+        </Tabs>
+        <TabPanel value={value} index={1}>
           <div style={styles.activitiesGrid}>
-            {filteredActivities.map((activity, index) => {
+            {participantActivities.map((activity, index) => {
               const startDate = new Date(activity.startDateTime);
               const endDate = new Date(activity.endDateTime);
               const formatDateTime = (date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
@@ -149,11 +211,43 @@ export default function Home() {
                       <span>{activity.location}</span>
                     </div>
                   </div>
-                  <button style={styles.joinButton}>Join Activity</button>
+                  <button style={styles.joinButton} onClick={() => handleLeaveActivity(activity.id)}>Leave Activity</button>
                 </div>
               );
             })}
           </div>
+        </TabPanel>
+        <TabPanel value={value} index={0}>
+          <div style={styles.activitiesGrid}>
+            {recentActivities.map((activity, index) => {
+              const startDate = new Date(activity.startDateTime);
+              const endDate = new Date(activity.endDateTime);
+              const formatDateTime = (date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+              
+              return (
+                <div key={index} style={styles.activityCard}>
+                  <h3 style={styles.activityTitle}>{activity.name}</h3>
+                  <p style={styles.activityDescription}>{activity.description}</p>
+                  <div style={styles.activityDetails}>
+                    <div style={styles.activityMeta}>
+                      <span style={styles.metaIcon}>🕐</span>
+                      <span><strong>Start:</strong> {formatDateTime(startDate)}</span>
+                    </div>
+                    <div style={styles.activityMeta}>
+                      <span style={styles.metaIcon}>🕕</span>
+                      <span><strong>End:</strong> {formatDateTime(endDate)}</span>
+                    </div>
+                    <div style={styles.activityMeta}>
+                      <span style={styles.metaIcon}>📍</span>
+                      <span>{activity.location}</span>
+                    </div>
+                  </div>
+                  <button style={styles.joinButton} onClick={() => handleJoinActivity(activity.id)}>Join Activity</button>
+                </div>
+              );
+            })}
+          </div>
+        </TabPanel>
         </div>
       </main>
     </div>
@@ -305,6 +399,7 @@ const styles = {
     marginBottom: "1.5rem"
   },
   activitiesGrid: {
+    marginTop: "1rem",
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
     gap: "1.5rem",

@@ -17,13 +17,20 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register/confirmation" element={<RegisterConfirm />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/create-activity" element={<CreateActivity />} />
+          <Route 
+            path="/create-activity" 
+            element={
+              <ProtectedRoute>
+                <CreateActivity />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/home"
             element={
-              //<ProtectedRoute>
+              <ProtectedRoute>
                 <Home />
-              //</ProtectedRoute>
+              </ProtectedRoute>
             }
           />
         </Routes>
