@@ -23,7 +23,8 @@ public class PublicPaths {
         return new OrRequestMatcher(
                 new AntPathRequestMatcher("/h2-console/**"),
                 new AntPathRequestMatcher("/v1/register"),
-                new AntPathRequestMatcher("/v1/register/confirm"),
+                new AntPathRequestMatcher("/v1/register/confirmation"),
+                new AntPathRequestMatcher("/v1/register/confirmation/resend"),
                 new AntPathRequestMatcher("/v1/health"),
                 new AntPathRequestMatcher("/v1/login")
         );

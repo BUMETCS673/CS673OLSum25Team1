@@ -1,6 +1,7 @@
 package com.bu.getactivecore.service.registration.api;
 
 import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
+import com.bu.getactivecore.service.registration.entity.ConfirmationResendRequestDto;
 import com.bu.getactivecore.service.registration.entity.ConfirmationResponseDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationResponseDto;
@@ -28,4 +29,12 @@ public interface RegistrationApi {
      * @return {@link RegistrationResponseDto} indicating the result of the verification registration.
      */
     ConfirmationResponseDto confirmRegistration(@Valid ConfirmationRequestDto verificationDto);
+
+    /**
+     * Resends the confirmation email to the user.
+     *
+     * @param resendRequestDto containing email and username for resending confirmation.
+     * @return true if the confirmation email was successfully resent
+     */
+    void resendConfirmation(@Valid ConfirmationResendRequestDto resendRequestDto);
 }

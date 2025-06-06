@@ -5,9 +5,10 @@ package com.bu.getactivecore.util;
  */
 public enum RestEndpoint {
     ACTIVITY("/v1/activity"),
-    CONFIRM_REGISTRATION("/v1/register/confirm"),
+    CONFIRM_REGISTRATION("/v1/register/confirmation"),
     LOGIN("/v1/login"),
-    REGISTER("/v1/register");
+    REGISTER("/v1/register"),
+    RESEND_CONFIRMATION("/v1/register/confirmation/resend");
 
     private final String endpoint;
 

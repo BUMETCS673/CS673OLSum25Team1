@@ -36,14 +36,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserRegistrationTest {
 
     private static final String VALID_PASSWORD = "Test123.";
+
     @MockitoBean
     private EmailVerificationService emailVerificationService;
+
     @MockitoBean
     private JavaGmailMailConfig javaGmailMailConfig;
+
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private JwtApi jwtApi;
 
