@@ -10,13 +10,13 @@ export const activityService = {
         return response.data.data.activities;
     },
     joinActivity: async (activityId) => {
-        const response = await api.post(`/activity/participants`, {
+        const response = await api.post("/activity/participants", {
             activityId: activityId
         });
         return response.data;
     },
     leaveActivity: async (activityId) => {
-        const response = await api.delete(`/activity/participants`, {
+        const response = await api.delete("/activity/participants", {
             data: {
                 activityId: activityId
             }
