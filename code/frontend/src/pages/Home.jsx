@@ -60,50 +60,56 @@ export default function Home() {
   };
 
   // Example activity data - replace with actual data from API later
-  // const [activities] = useState([
-  //   {
-  //     name: "Morning Yoga Class",
-  //     description: "Start your day with a relaxing yoga session in the heart of the city. Perfect for all skill levels.",
-  //     location: "Central Park, NYC",
-  //     startDateTime: "2025-01-15 08:00",
-  //     endDateTime: "2025-01-15 10:30"
-  //   },
-  //   {
-  //     name: "Book Club Meeting",
-  //     description: "Monthly discussion of our current read: 'The Seven Husbands of Evelyn Hugo'. Coffee and snacks provided!",
-  //     location: "Downtown Library",
-  //     startDateTime: "2025-01-18 19:00",
-  //     endDateTime: "2025-01-18 21:00"
-  //   },
-  //   {
-  //     name: "Hiking Adventure",
-  //     description: "Scenic mountain trail hike with breathtaking views. Bring water, snacks, and comfortable hiking boots.",
-  //     location: "Blue Ridge Mountains",
-  //     startDateTime: "2025-01-20 06:30",
-  //     endDateTime: "2025-01-20 14:00"
-  //   },
-  //   {
-  //     name: "Cooking Workshop",
-  //     description: "Learn to prepare authentic Italian pasta from scratch. All ingredients and equipment provided.",
-  //     location: "Community Center",
-  //     startDateTime: "2025-01-12 14:00",
-  //     endDateTime: "2025-01-12 17:00"
-  //   }
-  // ]);
+  // eslint-disable-next-line no-unused-vars
+  const [activities] = useState([
+    {
+      name: "Morning Yoga Class",
+      description:
+        "Start your day with a relaxing yoga session in the heart of the city. Perfect for all skill levels.",
+      location: "Central Park, NYC",
+      startDateTime: "2025-01-15 08:00",
+      endDateTime: "2025-01-15 10:30",
+    },
+    {
+      name: "Book Club Meeting",
+      description:
+        "Monthly discussion of our current read: 'The Seven Husbands of Evelyn Hugo'. Coffee and snacks provided!",
+      location: "Downtown Library",
+      startDateTime: "2025-01-18 19:00",
+      endDateTime: "2025-01-18 21:00",
+    },
+    {
+      name: "Hiking Adventure",
+      description:
+        "Scenic mountain trail hike with breathtaking views. Bring water, snacks, and comfortable hiking boots.",
+      location: "Blue Ridge Mountains",
+      startDateTime: "2025-01-20 06:30",
+      endDateTime: "2025-01-20 14:00",
+    },
+    {
+      name: "Cooking Workshop",
+      description: "Learn to prepare authentic Italian pasta from scratch. All ingredients and equipment provided.",
+      location: "Community Center",
+      startDateTime: "2025-01-12 14:00",
+      endDateTime: "2025-01-12 17:00",
+    },
+  ]);
 
-  // Not used anywhere, should it be removed?
   // Filter and sort activities
-  // const filteredActivities = activities
-  //   .filter(activity =>
-  //     activity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     activity.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     activity.location.toLowerCase().includes(searchQuery.toLowerCase())
-  //   )
-  //   .sort((a, b) => {
-  //     const dateA = new Date(a.startDateTime);
-  //     const dateB = new Date(b.startDateTime);
-  //     return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-  //   });
+
+  // eslint-disable-next-line no-unused-vars
+  const filteredActivities = activities
+    .filter(
+      (activity) =>
+        activity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        activity.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        activity.location.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      const dateA = new Date(a.startDateTime);
+      const dateB = new Date(b.startDateTime);
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
 
   const handleCreateActivity = () => {
     navigate("/create-activity");
