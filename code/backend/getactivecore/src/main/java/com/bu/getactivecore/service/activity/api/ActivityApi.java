@@ -1,12 +1,16 @@
 package com.bu.getactivecore.service.activity.api;
 
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
+import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.service.activity.entity.UserActivityDto;
-
 import jakarta.validation.Valid;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Interface for managing activities.
@@ -18,7 +22,7 @@ public interface ActivityApi {
      *
      * @return List of all activities
      */
-    List<ActivityDto> getAllActivities();
+    Page<ActivityDto> getAllActivities(Pageable page);
 
     /**
      * Retrieves activities by their name.
@@ -26,7 +30,7 @@ public interface ActivityApi {
      * @param activityName Name of the activity to search for
      * @return List of activities matching the given name
      */
-    List<ActivityDto> getActivityByName(String activityName);
+    Page<ActivityDto> getActivityByName(String activityName, Pageable page);
 
     /**
      * Creates a new activity.
@@ -36,6 +40,23 @@ public interface ActivityApi {
      * @return Response containing details of the created activity
      */
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
+
+    /**
+     * Delete an activity.
+     *
+     * @param activityId ID of a to be deleted activity
+     * @param requestDto Details of the activity to be deleted
+     */
+    void deleteActivity(String activityId, @Valid ActivityDeleteRequestDto requestDto);
+
+    /**
+     * Update an activity.
+     *
+     * @param activityId ID of a to be deleted activity
+     * @param requestDto Details of the activity to be updated
+     * @return Response containing details of the updated activity
+     */
+    ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
 
     /**
      * Retrieves activities where the user is a participant.

@@ -40,4 +40,5 @@ public class Users {
     @Enumerated(EnumType.STRING)
     @Column(name = "account_state", nullable = false)
     private AccountState accountState;
+
 }
