@@ -11,11 +11,7 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "files.eol": "\n"
       },
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "github.copilot"
-      ]
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "github.copilot"]
     }
   },
   "forwardPorts": [5173],
