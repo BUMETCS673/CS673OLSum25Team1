@@ -9,7 +9,6 @@ import com.bu.getactivecore.service.email.EmailVerificationService;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.shared.validation.AccountStateChecker;
 import com.bu.getactivecore.util.RestEndpoint;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
@@ -90,7 +89,7 @@ class ActivityTest {
         MvcResult response = sendPost(mockMvc, RestEndpoint.ACTIVITY, createActivityReq, u1token)
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
-                
+
         // Then create user2 and get its token
        /* requestDto = new RegistrationRequestDto("user2@bu.edu", "user2", "testpassword");
         String u2token = getToken(mockMvc, requestDto);

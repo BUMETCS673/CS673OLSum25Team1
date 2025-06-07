@@ -22,22 +22,22 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Stri
      */
     Optional<UserActivity> findByUserIdAndActivityId(String userId, String activityId);
 
-       /**
+    /**
      * Finds the {@link List of UserActivity} based on given parameters.
      *
      * @param activityId The ID of the user to search its activity role.
-     * @param role The user's role in an activity.
+     * @param role       The user's role in an activity.
      * @return {@link UserActivity} if found, otherwise {@link Optional#empty()}.
      */
     List<UserActivity> findByActivityIdAndRole(String activityId, RoleType role);
 
     /**
-     *  Delete an activity based on given parameters.
+     * Delete an activity based on given parameters.
      *
      * @param activityId The ID of the user to search its activity role.
      */
     void deleteByActivityId(String activityId);
 
     @Query("SELECT ua FROM UserActivity ua JOIN FETCH ua.activity WHERE ua.userId = :userId")
-    List<UserActivity> findByUserId(String userId);
+    List<UserActivity> findJoinedActivitiesByUserId(String userId);
 }

@@ -16,6 +16,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
+/**
+ * Purpose of this class is to provide a fast lookup of users and their activities.
+ */
 @Entity
 @Table(
         name = "user_activities", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "activity_id"}),

@@ -60,9 +60,9 @@ public class ActivityController {
      */
     @GetMapping("/activities")
     public ResponseEntity<Page<ActivityDto>> getActivities(@RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "true") boolean ascending) {
+                                                           @RequestParam(name = "size", defaultValue = "10") int size,
+                                                           @RequestParam(defaultValue = "id") String sortBy,
+                                                           @RequestParam(defaultValue = "true") boolean ascending) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(m_activityApi.getAllActivities(pageable));
@@ -75,26 +75,26 @@ public class ActivityController {
      */
     @GetMapping("/activity/{name}")
     public ResponseEntity<Page<ActivityDto>> getActivityByName(@PathVariable String name,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "true") boolean ascending) {
+                                                               @RequestParam(name = "page", defaultValue = "0") int page,
+                                                               @RequestParam(name = "size", defaultValue = "10") int size,
+                                                               @RequestParam(defaultValue = "id") String sortBy,
+                                                               @RequestParam(defaultValue = "true") boolean ascending) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(m_activityApi.getActivityByName(name, pageable));
     }
 
     @GetMapping("/activity/participants")
-    public ActivityParticipantResponseDto getActivityParticipants(@AuthenticationPrincipal UserPrincipal user) {
+    public ActivityParticipantResponseDto getJoinedActivities(@AuthenticationPrincipal UserPrincipal user) {
         log.info("Got request: /v1/activity/participants");
 
         String userId = user.getUserDto().getUserId();
-        return new ActivityParticipantResponseDto(m_activityApi.getParticipantActivities(userId));
+        return new ActivityParticipantResponseDto(m_activityApi.getJoinedActivities(userId));
     }
 
     @PostMapping("/activity/participants")
     public ResponseEntity<Void> join(@AuthenticationPrincipal UserPrincipal user,
-            @Valid @RequestBody ActivityParticipantRequestDto request) {
+                                     @Valid @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/participant");
 
         String userId = user.getUserDto().getUserId();
@@ -104,7 +104,7 @@ public class ActivityController {
 
     @DeleteMapping("/activity/participants")
     public ResponseEntity<Void> leave(@AuthenticationPrincipal UserPrincipal user,
-            @Valid @RequestBody ActivityParticipantRequestDto request) {
+                                      @Valid @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/leave");
 
         String userId = user.getUserDto().getUserId();
@@ -141,7 +141,7 @@ public class ActivityController {
     @Transactional
     @PostMapping("/activity")
     public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user,
-            @RequestBody @Valid ActivityCreateRequestDto requestDto) {
+                                                 @RequestBody @Valid ActivityCreateRequestDto requestDto) {
         String userId = user.getUserDto().getUserId();
         m_activityApi.createActivity(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -158,7 +158,7 @@ public class ActivityController {
     @PutMapping("/activity/{id}")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
     public ResponseEntity<ActivityDto> updateActivity(@PathVariable String id,
-            @Valid @RequestBody ActivityUpdateRequestDto request) {
+                                                      @Valid @RequestBody ActivityUpdateRequestDto request) {
         return ResponseEntity.ok(m_activityApi.updateActivity(id, request));
     }
 }

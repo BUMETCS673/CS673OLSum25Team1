@@ -36,8 +36,8 @@ public class ActivityService implements ActivityApi {
     /**
      * Constructs the ActivityService.
      *
-     * @param activityRepo            used to fetch and manage activities
-     * @param userActivityRepo          used to fetch and manage user activities
+     * @param activityRepo     used to fetch and manage activities
+     * @param userActivityRepo used to fetch and manage user activities
      */
     public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo) {
         m_activityRepo = activityRepo;
@@ -141,8 +141,9 @@ public class ActivityService implements ActivityApi {
         return ActivityDto.of(updateActivity);
     }
 
-    public List<UserActivityDto> getParticipantActivities(String userId) {
-        return m_userActivityRepo.findByUserId(userId).stream()
+    @Override
+    public List<UserActivityDto> getJoinedActivities(String userId) {
+        return m_userActivityRepo.findJoinedActivitiesByUserId(userId).stream()
                 .map(UserActivityDto::of).toList();
     }
 
