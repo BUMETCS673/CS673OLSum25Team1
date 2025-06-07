@@ -9,7 +9,11 @@ import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
+<<<<<<< HEAD
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
+=======
+import com.bu.getactivecore.service.activity.entity.UserActivityDto;
+>>>>>>> d1cc1e35f6718c4ae55af29176934217bf28e18c
 import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 import org.springframework.data.domain.Page;
@@ -20,8 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Optional;
 
+=======
+>>>>>>> d1cc1e35f6718c4ae55af29176934217bf28e18c
 /**
  * Core logic for managing activities.
  */
@@ -36,6 +43,8 @@ public class ActivityService implements ActivityApi {
      * Constructs the ActivityService.
      *
      * @param activityRepo used to fetch and manage activities
+     * @param userActivityRepo
+     * @param participantActivityRepo
      */
     public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo) {
         m_activityRepo = activityRepo;
@@ -89,13 +98,14 @@ public class ActivityService implements ActivityApi {
         Activity createdActivity = m_activityRepo.save(ActivityCreateRequestDto.from(requestDto));
         UserActivity userActivityRole = UserActivity.builder()
                 .userId(userId)
-                .activityId(createdActivity.getId())
+                .activity(createdActivity)
                 .role(RoleType.ADMIN)
                 .build();        
         m_userActivityRepo.save(userActivityRole);
     }
 
     @Override
+<<<<<<< HEAD
     public void deleteActivity(String activityId, ActivityDeleteRequestDto requestDto) {
         Optional<Activity> activity = m_activityRepo.findById(activityId);
 
@@ -141,5 +151,30 @@ public class ActivityService implements ActivityApi {
 
         Activity updateActivity = m_activityRepo.save(ActivityUpdateRequestDto.from(id, requestDto));
         return ActivityDto.of(updateActivity);
+=======
+    public List<UserActivityDto> getParticipantActivities(String userId) {
+        List<UserActivityDto> userActivityDtos = m_userActivityRepo.findByUserId(userId).stream().map(UserActivityDto::of).toList();
+        return userActivityDtos;
+    }
+
+    @Override
+    public void joinActivity(String userId, String activityId) {
+        m_userActivityRepo.findByUserIdAndActivityId(userId, activityId).ifPresent(userActivity -> {
+            throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("User already joined activity").build());
+        });
+        Activity activity = m_activityRepo.findById(activityId).orElseThrow(() -> new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build()));
+        m_userActivityRepo.save(UserActivity.builder()
+                .userId(userId)
+                .activity(activity)
+                .role(RoleType.PARTICIPANT)
+                .build());
+    }
+
+    @Override
+    public void leaveActivity(String userId, String activityId) {
+        m_userActivityRepo.findByUserIdAndActivityId(userId, activityId).ifPresent(userActivity -> {
+            m_userActivityRepo.delete(userActivity);
+        });
+>>>>>>> d1cc1e35f6718c4ae55af29176934217bf28e18c
     }
 }

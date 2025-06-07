@@ -4,6 +4,7 @@ import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.activity.UserActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,4 +37,6 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Stri
      */
     void deleteByActivityId(String activityId);
 
+    @Query("SELECT ua FROM UserActivity ua JOIN FETCH ua.activity WHERE ua.userId = :userId")
+    List<UserActivity> findByUserId(String userId);
 }

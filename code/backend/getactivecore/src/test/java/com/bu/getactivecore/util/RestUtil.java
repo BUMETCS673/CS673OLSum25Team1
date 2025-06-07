@@ -1,5 +1,6 @@
 package com.bu.getactivecore.util;
 
+import com.bu.getactivecore.service.registration.entity.ConfirmationRequestDto;
 import com.bu.getactivecore.service.registration.entity.RegistrationRequestDto;
 import com.bu.getactivecore.service.users.entity.LoginRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -125,7 +126,15 @@ public class RestUtil {
      */
     public static ResultActions registerAndLogin(MockMvc mockMvc, RegistrationRequestDto registerRequest) throws Exception {
         // Register the user first
-        register(mockMvc, registerRequest).andExpect(status().isOk());
+        MvcResult response = register(mockMvc, registerRequest).andExpect(status().isOk())
+                .andReturn();
+
+        // Confirm the registration
+        JsonNode jsonNode = objectMapper.readTree(response.getResponse().getContentAsString());
+        String confirmationToken = jsonNode.at("/data/token").asText();
+
+        confirmRegistration(mockMvc, new ConfirmationRequestDto(confirmationToken))
+                .andExpect(status().isOk());
 
         // Then log in with the registered user
         LoginRequestDto loginRequest = new LoginRequestDto(registerRequest.getUsername(), registerRequest.getPassword());
@@ -170,6 +179,20 @@ public class RestUtil {
      */
     public static ResultActions confirmRegistration(MockMvc mockMvc, Object confirmationRequest) throws Exception {
         return mockMvc.perform(post(RestEndpoint.CONFIRM_REGISTRATION.get())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(confirmationRequest)));
+    }
+
+    /**
+     * Resends the confirmation registration request.
+     *
+     * @param mockMvc             the MockMvc instance to perform the request
+     * @param confirmationRequest the confirmation request containing user details
+     * @return ResultActions containing the result of the resend action
+     * @throws Exception if an error occurs during request execution
+     */
+    public static ResultActions resendConfirmRegistration(MockMvc mockMvc, Object confirmationRequest) throws Exception {
+        return mockMvc.perform(post(RestEndpoint.RESEND_CONFIRMATION.get())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(confirmationRequest)));
     }

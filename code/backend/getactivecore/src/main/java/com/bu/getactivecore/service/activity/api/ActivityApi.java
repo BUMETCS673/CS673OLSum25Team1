@@ -3,7 +3,13 @@ package com.bu.getactivecore.service.activity.api;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
+<<<<<<< HEAD
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
+=======
+import com.bu.getactivecore.service.activity.entity.UserActivityDto;
+
+import jakarta.validation.Valid;
+>>>>>>> d1cc1e35f6718c4ae55af29176934217bf28e18c
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -38,6 +44,7 @@ public interface ActivityApi {
      */
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
 
+<<<<<<< HEAD
      /**
      * Delete an activity.
      *
@@ -54,4 +61,29 @@ public interface ActivityApi {
      * @return Response containing details of the updated activity
      */
     ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
+=======
+    /**
+     * Retrieves activities where the user is a participant.
+     *
+     * @param userId ID of the user
+     * @return List of activities where the user is a participant
+     */
+    List<UserActivityDto> getParticipantActivities(String userId);
+
+    /**
+     * Joins an activity.
+     *
+     * @param userId     ID of the user joining the activity
+     * @param activityId ID of the activity to join
+     */
+    void joinActivity(String userId, String activityId);
+
+    /**
+     * Leaves an activity.
+     *
+     * @param userId     ID of the user leaving the activity
+     * @param activityId ID of the activity to leave
+     */
+    void leaveActivity(String userId, String activityId);
+>>>>>>> d1cc1e35f6718c4ae55af29176934217bf28e18c
 }

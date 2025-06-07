@@ -16,9 +16,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.bu.getactivecore.model.users.Users;
-
-
 @Entity
 @Table(
         name = "user_activities",
@@ -40,8 +37,9 @@ public class UserActivity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "activity_id", nullable = false)
-    private String activityId;
+    @ManyToOne
+    @JoinColumn(name = "activity_id", referencedColumnName = "id")
+    private Activity activity;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
