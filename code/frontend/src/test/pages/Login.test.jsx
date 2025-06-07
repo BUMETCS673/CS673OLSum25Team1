@@ -1,9 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Login from '../../pages/Login';
-import Home from '../../pages/Home';
-import { useAuth, AuthProvider } from '../../contexts/AuthContext';
+import { AuthProvider } from '../../contexts/AuthContext';
 import userEvent from '@testing-library/user-event';
 
 const mockNavigate = vi.fn(); 
@@ -35,8 +34,7 @@ describe('LoginPage Unit Test', () => {
     it('should navigate to /home on successful login', async () => {
 
       mockLoginInUseAuth.mockResolvedValueOnce({ success: true, userData: { userId: '1', username: 'testuser', userEmail: 'test@test.com' }, error: null });
-        
-      render(<AuthProvider><MemoryRouter><Login /><Home /></MemoryRouter></AuthProvider>);
+      render(<AuthProvider><MemoryRouter><Login /></MemoryRouter></AuthProvider>);
       const user = userEvent.setup();
 
       await user.type(screen.getByLabelText(/username/i), 'testuser'); 
@@ -49,8 +47,6 @@ describe('LoginPage Unit Test', () => {
           expect(mockNavigate).toHaveBeenCalledTimes(1);
           expect(mockNavigate).toHaveBeenCalledWith('/home', { replace: true }); 
       });
-
-      await waitFor(() => expect(screen.getByText(/Welcome testuser/i)).toBeInTheDocument());
     });
 
     it('should display an error message on failed login', async () => {

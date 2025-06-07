@@ -6,6 +6,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -13,7 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
-
+import com.bu.getactivecore.model.users.Users;
 
 @Entity
 @Table(
@@ -36,8 +38,9 @@ public class UserActivity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "activity_id", nullable = false)
-    private String activityId;
+    @ManyToOne
+    @JoinColumn(name = "activity_id", referencedColumnName = "id")
+    private Activity activity;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
