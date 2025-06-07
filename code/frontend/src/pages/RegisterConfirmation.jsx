@@ -140,9 +140,10 @@ const RegisterConfirmation = () => {
       if (!result.success) {
         console.error("Resend failed:", result.error);
       }
-      setResendOpen(false);
     } catch (err) {
       console.error("Resend error:", err);
+    } finally {
+      setResendOpen(false);
     }
   };
 
@@ -205,7 +206,7 @@ const RegisterConfirmation = () => {
             </Alert>
           )}
           {confirmationSuccess && (
-            <Alert severity="success" sx={{ mb: 2 }}>
+            <Alert data-testid="success-alert" severity="success" sx={{ mb: 2 }}>
               Confirmation successful! Redirecting to login...
             </Alert>
           )}
@@ -214,10 +215,10 @@ const RegisterConfirmation = () => {
             <TextField
               label="Registration Code"
               variant="outlined"
+              slotProps={{ htmlInput: { "data-testid": "confirmTokenId" } }}
               fullWidth
               required
               value={confirmToken}
-              // onChange={(e) => setConfirmToken(e.target.value)}
               onChange={handleInputChange}
               margin="normal"
               autoFocus
