@@ -1,18 +1,16 @@
 package com.bu.getactivecore.service.activity.entity;
 
-import java.time.LocalDateTime;
-
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-
 import com.bu.getactivecore.model.activity.Activity;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import java.time.LocalDateTime;
 
 /**
  * DTO for updating an existing activity.

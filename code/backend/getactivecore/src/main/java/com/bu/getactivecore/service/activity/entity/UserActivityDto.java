@@ -1,8 +1,7 @@
 package com.bu.getactivecore.service.activity.entity;
 
-import com.bu.getactivecore.model.activity.UserActivity;
 import com.bu.getactivecore.model.activity.RoleType;
-
+import com.bu.getactivecore.model.activity.UserActivity;
 import lombok.Builder;
 import lombok.Data;
 

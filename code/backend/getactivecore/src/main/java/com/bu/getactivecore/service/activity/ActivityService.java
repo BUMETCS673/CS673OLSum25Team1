@@ -36,9 +36,8 @@ public class ActivityService implements ActivityApi {
     /**
      * Constructs the ActivityService.
      *
-     * @param activityRepo            used to fetch and manage activities
-     * @param userActivityRepo
-     * @param participantActivityRepo
+     * @param activityRepo     used to fetch and manage activities
+     * @param userActivityRepo used to fetch and manage user activities
      */
     public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo) {
         m_activityRepo = activityRepo;
@@ -106,7 +105,7 @@ public class ActivityService implements ActivityApi {
 
         List<UserActivity> userActivities = m_userActivityRepo.findByActivityIdAndRole(activityId,
                 RoleType.PARTICIPANT);
-        if (requestDto.isForce() == false && !userActivities.isEmpty()) {
+        if (!requestDto.isForce() && !userActivities.isEmpty()) {
             throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.FORBIDDEN)
                     .message("Force is set to false. There are participants in this activity. ").build());
         }
@@ -142,10 +141,10 @@ public class ActivityService implements ActivityApi {
         return ActivityDto.of(updateActivity);
     }
 
-    public List<UserActivityDto> getParticipantActivities(String userId) {
-        List<UserActivityDto> userActivityDtos = m_userActivityRepo.findByUserId(userId).stream()
+    @Override
+    public List<UserActivityDto> getJoinedActivities(String userId) {
+        return m_userActivityRepo.findJoinedActivitiesByUserId(userId).stream()
                 .map(UserActivityDto::of).toList();
-        return userActivityDtos;
     }
 
     @Override
@@ -165,8 +164,6 @@ public class ActivityService implements ActivityApi {
 
     @Override
     public void leaveActivity(String userId, String activityId) {
-        m_userActivityRepo.findByUserIdAndActivityId(userId, activityId).ifPresent(userActivity -> {
-            m_userActivityRepo.delete(userActivity);
-        });
+        m_userActivityRepo.findByUserIdAndActivityId(userId, activityId).ifPresent(m_userActivityRepo::delete);
     }
 }

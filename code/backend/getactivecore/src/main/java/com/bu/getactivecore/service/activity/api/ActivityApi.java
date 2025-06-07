@@ -6,11 +6,10 @@ import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.service.activity.entity.UserActivityDto;
 import jakarta.validation.Valid;
-
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 /**
  * Interface for managing activities.
@@ -59,12 +58,12 @@ public interface ActivityApi {
     ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
 
     /**
-     * Retrieves activities where the user is a participant.
+     * Retrieves a list of joined activities for the requested user.
      *
-     * @param userId ID of the user
-     * @return List of activities where the user is a participant
+     * @param userId ID of the user whose joined activities are to be fetched
+     * @return List of {@link UserActivityDto} representing the activities the user has joined
      */
-    List<UserActivityDto> getParticipantActivities(String userId);
+    List<UserActivityDto> getJoinedActivities(String userId);
 
     /**
      * Joins an activity.
