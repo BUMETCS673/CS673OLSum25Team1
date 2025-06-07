@@ -5,6 +5,7 @@ import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
+import com.bu.getactivecore.service.activity.entity.ActivityPageableRequest;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 
 import jakarta.transaction.Transactional;
@@ -22,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,18 +60,13 @@ public class ActivityController {
     /**
      * Get all activities.
      *
-     * @param page current page number
-     * @param size page size
-     * @param sortBy sort by fields
-     * @param ascending ascending or descending
      * @return Page of activities
      */
     @GetMapping("/activities")
     public ResponseEntity<Page<ActivityDto>> getActivities(@RequestParam(name = "page", defaultValue = "0") int page, 
                                            @RequestParam(name = "size", defaultValue = "10") int size,
                                            @RequestParam(defaultValue = "id") String sortBy,
-                                           @RequestParam(defaultValue = "true") boolean ascending
-                                           ) {
+                                           @RequestParam(defaultValue = "true") boolean ascending){
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();  
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(m_activityApi.getAllActivities(pageable));                                         
@@ -78,20 +75,14 @@ public class ActivityController {
     /**
      * Get activities by name.
      *
-     * @param name Name of the activity
-     * @param page current page number
-     * @param size page size
-     * @param sortBy sort by fields
-     * @param ascending ascending or descending
      * @return Page of activities matching the name
      */
     @GetMapping("/activity/{name}")
     public ResponseEntity<Page<ActivityDto>> getActivityByName(@PathVariable String name, 
                                                @RequestParam(name = "page", defaultValue = "0") int page, 
-                                               @RequestParam(name = "size", defaultValue = "10") int size,
-                                               @RequestParam(defaultValue = "id") String sortBy,
-                                               @RequestParam(defaultValue = "true") boolean ascending
-    ) {
+                                           @RequestParam(name = "size", defaultValue = "10") int size,
+                                           @RequestParam(defaultValue = "id") String sortBy,
+                                           @RequestParam(defaultValue = "true") boolean ascending){
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();  
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(m_activityApi.getActivityByName(name, pageable));                

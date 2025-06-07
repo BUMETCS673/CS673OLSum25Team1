@@ -144,7 +144,7 @@ public class ActivityServiceTest {
 
         UserActivity userActivityRole = UserActivity.builder()
                 .userId(userId)
-                .activityId(activityId)
+                .activity(createdActivity)
                 .role(RoleType.ADMIN)
                 .build();                                                                
 
@@ -172,7 +172,7 @@ public class ActivityServiceTest {
 
         UserActivity userActivityRole = UserActivity.builder()
                 .userId(userId)
-                .activityId(activityId)
+                .activity(createdActivity)
                 .role(RoleType.ADMIN)
                 .build();   
                 
@@ -200,7 +200,7 @@ public class ActivityServiceTest {
 
         UserActivity userActivityRole = UserActivity.builder()
                 .userId(userId)
-                .activityId(activityId)
+                .activity(createdActivity)
                 .role(RoleType.ADMIN)
                 .build();   
                 
@@ -228,7 +228,7 @@ public class ActivityServiceTest {
 
         UserActivity userActivityRole = UserActivity.builder()
                 .userId(userId)
-                .activityId(activityId)
+                .activity(createdActivity)
                 .role(RoleType.ADMIN)
                 .build();   
                 

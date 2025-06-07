@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 
@@ -22,11 +23,18 @@ public class ActivityUpdateRequestDto {
 
     
     @NotBlank(message = "Name cannot be blank")
+    @Size.List({
+        @Size(max = 250, message = "The length of name must be less or equals to 250")
+    })
     private String name;
 
+    @Size(max = 250, message = "The length of description must be less or equals to 250")
     private String description;
 
     @NotBlank(message = "Location cannot be blank")
+    @Size.List({
+        @Size(max = 250, message = "The length of location must be less or equals to 250")
+    })
     private String location;
 
     @NotNull(message = "Start DateTime cannot be blank")

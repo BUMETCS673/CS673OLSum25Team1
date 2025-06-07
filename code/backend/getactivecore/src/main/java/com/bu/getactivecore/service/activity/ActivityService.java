@@ -144,6 +144,9 @@ public class ActivityService implements ActivityApi {
 
         Activity updateActivity = m_activityRepo.save(ActivityUpdateRequestDto.from(id, requestDto));
         return ActivityDto.of(updateActivity);
+    }
+
+
     public List<UserActivityDto> getParticipantActivities(String userId) {
         List<UserActivityDto> userActivityDtos = m_userActivityRepo.findByUserId(userId).stream().map(UserActivityDto::of).toList();
         return userActivityDtos;
