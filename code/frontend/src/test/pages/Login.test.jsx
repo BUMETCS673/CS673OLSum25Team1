@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Login from "../../pages/Login";
-import Home from "../../pages/Home";
 import { AuthProvider } from "../../contexts/AuthContext";
 import userEvent from "@testing-library/user-event";
 
@@ -44,7 +43,6 @@ describe("LoginPage Unit Test", () => {
       <AuthProvider>
         <MemoryRouter>
           <Login />
-          <Home />
         </MemoryRouter>
       </AuthProvider>
     );
