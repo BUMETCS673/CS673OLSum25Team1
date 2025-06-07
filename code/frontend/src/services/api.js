@@ -23,7 +23,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    // const originalRequest = error.config;
 
     // if (error.response?.status === 401 && !originalRequest._retry) {
     //   originalRequest._retry = true;
@@ -33,9 +33,9 @@ api.interceptors.response.use(
     //   //   if (refreshToken) {
     //   //     const response = await api.post('/auth/refresh', { refreshToken });
     //   //     const { token } = response.data;
-          
+
     //   //     jwtUtils.setToken(token);
-          
+
     //   //     originalRequest.headers.Authorization = `Bearer ${token}`;
     //   //     return api(originalRequest);
     //   //   }

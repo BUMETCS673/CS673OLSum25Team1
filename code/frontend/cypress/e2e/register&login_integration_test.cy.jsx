@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 describe("Login Page E2E Test", () => {
   it("should allow a user to register successfully", () => {
     // Intercept the registration request to capture the token
