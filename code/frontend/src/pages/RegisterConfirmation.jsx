@@ -67,7 +67,10 @@ const ResendDialog = ({ open, onClose, onResend }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle data-testid="resendDialogId">Resend Confirmation Email</DialogTitle>
       <DialogContent>
-        <DialogContentText>Enter your username and email to resend the verification token.</DialogContentText>
+        <DialogContentText>
+          Please enter your username and email. A confirmation email will be sent if the information matches your
+          account.
+        </DialogContentText>
         <form noValidate autoComplete="off" onSubmit={handleSubmit}>
           <TextField
             margin="normal"
