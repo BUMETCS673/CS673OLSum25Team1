@@ -6,11 +6,8 @@ import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 
 import jakarta.validation.Valid;
-
-import java.util.List;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Interface for managing activities.
@@ -22,7 +19,7 @@ public interface ActivityApi {
      *
      * @return List of all activities
      */
-    Page<ActivityDto> getAllActivities(int page, int size, Sort sort);
+    Page<ActivityDto> getAllActivities(Pageable page);
 
     /**
      * Retrieves activities by their name.
@@ -30,7 +27,7 @@ public interface ActivityApi {
      * @param activityName Name of the activity to search for
      * @return List of activities matching the given name
      */
-    Page<ActivityDto> getActivityByName(String activityName, int page, int size, Sort sort);
+    Page<ActivityDto> getActivityByName(String activityName, Pageable page);
 
     /**
      * Creates a new activity.
@@ -44,19 +41,17 @@ public interface ActivityApi {
      /**
      * Delete an activity.
      *
-     * @param userId     ID of the user creating the activity
      * @param activityId   ID of a to be deleted activity
      * @param requestDto Details of the activity to be deleted
      */
-    void deleteActivity(String userId, String activityId, @Valid ActivityDeleteRequestDto requestDto);
+    void deleteActivity(String activityId, @Valid ActivityDeleteRequestDto requestDto);
 
     /**
      * Update an activity.
      *
-     * @param userId     ID of the user creating the activity
      * @param activityId   ID of a to be deleted activity
      * @param requestDto Details of the activity to be updated
      * @return Response containing details of the updated activity
      */
-    ActivityDto updateActivity(String userId, String activityId, @Valid ActivityUpdateRequestDto requestDto);
+    ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
 }

@@ -65,7 +65,7 @@ class ActivityRestControllerTest {
         Pageable pageable = PageRequest.of(0, 10, sort);
         Page<ActivityDto> page = new PageImpl<>(mockedActivities, pageable, mockedActivities.size());
 
-        given(m_activityApi.getAllActivities(0, 10, sort)).willReturn(page);
+        given(m_activityApi.getAllActivities(pageable)).willReturn(page);
         m_mvc.perform(
                         get("/v1/activities").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -81,7 +81,8 @@ class ActivityRestControllerTest {
 
         Page<ActivityDto> mockedActivities = Page.empty();
         Sort sort = Sort.by("id").ascending();
-        given(m_activityApi.getAllActivities(0, 10, sort)).willReturn(mockedActivities);
+        Pageable pageable = PageRequest.of(0, 10, sort);
+        given(m_activityApi.getAllActivities(pageable)).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activities").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -106,7 +107,7 @@ class ActivityRestControllerTest {
         Pageable pageable = PageRequest.of(0, 10, sort);
         Page<ActivityDto> page = new PageImpl<>(mockedActivities, pageable, mockedActivities.size());
 
-        given(m_activityApi.getActivityByName("Rock Climbing", 0, 10, sort)).willReturn(page);
+        given(m_activityApi.getActivityByName("Rock Climbing", pageable)).willReturn(page);
         m_mvc.perform(
                         get("/v1/activity/{name}", "Rock Climbing").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -120,7 +121,8 @@ class ActivityRestControllerTest {
 
         Page<ActivityDto> mockedActivities = Page.empty();
         Sort sort = Sort.by("id").ascending();
-        given(m_activityApi.getActivityByName("Rock Climbing", 0, 10, sort)).willReturn(mockedActivities);
+        Pageable pageable = PageRequest.of(0, 10, sort);
+        given(m_activityApi.getActivityByName("Rock Climbing", pageable)).willReturn(mockedActivities);
         m_mvc.perform(
                         get("/v1/activity/{name}", "Rock Climbing")
                         .accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))

@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +70,8 @@ public class ActivityController {
                                            @RequestParam(defaultValue = "true") boolean ascending
                                            ) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();  
-        return ResponseEntity.ok(m_activityApi.getAllActivities(page, size, sort));                                         
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(m_activityApi.getAllActivities(pageable));                                         
     }
 
     /**
@@ -89,7 +92,8 @@ public class ActivityController {
                                                @RequestParam(defaultValue = "true") boolean ascending
     ) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();  
-        return ResponseEntity.ok(m_activityApi.getActivityByName(name, page, size, sort));                
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(m_activityApi.getActivityByName(name, pageable));                
     }
 
     @PutMapping("/activity/join")
@@ -139,17 +143,15 @@ public class ActivityController {
     @Transactional
     @DeleteMapping("/activity/{id}")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
-    public ResponseEntity<Object> deleteActivity(@AuthenticationPrincipal UserPrincipal user, @PathVariable String id, @Valid ActivityDeleteRequestDto requestDto) {
-        String userId = user.getUserDto().getUserId();
-        m_activityApi.deleteActivity(userId, id, requestDto);
+    public ResponseEntity<Object> deleteActivity(@PathVariable String id, @Valid ActivityDeleteRequestDto requestDto) {
+        m_activityApi.deleteActivity(id, requestDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
     @PutMapping("/activity/{id}")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
-    public ResponseEntity<ActivityDto> updateActivity(@AuthenticationPrincipal UserPrincipal user, @PathVariable String id, @Valid @RequestBody ActivityUpdateRequestDto request) {
-         String userId = user.getUserDto().getUserId();
-         return ResponseEntity.ok(m_activityApi.updateActivity(userId, id, request));
+    public ResponseEntity<ActivityDto> updateActivity(@PathVariable String id, @Valid @RequestBody ActivityUpdateRequestDto request) {
+         return ResponseEntity.ok(m_activityApi.updateActivity(id, request));
     }
 }

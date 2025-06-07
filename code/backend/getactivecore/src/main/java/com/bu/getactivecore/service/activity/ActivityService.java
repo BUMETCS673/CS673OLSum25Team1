@@ -13,8 +13,7 @@ import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,16 +43,14 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public Page<ActivityDto> getActivityByName(String activityName, int page, int size, Sort sort) {
-        PageRequest pageable = PageRequest.of(page, size, sort);
+    public Page<ActivityDto> getActivityByName(String activityName, Pageable pageable) {
         Page<Activity> activities = m_activityRepo.findByNameContaining(activityName, pageable);
         return activities.map(ActivityDto::of);
     }
 
 
     @Override
-    public Page<ActivityDto> getAllActivities(int page, int size, Sort sort) {
-        PageRequest pageable = PageRequest.of(page, size, sort);
+    public Page<ActivityDto> getAllActivities(Pageable pageable) {
         Page<Activity> activities = m_activityRepo.findAll(pageable);
         return activities.map(ActivityDto::of);
     }
@@ -99,15 +96,15 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public void deleteActivity(String userId, String activityId, ActivityDeleteRequestDto requestDto) {
+    public void deleteActivity(String activityId, ActivityDeleteRequestDto requestDto) {
         Optional<Activity> activity = m_activityRepo.findById(activityId);
 
         if(activity.isEmpty()){
               throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build());
         }
 
-        Optional<List<UserActivity>> userActivities= m_userActivityRepo.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT);
-        if(requestDto.isForce() == false && !userActivities.isEmpty() && !userActivities.get().isEmpty()) {
+        List<UserActivity> userActivities= m_userActivityRepo.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT);
+        if(requestDto.isForce() == false && !userActivities.isEmpty()) {
             throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.FORBIDDEN).message("Force is set to false. There are participants in this activity. ").build());
         }
 
@@ -116,7 +113,7 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public ActivityDto updateActivity(String userId, String id, ActivityUpdateRequestDto requestDto) {
+    public ActivityDto updateActivity(String id, ActivityUpdateRequestDto requestDto) {
         if (requestDto.getEndDateTime().isBefore(LocalDateTime.now())
                 || requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
             throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST)

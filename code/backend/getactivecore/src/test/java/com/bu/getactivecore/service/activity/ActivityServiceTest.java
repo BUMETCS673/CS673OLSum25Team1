@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.bu.getactivecore.model.activity.Activity;
@@ -53,7 +55,7 @@ public class ActivityServiceTest {
     public void deleteActivityWithInValidActivityId(){
         when(activityRepository.findById(activityId)).thenReturn(Optional.empty());
 
-        assertThrows(ApiException.class, () -> activityService.deleteActivity(userId, activityId, ActivityDeleteRequestDto.builder().force(false).build()));
+        assertThrows(ApiException.class, () -> activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().force(false).build()));
 
         verify(userActivityRepository, never()).deleteByActivityId(activityId);
         
@@ -66,7 +68,7 @@ public class ActivityServiceTest {
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
 
         ActivityDeleteRequestDto requestDTO = ActivityDeleteRequestDto.builder().force(false).build();
-        activityService.deleteActivity(userId, activityId, requestDTO);
+        activityService.deleteActivity(activityId, requestDTO);
         
         verify(userActivityRepository).deleteByActivityId(activityId);
        
@@ -78,9 +80,9 @@ public class ActivityServiceTest {
     public void deleteActivityWithForceSetToFalseAndHasParticipantsInActivity(){
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
 
-        when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(Optional.of(List.of(new UserActivity())));
+        when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(List.of(new UserActivity()));
 
-        assertThrows(ApiException.class, () -> activityService.deleteActivity(userId, activityId, ActivityDeleteRequestDto.builder().force(false).build()));
+        assertThrows(ApiException.class, () -> activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().force(false).build()));
 
         verify(userActivityRepository, never()).deleteByActivityId(activityId);
        
@@ -91,9 +93,9 @@ public class ActivityServiceTest {
     public void deleteActivitySuccessfully(){
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
 
-        when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(Optional.empty());
+        when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(new ArrayList<>());
 
-        activityService.deleteActivity(userId, activityId, ActivityDeleteRequestDto.builder().force(false).build());
+        activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().force(false).build());
         
         verify(userActivityRepository).deleteByActivityId(activityId);
        
@@ -106,7 +108,7 @@ public class ActivityServiceTest {
         Page<Activity> page = new PageImpl<>(List.of(Activity.builder().build()), pageable, 1);
         when(activityRepository.findAll(pageable)).thenReturn(page);
 
-        activityService.getAllActivities(0, 10, Sort.by("id").ascending());
+        activityService.getAllActivities(pageable);
 
         verify(activityRepository).findAll(pageable);
     }
@@ -117,7 +119,7 @@ public class ActivityServiceTest {
         Page<Activity> page = new PageImpl<>(List.of(Activity.builder().build()), pageable, 1);
         when(activityRepository.findByNameContaining("Rock Climbing", pageable)).thenReturn(page);
 
-        activityService.getActivityByName("Rock Climbing",0, 10, Sort.by("id").ascending());
+        activityService.getActivityByName("Rock Climbing", pageable);
 
         verify(activityRepository).findByNameContaining("Rock Climbing", pageable);
     }
@@ -249,7 +251,7 @@ public class ActivityServiceTest {
 
         Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
 
-        assertThrows(ApiException.class, () ->   activityService.updateActivity(userId, activityId, dtoRequest));    
+        assertThrows(ApiException.class, () ->   activityService.updateActivity(activityId, dtoRequest));    
                                                             
         verify(activityRepository, never()).save(updateActivity);
     }
@@ -266,7 +268,7 @@ public class ActivityServiceTest {
 
         Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
 
-        assertThrows(ApiException.class, () ->   activityService.updateActivity(userId, activityId, dtoRequest));    
+        assertThrows(ApiException.class, () ->   activityService.updateActivity(activityId, dtoRequest));    
                                                             
         verify(activityRepository, never()).save(updateActivity);
     }
@@ -284,7 +286,7 @@ public class ActivityServiceTest {
 
         Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
 
-        assertThrows(ApiException.class, () ->   activityService.updateActivity(userId, activityId, dtoRequest));    
+        assertThrows(ApiException.class, () ->   activityService.updateActivity(activityId, dtoRequest));    
                                                             
         verify(activityRepository, never()).save(updateActivity);
     }
@@ -303,7 +305,7 @@ public class ActivityServiceTest {
 
         when(activityRepository.save(updateActivity)).thenReturn(updateActivity);
                                                              
-        activityService.updateActivity(userId, activityId, dtoRequest);
+        activityService.updateActivity(activityId, dtoRequest);
 
         verify(activityRepository).save(updateActivity);
     }
