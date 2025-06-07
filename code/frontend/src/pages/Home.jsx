@@ -209,7 +209,7 @@ export default function Home() {
                       <span>{activity.location}</span>
                     </div>
                   </div>
-                  <button style={styles.joinButton} onClick={() => handleLeaveActivity(activity.id)}>Leave Activity</button>
+                  <button style={styles.joinButton} onClick={() => handleLeaveActivity(activity.activityId)}>Leave Activity</button>
                 </div>
               );
             })}

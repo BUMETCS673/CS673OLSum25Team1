@@ -6,17 +6,17 @@ export const activityService = {
         return response.data.data;
     },
     getParticipantActivities: async () => {
-        const response = await api.get("/activity/participant");
+        const response = await api.get("/activity/participants");
         return response.data.data.activities;
     },
     joinActivity: async (activityId) => {
-        const response = await api.post(`/activity/participant`, {
+        const response = await api.post(`/activity/participants`, {
             activityId: activityId
         });
         return response.data;
     },
     leaveActivity: async (activityId) => {
-        const response = await api.delete(`/activity/participant`, {
+        const response = await api.delete(`/activity/participants`, {
             data: {
                 activityId: activityId
             }
