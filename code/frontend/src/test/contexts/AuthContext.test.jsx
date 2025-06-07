@@ -100,10 +100,10 @@ describe("AuthProvider", () => {
       let loginResult;
       await act(async () => {
         // Directly call login from a hypothetical way to get context, or use a button click
-        const authInContext = screen.getByRole("button", { name: /Login/i });
+        screen.getByRole("button", { name: /Login/i });
         // For direct call: need to get context instance. For simplicity, we use button click.
         loginResult = await new Promise((resolve) => {
-          authService.login.mockImplementationOnce(async (...args) => {
+          authService.login.mockImplementationOnce(async () => {
             const res = { success: true, userData: mockUserData, error: null };
             resolve(res);
             return res;
@@ -133,7 +133,7 @@ describe("AuthProvider", () => {
       let loginResult;
       await act(async () => {
         loginResult = await new Promise((resolve) => {
-          authService.login.mockImplementationOnce(async (...args) => {
+          authService.login.mockImplementationOnce(async () => {
             const res = { success: false, error: loginError };
             resolve(res);
             return res;
@@ -194,7 +194,7 @@ describe("AuthProvider", () => {
         // This is a bit tricky with the TestConsumer button. A more direct way would be to expose context instance.
         // For now, let's assume the button click works and we check the service call and context state.
         registerResult = await new Promise((resolve) => {
-          authService.register.mockImplementationOnce(async (...args) => {
+          authService.register.mockImplementationOnce(async () => {
             const res = registerResultPayload;
             resolve(res);
             return res;
