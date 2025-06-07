@@ -3,29 +3,36 @@ package com.bu.getactivecore.service.activity;
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
-import com.bu.getactivecore.service.activity.entity.ActivityResponseDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
+
+import jakarta.transaction.Transactional;
 import com.bu.getactivecore.service.activity.entity.ActivityParticipantRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityParticipantResponseDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,35 +58,32 @@ public class ActivityController {
     /**
      * Get all activities.
      *
-     * @return List of activities
+     * @return Page of activities
      */
     @GetMapping("/activities")
-    public List<ActivityDto> getActivities() {
-        log.info("Got request: /v1/activities");
-        return m_activityApi.getAllActivities();
+    public ResponseEntity<Page<ActivityDto>> getActivities(@RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(m_activityApi.getAllActivities(pageable));
     }
 
     /**
      * Get activities by name.
      *
-     * @param name Name of the activity
-     * @return List of activities matching the name
+     * @return Page of activities matching the name
      */
     @GetMapping("/activity/{name}")
-    public List<ActivityDto> getActivityByName(@PathVariable String name) {
-        return m_activityApi.getActivityByName(name);
-    }
-
-
-    @PutMapping("/activity")
-    @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #request.activityId)")
-    public ActivityResponseDto updateActivity(@Valid @RequestBody ActivityUpdateRequestDto request) {
-        log.info("Got request: /v1/activity/update");
-
-        // TODO implement the logic to update an activity
-        return new ActivityResponseDto(
-                ActivityDto.builder().build()
-        );
+    public ResponseEntity<Page<ActivityDto>> getActivityByName(@PathVariable String name,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(m_activityApi.getActivityByName(name, pageable));
     }
 
     @GetMapping("/activity/participants")
@@ -91,7 +95,8 @@ public class ActivityController {
     }
 
     @PostMapping("/activity/participants")
-    public ResponseEntity<Void> join(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody ActivityParticipantRequestDto request) {
+    public ResponseEntity<Void> join(@AuthenticationPrincipal UserPrincipal user,
+            @Valid @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/participant");
 
         String userId = user.getUserDto().getUserId();
@@ -100,7 +105,8 @@ public class ActivityController {
     }
 
     @DeleteMapping("/activity/participants")
-    public ResponseEntity<Void> leave(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody ActivityParticipantRequestDto request) {
+    public ResponseEntity<Void> leave(@AuthenticationPrincipal UserPrincipal user,
+            @Valid @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/participant");
 
         String userId = user.getUserDto().getUserId();
@@ -119,12 +125,13 @@ public class ActivityController {
     }
 
     /**
-     @ai-generated, Tool: Google Gemini,
-     Prompt: "how to create a Post API in spring boot",
-     Generated on: 2025-05-22,
-     Modified by: Jin Hao,
-     Modifications: change the return type and add validation to the input,
-     Verified: ✅ Unit tested, reviewed
+     * @ai-generated, Tool: Google Gemini,
+     *                Prompt: "how to create a Post API in spring boot",
+     *                Generated on: 2025-05-22,
+     *                Modified by: Jin Hao,
+     *                Modifications: change the return type and add validation to
+     *                the input,
+     *                Verified: ✅ Unit tested, reviewed
      */
 
     /**
@@ -133,10 +140,27 @@ public class ActivityController {
      * @param requestDto requested activity
      * @return an activity
      */
+    @Transactional
     @PostMapping("/activity")
-    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user, @RequestBody @Valid ActivityCreateRequestDto requestDto) {
+    public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user,
+            @RequestBody @Valid ActivityCreateRequestDto requestDto) {
         String userId = user.getUserDto().getUserId();
         m_activityApi.createActivity(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Transactional
+    @DeleteMapping("/activity/{id}")
+    @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
+    public ResponseEntity<Object> deleteActivity(@PathVariable String id, @Valid ActivityDeleteRequestDto requestDto) {
+        m_activityApi.deleteActivity(id, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/activity/{id}")
+    @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
+    public ResponseEntity<ActivityDto> updateActivity(@PathVariable String id,
+            @Valid @RequestBody ActivityUpdateRequestDto request) {
+        return ResponseEntity.ok(m_activityApi.updateActivity(id, request));
     }
 }

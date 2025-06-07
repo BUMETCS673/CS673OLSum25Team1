@@ -1,47 +1,60 @@
 package com.bu.getactivecore.service.activity.entity;
 
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import com.bu.getactivecore.model.activity.Activity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Value;
 
 /**
  * DTO for updating an existing activity.
  */
 @Value
+@Builder
 public class ActivityUpdateRequestDto {
 
-    /**
-     * The ID of the activity to update.
-     */
-    @NotBlank(message = "Activity ID must be provided")
-    String activityId;
+    @NotBlank(message = "Name cannot be blank")
+    @Size.List({
+            @Size(max = 250, message = "The length of name must be less or equal to 250")
+    })
+    private String name;
 
-    /**
-     * The updated name of the activity.
-     * <p> The validation will run if the field is set, otherwise it will be ignored.
-     */
-    @Size(min = 2, message = "Activity name must not be empty")
-    @Size(max = 100, message = "Activity name must not exceed 100 characters")
-    String updatedActivityName;
+    @Size(max = 250, message = "The length of description must be less or equal to 250")
+    private String description;
 
-    /**
-     * The new description of the activity.
-     * <p> The validation will run if the field is set,otherwise it will be ignored.
-     */
-    @Size(min = 1, message = "Activity description must not be empty")
-    @Size(max = 500, message = "Activity description must not exceed 500 characters")
-    String updatedActivityDescription;
+    @NotBlank(message = "Location cannot be blank")
+    @Size.List({
+            @Size(max = 250, message = "The length of location must be less or equal to 250")
+    })
+    private String location;
 
-    /**
-     * The updated location of the activity.
-     * <p> The validation will run if the field is set, otherwise it will be ignored.
-     */
-    @Size(min = 1, message = "Activity location must not be empty")
-    @Size(max = 100, message = "Activity location must not exceed 100 characters")
-    String updatedActivityLocation;
+    @NotNull(message = "Start DateTime cannot be blank")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime startDateTime;
 
-    @Positive(message = "Start time must be a positive number")
-    Long updatedStartTime;
+    @NotNull(message = "Start DateTime cannot be blank")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime endDateTime;
+
+    public static Activity from(String id, ActivityUpdateRequestDto request) {
+        return Activity.builder()
+                .id(id)
+                .location(request.getLocation())
+                .name(request.getName())
+                .startDateTime(request.getStartDateTime())
+                .endDateTime(request.getEndDateTime())
+                .description(request.getDescription())
+                .build();
+    }
 
 }

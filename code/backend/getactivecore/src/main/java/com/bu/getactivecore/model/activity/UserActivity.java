@@ -15,34 +15,30 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
-import com.bu.getactivecore.model.users.Users;
 
 @Entity
-@Table(
-        name = "user_activities",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "activity_id"}),
-        indexes = {
-                @Index(name = "idx_user_activities_userid_activityid", columnList = "user_id, activity_id")
-        }
-)
+@Table(name = "user_activities", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id",
+                "activity_id" }), indexes = {
+                                @Index(name = "idx_user_activities_userid_activityid", columnList = "user_id, activity_id")
+                })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserActivity {
 
-    @Id
-    @UuidGenerator
-    private String id;
+        @Id
+        @UuidGenerator
+        private String id;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+        @Column(name = "user_id", nullable = false)
+        private String userId;
 
-    @ManyToOne
-    @JoinColumn(name = "activity_id", referencedColumnName = "id")
-    private Activity activity;
+        @ManyToOne
+        @JoinColumn(name = "activity_id", referencedColumnName = "id")
+        private Activity activity;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RoleType role;
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private RoleType role;
 }
