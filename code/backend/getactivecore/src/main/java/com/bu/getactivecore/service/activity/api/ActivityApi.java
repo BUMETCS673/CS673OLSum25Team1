@@ -3,15 +3,12 @@ package com.bu.getactivecore.service.activity.api;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
-<<<<<<< HEAD
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
-=======
 import com.bu.getactivecore.service.activity.entity.UserActivityDto;
-
 import jakarta.validation.Valid;
->>>>>>> d1cc1e35f6718c4ae55af29176934217bf28e18c
 
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -44,7 +41,6 @@ public interface ActivityApi {
      */
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
 
-<<<<<<< HEAD
      /**
      * Delete an activity.
      *
@@ -61,7 +57,6 @@ public interface ActivityApi {
      * @return Response containing details of the updated activity
      */
     ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
-=======
     /**
      * Retrieves activities where the user is a participant.
      *
@@ -85,5 +80,4 @@ public interface ActivityApi {
      * @param activityId ID of the activity to leave
      */
     void leaveActivity(String userId, String activityId);
->>>>>>> d1cc1e35f6718c4ae55af29176934217bf28e18c
 }
