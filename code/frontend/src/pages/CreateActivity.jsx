@@ -72,7 +72,7 @@ export default function CreateActivity() {
       // Convert datetime-local format to our required format (YYYY-MM-DD HH:MM)
       const formatDateTime = (dateTimeStr) => {
         const date = new Date(dateTimeStr);
-        return date.toISOString().slice(0, 16).replace('T', ' ');
+        return date.toISOString().slice(0, 16).replace("T", " ");
       };
 
       const activityData = {

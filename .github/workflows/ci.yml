@@ -94,11 +94,17 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './code/frontend/package-lock.json'
       
-      - name: Run frontend tests
+      - name: Install frontend dependencies
         working-directory: ./code/frontend/
-        run: |
-          npm ci
-          npm run test
+        run: npm ci
+
+      - name: Lint frontend code
+        working-directory: ./code/frontend/
+        run: npm run lint
+
+      - name: Run frontend unit tests
+        working-directory: ./code/frontend/
+        run: npm run test
 
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6

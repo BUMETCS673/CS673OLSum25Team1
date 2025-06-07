@@ -2,18 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import validator from "validator";
-import {
-  Container,
-  Paper,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-  LinearProgress,
-} from "@mui/material";
+import { Container, Paper, TextField, Button, Typography, Box, Alert, LinearProgress } from "@mui/material";
 
-const Register = () => {
+const Registration = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,8 +63,7 @@ const Register = () => {
   };
 
   const getNextLevelHint = (password) => {
-    if (password.length < 8)
-      return "Add more characters to make it at least 8.";
+    if (password.length < 8) return "Add more characters to make it at least 8.";
     if (!/[A-Z]/.test(password)) return "Add an uppercase letter.";
     if (!/[0-9]/.test(password)) return "Add a number.";
     if (!/[^A-Za-z0-9]/.test(password)) return "Add a special character.";
@@ -92,14 +82,8 @@ const Register = () => {
       return;
     }
 
-    if (
-      password.length < 8 ||
-      !/[A-Z]/.test(password) ||
-      !/[0-9]/.test(password)
-    ) {
-      setError(
-        "Password must be at least 8 characters long, contain an uppercase letter, and a number"
-      );
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      setError("Password must be at least 8 characters long, contain an uppercase letter, and a number");
       setLoading(false);
       return;
     }
@@ -111,11 +95,7 @@ const Register = () => {
     }
 
     try {
-      const { success, error: registerError } = await register(
-        username,
-        email,
-        password
-      );
+      const { success, error: registerError } = await register(username, email, password);
       if (success) {
         setRegisterSuccess(true);
         setTimeout(() => {
@@ -225,25 +205,12 @@ const Register = () => {
             <LinearProgress
               variant="determinate"
               value={(getPasswordStrength(password) / 4) * 100}
-              sx={{
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: "lightgray",
-                mt: 1,
-              }}
+              sx={{ height: 10, borderRadius: 5, backgroundColor: "lightgray", mt: 1 }}
             />
-            <Typography
-              variant="body2"
-              align="left"
-              sx={{ color: passwordStrength?.color || "", mt: 1 }}
-            >
+            <Typography variant="body2" align="left" sx={{ color: passwordStrength?.color || "", mt: 1 }}>
               {passwordStrength?.label}
             </Typography>
-            <Typography
-              variant="body2"
-              align="left"
-              sx={{ color: "gray", mt: 1 }}
-            >
+            <Typography variant="body2" align="left" sx={{ color: "gray", mt: 1 }}>
               {getNextLevelHint(password)}
             </Typography>
             <TextField
@@ -264,13 +231,7 @@ const Register = () => {
               }}
               disabled={loading}
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading}
-            >
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={loading}>
               {loading ? "Registering..." : "Register"}
             </Button>
           </form>
@@ -280,4 +241,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Registration;

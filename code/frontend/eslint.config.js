@@ -2,9 +2,11 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import prettier from "eslint-config-prettier";
 
 export default [
   { ignores: ["dist"] },
+  prettier,
   {
     files: ["**/*.{js,jsx}"],
     languageOptions: {
@@ -28,8 +30,7 @@ export default [
         "warn",
         { allowConstantExport: true },
       ],
-      quotes: ["error", "double"],
+      quotes: ["error", "double", { avoidEscape: true }],
     },
-    extends: ["plugin:cypress/recommended"],
   },
 ];
