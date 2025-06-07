@@ -39,5 +39,5 @@ public class UserActivityDto {
                 .role(userActivity.getRole())
                 .build();
     }
-    
+
 }

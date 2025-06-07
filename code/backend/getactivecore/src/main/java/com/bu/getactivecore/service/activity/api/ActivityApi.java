@@ -41,10 +41,10 @@ public interface ActivityApi {
      */
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
 
-     /**
+    /**
      * Delete an activity.
      *
-     * @param activityId   ID of a to be deleted activity
+     * @param activityId ID of a to be deleted activity
      * @param requestDto Details of the activity to be deleted
      */
     void deleteActivity(String activityId, @Valid ActivityDeleteRequestDto requestDto);
@@ -52,11 +52,12 @@ public interface ActivityApi {
     /**
      * Update an activity.
      *
-     * @param activityId   ID of a to be deleted activity
+     * @param activityId ID of a to be deleted activity
      * @param requestDto Details of the activity to be updated
      * @return Response containing details of the updated activity
      */
     ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
+
     /**
      * Retrieves activities where the user is a participant.
      *

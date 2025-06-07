@@ -21,7 +21,7 @@ public class ActivityCreateRequestDto {
 
     @NotBlank(message = "Name cannot be blank")
     @Size.List({
-        @Size(max = 250, message = "The length of name must be less or equal to 250")
+            @Size(max = 250, message = "The length of name must be less or equal to 250")
     })
     private String name;
 
@@ -30,7 +30,7 @@ public class ActivityCreateRequestDto {
 
     @NotBlank(message = "Location cannot be blank")
     @Size.List({
-        @Size(max = 250, message = "The length of location must be less or equal to 250")
+            @Size(max = 250, message = "The length of location must be less or equal to 250")
     })
     private String location;
 
