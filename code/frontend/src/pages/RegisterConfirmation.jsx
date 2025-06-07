@@ -44,16 +44,17 @@ const ResendDialog = ({ open, onClose, onResend }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setUsernameError("");
-    setEmailError("");
 
+    let hasError = false;
     if (username.trim() === "") {
+      hasError = true;
       setUsernameError("Username is required");
     }
     if (email.trim() === "") {
+      hasError = true;
       setEmailError("Email is required");
     }
-    if (usernameError || emailError) {
+    if (hasError) {
       return;
     }
 
@@ -64,7 +65,7 @@ const ResendDialog = ({ open, onClose, onResend }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Resend Confirmation Email</DialogTitle>
+      <DialogTitle data-testid="resendDialogId">Resend Confirmation Email</DialogTitle>
       <DialogContent>
         <DialogContentText>Enter your username and email to resend the verification token.</DialogContentText>
         <form noValidate autoComplete="off" onSubmit={handleSubmit}>
@@ -72,6 +73,7 @@ const ResendDialog = ({ open, onClose, onResend }) => {
             margin="normal"
             label="Username"
             type="text"
+            slotProps={{ htmlInput: { "data-testid": "usernameId" } }}
             value={username}
             required
             fullWidth
@@ -89,12 +91,12 @@ const ResendDialog = ({ open, onClose, onResend }) => {
             margin="normal"
             label="Email"
             type="email"
+            slotProps={{ htmlInput: { "data-testid": "emailId" } }}
             value={email}
             fullWidth
             required
             error={!!emailError}
             helperText={emailError}
-            // onChange={handleEmailChange}
             onChange={(e) => {
               setEmail(e.target.value);
               setEmailError("");
@@ -110,7 +112,7 @@ const ResendDialog = ({ open, onClose, onResend }) => {
             <Button disabled={loading} onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} variant="contained">
+            <Button type="submit" data-testid="resendButtonId" disabled={loading} variant="contained">
               Resend
             </Button>
           </DialogActions>
@@ -135,11 +137,10 @@ const RegisterConfirmation = () => {
   const handleResend = async ({ username, email }) => {
     try {
       const result = await resendConfirmation(username, email);
-      if (result.success) {
-        setResendOpen(false);
-      } else {
+      if (!result.success) {
         console.error("Resend failed:", result.error);
       }
+      setResendOpen(false);
     } catch (err) {
       console.error("Resend error:", err);
     }
@@ -177,6 +178,14 @@ const RegisterConfirmation = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    e.preventDefault();
+    if (error) {
+      setError(undefined);
+    }
+    setConfirmToken(e.target.value);
+  };
+
   return (
     <Container component="main" maxWidth="xs">
       <Box sx={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -185,13 +194,13 @@ const RegisterConfirmation = () => {
             Confirm Your Email
           </Typography>
           <Typography variant="body1" align="center" sx={{ mb: 3 }}>
-            We've sent a confirmation code to your email. Please enter it below to complete your registration.
+            We've sent a code to your email. Please enter it below to complete your registration.
           </Typography>
 
           {loading && <LinearProgress sx={{ mb: 2 }} />}
 
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert data-testid="error-alert" severity="error" sx={{ mb: 2 }}>
               {error}
             </Alert>
           )}
@@ -203,17 +212,24 @@ const RegisterConfirmation = () => {
 
           <form onSubmit={handleSubmit}>
             <TextField
-              label="Confirmation Code"
+              label="Registration Code"
               variant="outlined"
               fullWidth
               required
               value={confirmToken}
-              onChange={(e) => setConfirmToken(e.target.value)}
+              // onChange={(e) => setConfirmToken(e.target.value)}
+              onChange={handleInputChange}
               margin="normal"
               autoFocus
             />
 
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={loading}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={loading || error !== undefined || confirmToken.trim() === ""}
+            >
               Confirm
             </Button>
           </form>
