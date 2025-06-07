@@ -3,8 +3,8 @@ package com.bu.getactivecore.repository;
 import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.activity.UserActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +31,8 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Stri
      */
     List<UserActivity> findByActivityIdAndRole(String activityId, RoleType role);
 
-    /* delete an activity based on given parameters.
+    /**
+     *  Delete an activity based on given parameters.
      *
      * @param activityId The ID of the user to search its activity role.
      */
