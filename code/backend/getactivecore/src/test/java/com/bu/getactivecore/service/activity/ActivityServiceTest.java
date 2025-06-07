@@ -55,7 +55,7 @@ public class ActivityServiceTest {
     public void deleteActivityWithInValidActivityId(){
         when(activityRepository.findById(activityId)).thenReturn(Optional.empty());
 
-        assertThrows(ApiException.class, () -> activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().force(false).build()));
+        assertThrows(ApiException.class, () -> activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().build()));
 
         verify(userActivityRepository, never()).deleteByActivityId(activityId);
         
@@ -67,7 +67,7 @@ public class ActivityServiceTest {
     public void deleteActivityWithForceSetToTrue(){
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
 
-        ActivityDeleteRequestDto requestDTO = ActivityDeleteRequestDto.builder().force(false).build();
+        ActivityDeleteRequestDto requestDTO = ActivityDeleteRequestDto.builder().build();
         activityService.deleteActivity(activityId, requestDTO);
         
         verify(userActivityRepository).deleteByActivityId(activityId);
@@ -82,7 +82,7 @@ public class ActivityServiceTest {
 
         when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(List.of(new UserActivity()));
 
-        assertThrows(ApiException.class, () -> activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().force(false).build()));
+        assertThrows(ApiException.class, () -> activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().build()));
 
         verify(userActivityRepository, never()).deleteByActivityId(activityId);
        
@@ -95,7 +95,7 @@ public class ActivityServiceTest {
 
         when(userActivityRepository.findByActivityIdAndRole(activityId, RoleType.PARTICIPANT)).thenReturn(new ArrayList<>());
 
-        activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().force(false).build());
+        activityService.deleteActivity(activityId, ActivityDeleteRequestDto.builder().build());
         
         verify(userActivityRepository).deleteByActivityId(activityId);
        
