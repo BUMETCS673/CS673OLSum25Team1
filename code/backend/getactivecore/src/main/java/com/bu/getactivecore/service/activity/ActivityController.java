@@ -5,7 +5,6 @@ import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
-import com.bu.getactivecore.service.activity.entity.ActivityPageableRequest;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 
 import jakarta.transaction.Transactional;

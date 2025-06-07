@@ -11,6 +11,6 @@ import lombok.Value;
 public class ActivityDeleteRequestDto {
 
     //remove all participants from this activity
-    private boolean force;
+    private boolean force = false;
 
 }
