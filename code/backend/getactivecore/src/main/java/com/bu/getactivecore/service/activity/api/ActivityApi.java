@@ -2,7 +2,8 @@ package com.bu.getactivecore.service.activity.api;
 
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
-import com.bu.getactivecore.service.activity.entity.ActivityParticipantDto;
+import com.bu.getactivecore.service.activity.entity.UserActivityDto;
+
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public interface ActivityApi {
      * @param userId ID of the user
      * @return List of activities where the user is a participant
      */
-    List<ActivityParticipantDto> getParticipantActivities(String userId);
+    List<UserActivityDto> getParticipantActivities(String userId);
 
     /**
      * Joins an activity.

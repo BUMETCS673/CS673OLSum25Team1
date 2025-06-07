@@ -8,5 +8,5 @@ import lombok.Value;
 @Value
 public class ActivityParticipantResponseDto {
     
-    List<ActivityParticipantDto> activities;
+    List<UserActivityDto> activities;
 }

@@ -82,9 +82,9 @@ public class ActivityController {
         );
     }
 
-    @GetMapping("/activity/participant")
-    public ActivityParticipantResponseDto getParticipantActivities(@AuthenticationPrincipal UserPrincipal user) {
-        log.info("Got request: /v1/activity/participant");
+    @GetMapping("/activity/participants")
+    public ActivityParticipantResponseDto getActivityParticipants(@AuthenticationPrincipal UserPrincipal user) {
+        log.info("Got request: /v1/activity/participants");
 
         String userId = user.getUserDto().getUserId();
         System.out.println("userId: " + userId);
@@ -97,11 +97,11 @@ public class ActivityController {
 
         String userId = user.getUserDto().getUserId();
         m_activityApi.joinActivity(userId, request.getActivityId());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/activity/participant")
-    public ResponseEntity<Object> leave(@AuthenticationPrincipal UserPrincipal user, @RequestBody ActivityParticipantRequestDto request) {
+    public ResponseEntity<Void> leave(@AuthenticationPrincipal UserPrincipal user, @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/participant");
 
         String userId = user.getUserDto().getUserId();

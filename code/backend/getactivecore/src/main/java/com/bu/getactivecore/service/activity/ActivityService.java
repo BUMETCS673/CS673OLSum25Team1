@@ -11,6 +11,7 @@ import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
 import com.bu.getactivecore.service.activity.entity.ActivityParticipantDto;
+import com.bu.getactivecore.service.activity.entity.UserActivityDto;
 import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
+import java.util.ArrayList;
 /**
  * Core logic for managing activities.
  */
@@ -82,9 +83,11 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public List<ActivityParticipantDto> getParticipantActivities(String userId) {
-        List<ActivityParticipant> participantActivities = m_activityParticipantRepo.findActivitiesByUserId(userId);
-        return participantActivities.stream().map(ActivityParticipantDto::of).toList();
+    public List<UserActivityDto> getParticipantActivities(String userId) {
+        //List<ActivityParticipant> participantActivities = m_activityParticipantRepo.findActivitiesByUserId(userId);
+        //List<UserActivity> userActivities = m_userActivityRepo.findByUserId(userId);
+        //return userActivities.stream().map(ActivityParticipantDto::of).toList();
+        return m_userActivityRepo.findByUserId(userId).stream().map(UserActivityDto::of).toList();
     }
 
     @Override
