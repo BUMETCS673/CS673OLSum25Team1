@@ -1,10 +1,13 @@
 package com.bu.getactivecore.service.activity.api;
 
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
+import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.service.activity.entity.UserActivityDto;
-
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ public interface ActivityApi {
      *
      * @return List of all activities
      */
-    List<ActivityDto> getAllActivities();
+    Page<ActivityDto> getAllActivities(Pageable page);
 
     /**
      * Retrieves activities by their name.
@@ -26,7 +29,7 @@ public interface ActivityApi {
      * @param activityName Name of the activity to search for
      * @return List of activities matching the given name
      */
-    List<ActivityDto> getActivityByName(String activityName);
+    Page<ActivityDto> getActivityByName(String activityName, Pageable page);
 
     /**
      * Creates a new activity.
@@ -38,12 +41,29 @@ public interface ActivityApi {
     void createActivity(String userId, @Valid ActivityCreateRequestDto requestDto);
 
     /**
-     * Retrieves activities where the user is a participant.
+     * Delete an activity.
      *
-     * @param userId ID of the user
-     * @return List of activities where the user is a participant
+     * @param activityId ID of a to be deleted activity
+     * @param requestDto Details of the activity to be deleted
      */
-    List<UserActivityDto> getParticipantActivities(String userId);
+    void deleteActivity(String activityId, @Valid ActivityDeleteRequestDto requestDto);
+
+    /**
+     * Update an activity.
+     *
+     * @param activityId ID of a to be deleted activity
+     * @param requestDto Details of the activity to be updated
+     * @return Response containing details of the updated activity
+     */
+    ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
+
+    /**
+     * Retrieves a list of joined activities for the requested user.
+     *
+     * @param userId ID of the user whose joined activities are to be fetched
+     * @return List of {@link UserActivityDto} representing the activities the user has joined
+     */
+    List<UserActivityDto> getJoinedActivities(String userId);
 
     /**
      * Joins an activity.

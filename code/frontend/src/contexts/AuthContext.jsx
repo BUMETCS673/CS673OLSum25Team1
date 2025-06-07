@@ -11,8 +11,8 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       if (authService.isAuthenticated()) {
         try {
-            const userData = await authService.getCurrentUser();
-            setUser(userData);
+          const userData = await authService.getCurrentUser();
+          setUser(userData);
         } catch (error) {
           authService.logout();
         }
@@ -23,10 +23,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const { success, userData, error } = await authService.login(
-      username,
-      password
-    );
+    const { success, userData, error } = await authService.login(username, password);
     console.log("userData", userData);
     if (success) {
       setLoading(false);
@@ -41,28 +38,33 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (username, email, password) => {
-    const { success, error } = await authService.register(
-      username,
-      email,
-      password
-    );
+    const { success, error } = await authService.register(username, email, password);
     return { success, error };
   };
 
   /**
    * Confirms the user registration using the given token.
-   * @param {*} token JWT token to confirm the registration
+   * @param {string} token JWT token to confirm the registration
    * @returns success: boolean, error: string
    */
-  const registerConfirm = async (token) => {
-    const { success, error } = await authService.registerConfirm(token);
+  const registerConfirmation = async (token) => {
+    const { success, error } = await authService.registerConfirmation(token);
+    return { success, error };
+  };
+
+  /**
+   * Resends the registration confirmation email.
+   * @param {string} username Username of the user
+   * @param {string} email Email of the user
+   * @returns {success: boolean, error: string}
+   */
+  const resendConfirmation = async (username, email) => {
+    const { success, error } = await authService.resendConfirmation(username, email);
     return { success, error };
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, login, logout, register, registerConfirm, loading }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, register, registerConfirmation, resendConfirmation, loading }}>
       {children}
     </AuthContext.Provider>
   );

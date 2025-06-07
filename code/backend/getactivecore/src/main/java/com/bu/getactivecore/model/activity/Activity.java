@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "activity")
-@Table(name = "activity")
+@Entity(name = "activities")
+@Table(name = "activities")
 public class Activity {
     @Id
     @UuidGenerator
