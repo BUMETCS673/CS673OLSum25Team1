@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import Register from "./pages/Registeration";
+import Registeration from "./pages/Registeration";
 import RegisterConfirmation from "./pages/RegisterConfirmation";
 import CreateActivity from "./pages/CreateActivity";
 
@@ -16,7 +16,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register/confirmation" element={<RegisterConfirmation />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Registeration />} />
           <Route
             path="/create-activity"
             element={

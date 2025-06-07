@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act, waitFor } from "@testing-library/react";
 import { AuthProvider, useAuth } from "../../contexts/AuthContext";
 import { authService } from "../../services/authService";
@@ -87,7 +87,7 @@ describe("AuthProvider", () => {
     it("should set user and loading to false on successful login", async () => {
       authService.login.mockResolvedValue({ success: true, userData: mockUserData, error: null });
       // Start with loading true, as useEffect might not have finished or user wasn't initially auth
-      authService.isAuthenticated.mockReturnValue(false); 
+      authService.isAuthenticated.mockReturnValue(false);
 
       render(
         <AuthProvider>
@@ -100,18 +100,18 @@ describe("AuthProvider", () => {
       let loginResult;
       await act(async () => {
         // Directly call login from a hypothetical way to get context, or use a button click
-        const authInContext = screen.getByRole("button", {name: /Login/i});
+        const authInContext = screen.getByRole("button", { name: /Login/i });
         // For direct call: need to get context instance. For simplicity, we use button click.
-        loginResult = await new Promise(resolve => {
-            authService.login.mockImplementationOnce(async (...args) => {
-                const res = { success: true, userData: mockUserData, error: null };
-                resolve(res);
-                return res;
-            });
-            screen.getByRole("button", { name: /Login/i }).click();
+        loginResult = await new Promise((resolve) => {
+          authService.login.mockImplementationOnce(async (...args) => {
+            const res = { success: true, userData: mockUserData, error: null };
+            resolve(res);
+            return res;
+          });
+          screen.getByRole("button", { name: /Login/i }).click();
         });
       });
-      
+
       expect(authService.login).toHaveBeenCalledWith("testuser", "password");
       await waitFor(() => expect(screen.getByTestId("user").textContent).toBe(JSON.stringify(mockUserData)));
       expect(screen.getByTestId("loading").textContent).toBe("false");
@@ -132,13 +132,13 @@ describe("AuthProvider", () => {
 
       let loginResult;
       await act(async () => {
-         loginResult = await new Promise(resolve => {
-            authService.login.mockImplementationOnce(async (...args) => {
-                const res = { success: false, error: loginError };
-                resolve(res);
-                return res;
-            });
-            screen.getByRole("button", { name: /Login/i }).click();
+        loginResult = await new Promise((resolve) => {
+          authService.login.mockImplementationOnce(async (...args) => {
+            const res = { success: false, error: loginError };
+            resolve(res);
+            return res;
+          });
+          screen.getByRole("button", { name: /Login/i }).click();
         });
       });
 
@@ -193,13 +193,13 @@ describe("AuthProvider", () => {
         // To get the return value, we need to call the register function from the context.
         // This is a bit tricky with the TestConsumer button. A more direct way would be to expose context instance.
         // For now, let's assume the button click works and we check the service call and context state.
-         registerResult = await new Promise(resolve => {
-            authService.register.mockImplementationOnce(async (...args) => {
-                const res = registerResultPayload;
-                resolve(res);
-                return res;
-            });
-            screen.getByRole("button", { name: /Register/i }).click();
+        registerResult = await new Promise((resolve) => {
+          authService.register.mockImplementationOnce(async (...args) => {
+            const res = registerResultPayload;
+            resolve(res);
+            return res;
+          });
+          screen.getByRole("button", { name: /Register/i }).click();
         });
       });
 
@@ -210,4 +210,4 @@ describe("AuthProvider", () => {
       expect(screen.getByTestId("loading").textContent).toBe(initialLoading);
     });
   });
-}); 
+});

@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import validator from "validator";
 import { Container, Paper, TextField, Button, Typography, Box, Alert, LinearProgress } from "@mui/material";
 
-const Register = () => {
+const Registeration = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -241,4 +241,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Registeration;
