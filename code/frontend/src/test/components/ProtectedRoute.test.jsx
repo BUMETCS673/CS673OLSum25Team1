@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 const mockNavigate = vi.fn();
 const mockUseLocation = vi.fn();
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock("react-router-dom", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -18,19 +18,19 @@ vi.mock('react-router-dom', async (importOriginal) => {
   };
 });
 
-vi.mock('../../contexts/AuthContext', () => ({
+vi.mock("../../contexts/AuthContext", () => ({
   useAuth: vi.fn(),
 }));
 
-describe('<ProtectedRoute />', () => {
-    const mockLocation = { pathname: '/protected-page', search: '', hash: '', state: null };
+describe("<ProtectedRoute />", () => {
+    const mockLocation = { pathname: "/protected-page", search: "", hash: "", state: null };
   
     beforeEach(() => {
       mockNavigate.mockClear();
       mockUseLocation.mockReturnValue(mockLocation);
     });
   
-    it('should render loading state when loading is true', () => {
+    it("should render loading state when loading is true", () => {
       useAuth.mockReturnValue({ user: null, loading: true });
       render(
         <MemoryRouter>
@@ -39,14 +39,14 @@ describe('<ProtectedRoute />', () => {
           </ProtectedRoute>
         </MemoryRouter>
       );
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
-      expect(screen.queryByText('Protected Component')).not.toBeInTheDocument();
+      expect(screen.getByText("Loading...")).toBeInTheDocument();
+      expect(screen.queryByText("Protected Component")).not.toBeInTheDocument();
     });
 
-    it('should navigate to /login if not authenticated and not loading', () => {
+    it("should navigate to /login if not authenticated and not loading", () => {
         useAuth.mockReturnValue({ user: null, loading: false });
         render(
-            <MemoryRouter initialEntries={['/protected-page']}>
+            <MemoryRouter initialEntries={["/protected-page"]}>
             <Routes>
                 <Route path="/protected-page" element={
                 <ProtectedRoute>
@@ -60,15 +60,15 @@ describe('<ProtectedRoute />', () => {
 
         expect(mockNavigate).toHaveBeenCalledTimes(1);
         expect(mockNavigate).toHaveBeenCalledWith({
-            to: '/login',  
+            to: "/login",  
             state: { from: mockLocation },
             replace: true,
           });
-        expect(screen.queryByText('Protected Component')).not.toBeInTheDocument();
+        expect(screen.queryByText("Protected Component")).not.toBeInTheDocument();
     });
     
-    it('should render children if authenticated and not loading', () => {
-        useAuth.mockReturnValue({ user: { id: '1', name: 'Test User' }, loading: false });
+    it("should render children if authenticated and not loading", () => {
+        useAuth.mockReturnValue({ user: { id: "1", name: "Test User" }, loading: false });
         render(
             <MemoryRouter>
             <ProtectedRoute>
@@ -76,9 +76,9 @@ describe('<ProtectedRoute />', () => {
             </ProtectedRoute>
             </MemoryRouter>
         );
-        expect(screen.getByTestId('child')).toBeInTheDocument();
-        expect(screen.getByText('Protected Component Content')).toBeInTheDocument();
-        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+        expect(screen.getByTestId("child")).toBeInTheDocument();
+        expect(screen.getByText("Protected Component Content")).toBeInTheDocument();
+        expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
         expect(mockNavigate).not.toHaveBeenCalled();
     });
 });
