@@ -3,14 +3,11 @@ package com.bu.getactivecore.service.activity;
 import com.bu.getactivecore.model.activity.Activity;
 import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.activity.UserActivity;
-import com.bu.getactivecore.model.activity.ActivityParticipant;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
-import com.bu.getactivecore.repository.ActivityParticipantRepository;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
-import com.bu.getactivecore.service.activity.entity.ActivityParticipantDto;
 import com.bu.getactivecore.service.activity.entity.UserActivityDto;
 import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.ArrayList;
 /**
  * Core logic for managing activities.
  */
@@ -30,8 +26,6 @@ public class ActivityService implements ActivityApi {
 
     private final ActivityRepository m_activityRepo;
 
-    private final ActivityParticipantRepository m_activityParticipantRepo;
-
     /**
      * Constructs the ActivityService.
      *
@@ -39,10 +33,9 @@ public class ActivityService implements ActivityApi {
      * @param userActivityRepo
      * @param participantActivityRepo
      */
-    public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo, ActivityParticipantRepository activityParticipantRepo) {
+    public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo) {
         m_activityRepo = activityRepo;
         m_userActivityRepo = userActivityRepo;
-        m_activityParticipantRepo = activityParticipantRepo;
     }
 
     @Override
@@ -76,7 +69,7 @@ public class ActivityService implements ActivityApi {
         Activity createdActivity = m_activityRepo.save(ActivityCreateRequestDto.from(requestDto));
         UserActivity userActivityRole = UserActivity.builder()
                 .userId(userId)
-                .activityId(createdActivity.getId())
+                .activity(createdActivity)
                 .role(RoleType.ADMIN)
                 .build();
         m_userActivityRepo.save(userActivityRole);
@@ -84,10 +77,8 @@ public class ActivityService implements ActivityApi {
 
     @Override
     public List<UserActivityDto> getParticipantActivities(String userId) {
-        //List<ActivityParticipant> participantActivities = m_activityParticipantRepo.findActivitiesByUserId(userId);
-        //List<UserActivity> userActivities = m_userActivityRepo.findByUserId(userId);
-        //return userActivities.stream().map(ActivityParticipantDto::of).toList();
-        return m_userActivityRepo.findByUserId(userId).stream().map(UserActivityDto::of).toList();
+        List<UserActivityDto> userActivityDtos = m_userActivityRepo.findByUserId(userId).stream().map(UserActivityDto::of).toList();
+        return userActivityDtos;
     }
 
     @Override
@@ -95,10 +86,10 @@ public class ActivityService implements ActivityApi {
         m_userActivityRepo.findByUserIdAndActivityId(userId, activityId).ifPresent(userActivity -> {
             throw new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("User already joined activity").build());
         });
-
+        Activity activity = m_activityRepo.findById(activityId).orElseThrow(() -> new ApiException(ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build()));
         m_userActivityRepo.save(UserActivity.builder()
                 .userId(userId)
-                .activityId(activityId)
+                .activity(activity)
                 .role(RoleType.PARTICIPANT)
                 .build());
     }

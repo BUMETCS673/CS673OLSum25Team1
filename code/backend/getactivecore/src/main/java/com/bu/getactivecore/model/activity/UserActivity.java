@@ -38,11 +38,8 @@ public class UserActivity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "activity_id", nullable = false)
-    private String activityId;
-
     @ManyToOne
-    @JoinColumn(name = "activity")
+    @JoinColumn(name = "activity_id", referencedColumnName = "id")
     private Activity activity;
 
     @Enumerated(EnumType.STRING)
