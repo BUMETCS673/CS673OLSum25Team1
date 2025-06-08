@@ -3,7 +3,7 @@ import api from "./api";
 export const activityService = {
   getRecentActivities: async () => {
     const response = await api.get("/activities");
-    return response.data.data;
+    return response.data.data.content;
   },
   getParticipantActivities: async () => {
     const response = await api.get("/activity/participants");

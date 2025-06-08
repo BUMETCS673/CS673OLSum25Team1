@@ -1,7 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import Register from '../../pages/Register'; 
+import Registration from '../../pages/Registration'; 
+import { AuthProvider } from "../../contexts/AuthContext";
+import { MemoryRouter } from "react-router-dom";
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -12,89 +14,129 @@ vi.mock('react-router-dom', async (importOriginal) => {
   };
 });
 
-const mockRegisterInUseAuth = vi.fn();
-vi.mock('../../contexts/AuthContext', () => { return {
-  useAuth: () => ({ 
-    register: mockRegisterInUseAuth, 
-    // user: { userId: '1', username: 'testuser', userEmail: 'test@test.com' }, 
-    // logout: vi.fn(), 
-  }),
-  AuthProvider: ({ children }) => <div data-testid="MockAuthProvider">{children}</div>
-}}
-);
+const mockRegister = vi.fn();
+vi.mock('../../contexts/AuthContext', () => ({
+    useAuth: () => ({
+        register: mockRegister,
+    }),
+    AuthProvider: ({ children }) => <div data-testid="MockAuthProvider">{children}</div>,
+}));
 
-describe('RegisterPage Unit Tests', () => {
+describe('Registration Component Tests', () => {
     beforeEach(() => {
-        mockRegisterInUseAuth.mockClear();
+        mockRegister.mockClear();
         mockNavigate.mockClear();
     });
 
     it('should allow a user to register successfully and navigate', async () => {
-        mockRegisterInUseAuth.mockResolvedValueOnce({ success: true, token: 'mockToken', error: null });
+        mockRegister.mockResolvedValueOnce({ success: true, error: null });
         
-        render(<AuthProvider><MemoryRouter><Register /></MemoryRouter></AuthProvider>);
+        render(<AuthProvider><MemoryRouter><Registration /></MemoryRouter></AuthProvider>);
         const user = userEvent.setup();
 
-        await user.type(screen.getByLabelText(/username/i), 'newuser');
-        await user.type(screen.getByLabelText(/email/i), 'newuser@example.com');
-        await user.type(screen.getByLabelText(/^password$/i), 'password');
-        await user.type(screen.getByLabelText(/confirm password/i), 'password');
-        
-        await user.click(screen.getByRole('button', { name: /register/i }));
+        await user.type(screen.getByLabelText(/Username/i), 'testuser');
+        await user.type(screen.getByLabelText(/Email/i), 'testuser@bu.edu');
+        await user.type(screen.getAllByLabelText(/Password/i)[0], 'Password123!');
+        await user.type(screen.getAllByLabelText(/Confirm Password/i)[0], 'Password123!');
+        await user.click(screen.getByRole('button', { name: /REGISTER/i }));
 
         await waitFor(() => {
-            expect(authService.register).toHaveBeenCalledWith({
-                username: 'newuser',
-                email: 'newuser@example.com',
-                password: 'password',
-            });
+            expect(mockRegister).toHaveBeenCalledWith("testuser", "testuser@bu.edu", "Password123!");
+            expect(screen.getByText(/registration successful/i)).toBeInTheDocument();
         });
-
-        
-        await waitFor(() => expect(screen.getByText(/registration successful/i)).toBeInTheDocument());
-
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/login');
-        });
+            expect(mockNavigate).toHaveBeenCalledWith('/register/confirmation', { replace: true });
+        },{timeout: 2000});
     });
 
     it('should display an error message if registration fails (e.g., email exists)', async () => {
-        authService.register.mockRejectedValueOnce({ 
-            response: { data: { message: 'Email already exists' } }
-        });
+        mockRegister.mockResolvedValueOnce({ success: false, error: {errorCode: "EMAIL_USERNAME_TAKEN"} });
         
-        render(<RegisterPage />);
+        render(<AuthProvider><MemoryRouter><Registration /></MemoryRouter></AuthProvider>);
         const user = userEvent.setup();
 
-        await user.type(screen.getByLabelText(/username/i), 'testuser');
-        await user.type(screen.getByLabelText(/email/i), 'existing@example.com');
-        await user.type(screen.getByLabelText(/^password$/i), 'Password123!');
-        await user.type(screen.getByLabelText(/confirm password/i), 'Password123!');
-        
-        await user.click(screen.getByRole('button', { name: /register/i }));
+        await user.type(screen.getByLabelText(/Username/i), 'testuser');
+        await user.type(screen.getByLabelText(/Email/i), 'testuser@bu.edu');
+        await user.type(screen.getAllByLabelText(/Password/i)[0], 'Password123!');
+        await user.type(screen.getAllByLabelText(/Confirm Password/i)[0], 'Password123!');
+        await user.click(screen.getByRole('button', { name: /REGISTER/i }));
 
         await waitFor(() => {
-            expect(screen.getByText(/email already exists/i)).toBeInTheDocument();
+            expect(mockRegister).toHaveBeenCalledWith("testuser", "testuser@bu.edu", "Password123!");
+            expect(screen.getByText(/Username or email already taken/i)).toBeInTheDocument();
+            expect(mockNavigate).not.toHaveBeenCalled();
         });
-        expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('should display an error message if registration fails other than email or username exists', async () => {
+        mockRegister.mockRejectedValueOnce(new Error("Registration failed"));
+        
+        render(<AuthProvider><MemoryRouter><Registration /></MemoryRouter></AuthProvider>);
+        const user = userEvent.setup();
+
+        await user.type(screen.getByLabelText(/Username/i), 'testuser');
+        await user.type(screen.getByLabelText(/Email/i), 'testuser@bu.edu');
+        await user.type(screen.getAllByLabelText(/Password/i)[0], 'Password123!');
+        await user.type(screen.getAllByLabelText(/Confirm Password/i)[0], 'Password123!');
+        await user.click(screen.getByRole('button', { name: /REGISTER/i }));
+
+        await waitFor(() => {
+            expect(mockRegister).toHaveBeenCalledWith("testuser", "testuser@bu.edu", "Password123!");
+            expect(screen.getByText(/Registration failed/i)).toBeInTheDocument();
+            expect(mockNavigate).not.toHaveBeenCalled();
+        });
     });
 
     it('should display a client-side validation error if passwords do not match', async () => {
-        render(<RegisterPage />);
+        mockRegister.mockResolvedValueOnce({ success: true, error: null });
+        
+        render(<AuthProvider><MemoryRouter><Registration /></MemoryRouter></AuthProvider>);
         const user = userEvent.setup();
 
-        await user.type(screen.getByLabelText(/^password$/i), 'Password123!');
-        await user.type(screen.getByLabelText(/confirm password/i), 'Password différent!');
-        
-        await user.click(screen.getByRole('button', { name: /register/i }));
+        await user.type(screen.getByLabelText(/Username/i), 'testuser');
+        await user.type(screen.getByLabelText(/Email/i), 'testuser@bu.edu');
+        await user.type(screen.getAllByLabelText(/Password/i)[0], 'Password123!');
+        await user.type(screen.getAllByLabelText(/Confirm Password/i)[0], 'DifferentPassword123!');
         
         await waitFor(() => {
-            expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
+            expect(screen.getByText(/Passwords do not match/i)).toBeInTheDocument();
         });
         
-        expect(authService.register).not.toHaveBeenCalled();
+        expect(mockRegister).not.toHaveBeenCalled();
         expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    
+    it('should display a client-side validation error if email is not valid', async () => {
+        mockRegister.mockResolvedValueOnce({ success: true, error: null });
+        
+        render(<AuthProvider><MemoryRouter><Registration /></MemoryRouter></AuthProvider>);
+        const user = userEvent.setup();
+
+        await user.type(screen.getByLabelText(/Username/i), 'testuser');
+        await user.type(screen.getByLabelText(/Email/i), 'testuser');
+        
+        await waitFor(() => {
+            expect(screen.getByText(/Invalid email format/i)).toBeInTheDocument();
+        });
+        
+        expect(mockRegister).not.toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('should display a client-side validation error if email is not a BU email', async () => {
+        mockRegister.mockResolvedValueOnce({ success: true, error: null });
+        
+        render(<AuthProvider><MemoryRouter><Registration /></MemoryRouter></AuthProvider>);
+        const user = userEvent.setup();
+
+        await user.type(screen.getByLabelText(/Username/i), 'testuser');
+        await user.type(screen.getByLabelText(/Email/i), 'testuser@gmail.com');
+        
+        await waitFor(() => {
+            expect(screen.getByText(/Email must be a BU email/i)).toBeInTheDocument();
+        });
+        
+        expect(mockRegister).not.toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalled();
+    });
 });
