@@ -7,8 +7,6 @@ const api = axios.create({
   timeout: 5000,
 });
 
-
-
 api.interceptors.request.use(
   (config) => {
     const token = jwtUtils.getToken("auth_token");
@@ -25,9 +23,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401) {
       const navigate = useNavigate();
       navigate("/login");
     }

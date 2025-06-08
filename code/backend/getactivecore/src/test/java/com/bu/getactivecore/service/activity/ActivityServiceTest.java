@@ -367,7 +367,6 @@ public class ActivityServiceTest {
         when(userActivityRepository.findByUserIdAndActivityId(userId, activityId))
             .thenReturn(Optional.empty());
 
-        // 不抛异常，只是不做任何操作
         activityService.leaveActivity(userId, activityId);
 
         verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
@@ -376,7 +375,6 @@ public class ActivityServiceTest {
 
     @Test
     public void getJoinedActivitiesSuccessfully() {
-        // 构造模拟数据
         UserActivity userActivity = UserActivity.builder()
                 .userId(userId)
                 .activity(Activity.builder().id(activityId).name("Test Activity").build())
@@ -384,13 +382,10 @@ public class ActivityServiceTest {
                 .build();
         List<UserActivity> userActivities = List.of(userActivity);
 
-        // mock repository 返回
         when(userActivityRepository.findJoinedActivitiesByUserId(userId)).thenReturn(userActivities);
 
-        // 调用 service
         List<UserActivityDto> result = activityService.getJoinedActivities(userId);
 
-        // 验证 repository 被调用
         verify(userActivityRepository).findJoinedActivitiesByUserId(userId);
-        }
+    }
 }

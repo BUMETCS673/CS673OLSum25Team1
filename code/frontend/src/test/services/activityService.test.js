@@ -17,7 +17,17 @@ describe("activityService", () => {
 
   describe("getRecentActivities", () => {
     it("should return activities on success", async () => {
-      const mockData = [{ id: 1, name: "Activity 1", activityId: 123, description: "Description 1", location: "Location 1", startDateTime: "2024-01-01 10:00:00", endDateTime: "2024-01-01 11:00:00" }];
+      const mockData = [
+        {
+          id: 1,
+          name: "Activity 1",
+          activityId: 123,
+          description: "Description 1",
+          location: "Location 1",
+          startDateTime: "2024-01-01 10:00:00",
+          endDateTime: "2024-01-01 11:00:00",
+        },
+      ];
       api.get.mockResolvedValue({ data: { data: { content: mockData } } });
       const result = await activityService.getRecentActivities();
       expect(api.get).toHaveBeenCalledWith("/activities");
@@ -31,7 +41,18 @@ describe("activityService", () => {
 
   describe("getParticipantActivities", () => {
     it("should return participant activities on success", async () => {
-      const mockActivities = [{ id: 2, name: "Activity 2", activityId: 456, description: "Description 2", location: "Location 2", startDateTime: "2024-01-01 10:00:00", endDateTime: "2024-01-01 11:00:00", role: "participant" }];
+      const mockActivities = [
+        {
+          id: 2,
+          name: "Activity 2",
+          activityId: 456,
+          description: "Description 2",
+          location: "Location 2",
+          startDateTime: "2024-01-01 10:00:00",
+          endDateTime: "2024-01-01 11:00:00",
+          role: "participant",
+        },
+      ];
       api.get.mockResolvedValue({ data: { data: { activities: mockActivities } } });
       const result = await activityService.getParticipantActivities();
       expect(api.get).toHaveBeenCalledWith("/activity/participants");
@@ -70,4 +91,4 @@ describe("activityService", () => {
       await expect(activityService.leaveActivity(456)).rejects.toThrow("fail to leave activity");
     });
   });
-}); 
+});

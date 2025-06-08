@@ -31,8 +31,8 @@ export default function Home() {
   const [recentActivities, setRecentActivities] = useState([]);
   const [notification, setNotification] = useState({
     open: false,
-    message: '',
-    severity: 'success',
+    message: "",
+    severity: "success",
   });
 
   const handleChange = async (event, newValue) => {
@@ -99,7 +99,7 @@ export default function Home() {
   };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setNotification({ ...notification, open: false });
@@ -167,14 +167,9 @@ export default function Home() {
         open={notification.open}
         autoHideDuration={5000}
         onClose={handleClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert
-          onClose={handleClose}
-          severity={notification.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={handleClose} severity={notification.severity} variant="filled" sx={{ width: "100%" }}>
           {notification.message}
         </Alert>
       </Snackbar>
