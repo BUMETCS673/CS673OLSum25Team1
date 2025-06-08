@@ -1,7 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tabs, Tab } from "@mui/material";
+import { Tabs, Tab, Snackbar, Alert } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { activityService } from "../services/activityService";
 
@@ -29,6 +29,11 @@ export default function Home() {
   const [value, setValue] = useState(0);
   const [participantActivities, setParticipantActivities] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const handleChange = async (event, newValue) => {
     setValue(newValue);
@@ -43,20 +48,61 @@ export default function Home() {
   };
 
   useEffect(() => {
-    activityService.getRecentActivities().then(setRecentActivities);
-    activityService.getParticipantActivities().then(setParticipantActivities);
+    try {
+      activityService.getRecentActivities().then(setRecentActivities);
+      activityService.getParticipantActivities().then(setParticipantActivities);
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: "Failed to get recent activities or participated activities",
+        severity: "error",
+      });
+    }
   }, []);
 
   const handleJoinActivity = async (activityId) => {
-    await activityService.joinActivity(activityId);
-    const activities = await activityService.getParticipantActivities();
-    setParticipantActivities(activities);
+    try {
+      await activityService.joinActivity(activityId);
+      const activities = await activityService.getParticipantActivities();
+      setParticipantActivities(activities);
+      setNotification({
+        open: true,
+        message: "Joined activity successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: "Failed to join activity",
+        severity: "error",
+      });
+    }
   };
 
   const handleLeaveActivity = async (activityId) => {
-    await activityService.leaveActivity(activityId);
-    const activities = await activityService.getParticipantActivities();
-    setParticipantActivities(activities);
+    try {
+      await activityService.leaveActivity(activityId);
+      const activities = await activityService.getParticipantActivities();
+      setParticipantActivities(activities);
+      setNotification({
+        open: true,
+        message: "Left activity successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: "Failed to leave activity",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setNotification({ ...notification, open: false });
   };
 
   // Example activity data - replace with actual data from API later
@@ -117,6 +163,16 @@ export default function Home() {
 
   return (
     <div style={styles.container}>
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={5000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleClose} severity={notification.severity} variant="filled" sx={{ width: "100%" }}>
+          {notification.message}
+        </Alert>
+      </Snackbar>
       {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerLeft}>

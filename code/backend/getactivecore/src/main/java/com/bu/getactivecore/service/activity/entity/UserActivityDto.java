@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 public class UserActivityDto {
     private String id;
 
+    private String name;
+
     private String userId;
 
     private String activityId;
@@ -30,6 +32,7 @@ public class UserActivityDto {
         return UserActivityDto.builder()
                 .id(userActivity.getId())
                 .userId(userActivity.getUserId())
+                .name(userActivity.getActivity().getName())
                 .activityId(userActivity.getActivity().getId())
                 .description(userActivity.getActivity().getDescription())
                 .location(userActivity.getActivity().getLocation())

@@ -9,6 +9,7 @@ import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
+import com.bu.getactivecore.service.activity.entity.UserActivityDto;
 import com.bu.getactivecore.shared.exception.ApiException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -308,4 +309,83 @@ public class ActivityServiceTest {
         verify(activityRepository).save(updateActivity);
     }
 
+    @Test
+    public void joinActivitySuccessfully() {
+        Activity activity = Activity.builder().id(activityId).build();
+        when(userActivityRepository.findByUserIdAndActivityId(userId, activityId)).thenReturn(Optional.empty());
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(activity));
+
+        activityService.joinActivity(userId, activityId);
+
+        verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
+        verify(activityRepository).findById(activityId);
+        verify(userActivityRepository).save(
+            UserActivity.builder()
+                .userId(userId)
+                .activity(activity)
+                .role(RoleType.PARTICIPANT)
+                .build()
+        );
+    }
+
+    @Test
+    public void joinActivityAlreadyJoined() {
+        when(userActivityRepository.findByUserIdAndActivityId(userId, activityId))
+            .thenReturn(Optional.of(new UserActivity()));
+
+        assertThrows(ApiException.class, () -> activityService.joinActivity(userId, activityId));
+        verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
+        verify(activityRepository, never()).findById(activityId);
+        verify(userActivityRepository, never()).save(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    public void joinActivityActivityNotFound() {
+        when(userActivityRepository.findByUserIdAndActivityId(userId, activityId)).thenReturn(Optional.empty());
+        when(activityRepository.findById(activityId)).thenReturn(Optional.empty());
+
+        assertThrows(ApiException.class, () -> activityService.joinActivity(userId, activityId));
+        verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
+        verify(activityRepository).findById(activityId);
+        verify(userActivityRepository, never()).save(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    public void leaveActivitySuccessfully() {
+        UserActivity userActivity = UserActivity.builder().userId(userId).build();
+        when(userActivityRepository.findByUserIdAndActivityId(userId, activityId))
+            .thenReturn(Optional.of(userActivity));
+
+        activityService.leaveActivity(userId, activityId);
+
+        verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
+        verify(userActivityRepository).delete(userActivity);
+    }
+
+    @Test
+    public void leaveActivityNotJoined() {
+        when(userActivityRepository.findByUserIdAndActivityId(userId, activityId))
+            .thenReturn(Optional.empty());
+
+        activityService.leaveActivity(userId, activityId);
+
+        verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
+        verify(userActivityRepository, never()).delete(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    public void getJoinedActivitiesSuccessfully() {
+        UserActivity userActivity = UserActivity.builder()
+                .userId(userId)
+                .activity(Activity.builder().id(activityId).name("Test Activity").build())
+                .role(RoleType.PARTICIPANT)
+                .build();
+        List<UserActivity> userActivities = List.of(userActivity);
+
+        when(userActivityRepository.findJoinedActivitiesByUserId(userId)).thenReturn(userActivities);
+
+        List<UserActivityDto> result = activityService.getJoinedActivities(userId);
+
+        verify(userActivityRepository).findJoinedActivitiesByUserId(userId);
+    }
 }
