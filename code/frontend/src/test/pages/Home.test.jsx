@@ -1,7 +1,7 @@
 // Home.test.jsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Home from "../../pages/Home";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach, test } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
 vi.mock("../../contexts/AuthContext", () => {
