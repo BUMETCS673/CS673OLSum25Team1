@@ -7,7 +7,7 @@ const api = axios.create({
   timeout: 5000,
 });
 
-const navigate = useNavigate();
+
 
 api.interceptors.request.use(
   (config) => {
@@ -28,6 +28,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      const navigate = useNavigate();
       navigate("/login");
     }
 
