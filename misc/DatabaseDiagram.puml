@@ -8,26 +8,9 @@ package model {
         +username: VARCHAR
     }
 
-    enum TokenRequestReason {
-        REGISTRATION
-        PASSWORD_RESET
-    }
-
     enum ParticipantRole {
         ADMIN
-        GUEST
-    }
-
-    'Composite key class for Participant'
-    class ParticipantId {
-        +userId: UUID <<PK,FK>>
-        +activityId: UUID <<PK,FK>>
-    }
-
-    class Participant {
-        +userId: UUID <<FK>>
-        +activityId: UUID <<FK>>
-        +role: ParticipantRole
+        PARTICIPANT
     }
 
     class Activity {
@@ -35,32 +18,22 @@ package model {
         +name: VARCHAR
         +description: TEXT
         +location: VARCHAR
+        +startTime: LocalDateTime
+        +endTime: LocalDateTime
     }
 
-    'Composite key class for Token'
-    class TokenId {
-        +userId: UUID <<PK,FK>>
-        +reason: TokenRequestReason <<PK>>
-    }
-
-    class Token {
+    class UserActivity {
+        +id: UUID <<PK>>
         +userId: UUID <<FK>>
-        +reason: TokenRequestReason
-        +token: VARCHAR
-        +counter: INT
-        +createdDate: BIGINT
-        +expiryDate: BIGINT
+        +activity: Activity
+        +role: RoleType <<Enum>>
     }
+}
 
     'Relationships'
-    User "1" o-- "0..*" Participant : participates in
-    Activity "1" o-- "0..*" Participant : includes
-    Participant *-- ParticipantId : composite key
-    Participant --> ParticipantRole : has role
-
-    User "1" o-- "0..*" Token : issues
-    Token *-- TokenId : composite key
-    Token --> TokenRequestReason : for purpose
+    User "1" o-- "0..*" UserActivity : participates in
+    Activity "1" o-- "0..*" UserActivity : includes
+    UserActivity --> ParticipantRole : is assigned a role
 
 }
 @enduml
