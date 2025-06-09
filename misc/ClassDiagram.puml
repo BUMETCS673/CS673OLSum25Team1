@@ -12,42 +12,26 @@ package model {
     }
     enum ParticipantRole {
         ADMIN
-        GUEST
+        PARTICIPANT
     }
-    'Composite key class for Participant'
-    class ParticipantId {
-        +userId: UUID
-        +activityId: UUID
-    }
-    class Participant {
-        -compositeKey: ParticipantId
-        -role: ParticipantRole
+    class UserActivity {
+        -userId: UUID
+        -user: User
+        -activity: Activity
+        -role: RoleType
     }
     class Activity {
         -id: UUID
         -name: String
         -description: String
         -location: String
-    }
-    'Composite key class for Token'
-    class TokenId {
-        +userId: UUID
-        +reason: TokenRequestReason
-    }
-    class Token {
-        -compositeKey: TokenId
-        -token: String
-        -counter: int
-        -createdDate: Long
-        -expiryDate: Long
+        -startTime: LocalDateTime
+        -endTime: LocalDateTime
     }
 
-    User "1" -l-> "0..*" Participant: Is a
-    Activity "1..*" -r-> "1.*" Participant : Has
-    Participant o-d- ParticipantId : composite key
-    Participant -d-> ParticipantRole: Is
-    User "1" --> "0..*" Token : issues
-    Token --> TokenRequestReason : for
+    User "1" -l-> "0..*" UserActivity: Is a
+    Activity "1..*" -r-> "1.*" UserActivity : Has
+    UserActivity -d-> ParticipantRole: Is
 }
 
 package repository {
@@ -58,23 +42,39 @@ package repository {
 }
 
 package service {
-    class TokenService {
-        -maxRegistrationAttempts: int
-        -maxPasswordResetAttempts: int
+    class JwtService {
         -tokenRepository: TokenRepository
-        +generateToken(userId: UUID, reason: TokenRequestReason): Token
-        -deleteToken(tokenId: UUID): void
-        +getToken(tokenRequestDto: TokenRequestDto): Token
+        +generateToken(userId: UUID, reason: TokenRequestReason): String
+        +getToken(tokenRequestDto: TokenRequestDto): String
+        +JwtService(jwtProperties: JwtProperties)
+        +generateToken(username: String, claimType:TokenClaimType): String
+        +getClaim(token: String, claimName: String): String
+        +getUsername(token: String): String
+        +isValid(token: String): boolean
+        +validateToken(token: String): boolean
     }
 
-    interface TokenServiceApi {
-        +generateToken(userId: UUID, reason: TokenRequestReason): Token
-        -deleteToken(tokenId: UUID): void
-        +getToken(tokenRequestDto: TokenRequestDto): Token
+    enum TokenClaimType {
+        REGISTRATION_CONFIRMATION
+    }
+
+    class JwtProperties {
+        -secretKey: String
+        -expirationMs: long
+    }
+
+    interface JwtApi {
+        +generateToken(username: String, TokenClaimType claimType): String
+        +generateToken(username: String): String
+        +getUsername(token: String): String
+        +getClaim(token: String, claimName: String): String
+        +isValid(String token): boolean
+        +validateToken(String token): boolean
+        +validateToken(token: String, userDetails: UserDetails): boolean
     }
 
     class UserManagementService {
-        -tokenServiceApi: TokenServiceApi
+        -JwtApi: JwtApi
         -userRepository: UserRepository
         -verificationServiceApi: VerificationServiceApi
         +registerUser(registrationDto:RegistrationDto): void
@@ -120,17 +120,17 @@ package service {
         +isVerified(userDto: UserDto): boolean
     }
 
-    TokenService .u.|> TokenServiceApi: Implements
+    JwtService .u.|> JwtApi: Implements
+    JwtService .u.> JwtProperties: Uses to configure JWT properties
     UserManagementService .u.|> UserManagementApi: Implements
     ActivityService .u.|> ActivityServiceApi: Implements
     EmailVerificationService .u.|> VerificationServiceApi: Implements
 
-    TokenService -d-> repository.TokenRepository: Uses to access token data
     UserManagementService -d-> repository.UserRepository: Uses to access user data
     UserManagementService -u-> VerificationServiceApi: Uses to send verification email
-    UserManagementService -u-> TokenServiceApi: Uses to generate token\nwhen user wants to register or reset password.\nTo delete token when the request is completed.
+    UserManagementService -u-> JwtApi: Uses to generate token\nwhen user wants to register or reset password.
     ActivityService -d-> repository.ActivityRepository: Uses to access activity data
-    ActivityService -d-> repository.ParticipantRepository: Uses to access participant data
+    ActivityService -d-> repository.ParticipantRepository: Uses to access UserActivity data
 }
 
 package controller {
