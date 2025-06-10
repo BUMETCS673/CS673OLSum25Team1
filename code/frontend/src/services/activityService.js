@@ -23,4 +23,8 @@ export const activityService = {
     });
     return response.data;
   },
+  createActivity: async (activityData) => {
+    const response = await api.post("/activity", activityData);
+    return response.data;
+  },
 };

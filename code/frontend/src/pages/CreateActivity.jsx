@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { activityService } from "../services/activityService";
 
 export default function CreateActivity() {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ export default function CreateActivity() {
   });
 
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -65,38 +68,70 @@ export default function CreateActivity() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError("");
     
     if (validateForm()) {
-      // Convert datetime-local format to our required format (YYYY-MM-DD HH:MM)
-      const formatDateTime = (dateTimeStr) => {
-        const date = new Date(dateTimeStr);
-        return date.toISOString().slice(0, 16).replace("T", " ");
-      };
+      setIsLoading(true);
+      try {
+        // Convert datetime-local format to our required format (YYYY-MM-DD HH:MM)
+        const formatDateTime = (dateTimeStr) => {
+          // datetime-local gives us "YYYY-MM-DDTHH:MM" format
+          // We need "YYYY-MM-DD HH:MM" format
+          return dateTimeStr.replace("T", " ");
+        };
 
-      const activityData = {
-        ...formData,
-        startDateTime: formatDateTime(formData.startDateTime),
-        endDateTime: formatDateTime(formData.endDateTime)
-      };
+        const activityData = {
+          ...formData,
+          startDateTime: formatDateTime(formData.startDateTime),
+          endDateTime: formatDateTime(formData.endDateTime)
+        };
 
-      // TODO: Submit to API
-      console.log("Creating activity:", activityData);
-      
-      // For now, just navigate back to home
-      navigate("/");
+        await activityService.createActivity(activityData);
+        
+        // Success - navigate back to home
+        navigate("/home");
+      } catch (error) {
+        console.error("Error creating activity:", error);
+        console.error("Error response:", error.response);
+        console.error("Error response data:", error.response?.data);
+        
+        let errorMessage = "Failed to create activity. Please try again.";
+        
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response?.data?.errors?.message) {
+          errorMessage = error.response.data.errors.message;
+        } else if (error.response?.data?.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.response?.status === 400) {
+          errorMessage = "Please check your input data and try again.";
+        } else if (error.response?.status === 401) {
+          errorMessage = "You must be logged in to create an activity.";
+        }
+        
+        setApiError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   const handleCancel = () => {
-    navigate("/");
+    navigate("/home");
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.formContainer}>
         <h1 style={styles.title}>Create New Activity</h1>
+        
+        {apiError && (
+          <div style={styles.errorBanner}>
+            {apiError}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.formGroup}>
@@ -189,9 +224,13 @@ export default function CreateActivity() {
             </button>
             <button
               type="submit"
-              style={styles.submitButton}
+              style={{
+                ...styles.submitButton,
+                ...(isLoading ? styles.submitButtonDisabled : {})
+              }}
+              disabled={isLoading}
             >
-              Create Activity
+              {isLoading ? "Creating..." : "Create Activity"}
             </button>
           </div>
         </form>
@@ -271,6 +310,16 @@ const styles = {
     fontSize: "0.875rem",
     fontWeight: "500"
   },
+  errorBanner: {
+    backgroundColor: "#fee2e2",
+    border: "1px solid #fecaca",
+    color: "#dc2626",
+    padding: "0.75rem",
+    borderRadius: "0.5rem",
+    fontSize: "0.9rem",
+    fontWeight: "500",
+    marginBottom: "1rem"
+  },
   buttonGroup: {
     display: "flex",
     gap: "1rem",
@@ -298,5 +347,9 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
     transition: "background-color 0.2s"
+  },
+  submitButtonDisabled: {
+    backgroundColor: "#9ca3af",
+    cursor: "not-allowed"
   }
 }; 

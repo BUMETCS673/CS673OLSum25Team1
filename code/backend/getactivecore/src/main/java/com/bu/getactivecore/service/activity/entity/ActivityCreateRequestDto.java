@@ -25,7 +25,8 @@ public class ActivityCreateRequestDto {
     })
     private String name;
 
-    @Size(max = 250, message = "The length of description must be greater or equal to 1")
+    @NotBlank(message = "Description cannot be blank")
+    @Size(max = 250, message = "The length of description must be less or equal to 250")
     private String description;
 
     @NotBlank(message = "Location cannot be blank")
@@ -39,7 +40,7 @@ public class ActivityCreateRequestDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDateTime;
 
-    @NotNull(message = "Start DateTime cannot be blank")
+    @NotNull(message = "End DateTime cannot be blank")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime endDateTime;
