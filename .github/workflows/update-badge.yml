@@ -40,7 +40,7 @@ jobs:
         run: |
           pip install lxml
           python ../../../.github/scripts/extract_coverage_and_generate_badge.py
-          mv ../badges/coverage.json /tmp/coverage.json
+          mv ../badges/coverage.json /tmp/coverage.json # Move to avoid untracked files git issue in the next step
         working-directory: ./code/backend/getactivecore
 
       - name: Checkout coverage-badge branch
