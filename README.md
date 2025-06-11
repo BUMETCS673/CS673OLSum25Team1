@@ -4,6 +4,9 @@
   - [Technology Stack and Frameworks](#technology-stack-and-frameworks)
 - [Package Structure](#package-structure)
 
+[![CD workflow](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/cd.yml/badge.svg)](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/cd.yml) 
+[![CI workflow](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/ci.yml/badge.svg)](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/ci.yml)
+
 
 # GetActive
 <img src="misc/logo.png" alt="drawing" width="100"/>
