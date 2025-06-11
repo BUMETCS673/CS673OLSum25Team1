@@ -40,6 +40,7 @@ jobs:
         run: |
           pip install lxml
           python ../../../.github/scripts/extract_coverage_and_generate_badge.py
+          cp code/backend/badges/coverage.json /tmp/coverage.json
         working-directory: ./code/backend/getactivecore
 
       - name: Checkout coverage-badge branch
@@ -48,10 +49,10 @@ jobs:
           git switch coverage-badge
           
 
-#      - name: Copy badge to branch
-#        run: |
-#          mkdir -p code/backend/badges
-#          cp code/backend/badges/coverage.json code/backend/badges/coverage.json
+      - name: Copy badge to branch
+        run: |
+          mkdir -p code/backend/badges
+          cp -f /tmp/coverage.json code/backend/badges/coverage.json
 
       - name: Commit and push badge
         env:
