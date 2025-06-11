@@ -39,5 +39,5 @@ jobs:
       - name: Generate coverage JSON badge
         run: |
           pip install lxml
-          python ../../.github/scripts/extract_coverage_and_generate_badge.py
-        working-directory: ./
+          python ../../../.github/scripts/extract_coverage_and_generate_badge.py
+        working-directory: ./code/backend/getactivecore
