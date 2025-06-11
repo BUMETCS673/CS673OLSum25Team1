@@ -55,7 +55,7 @@ jobs:
       - name: Commit and push badge
         run: |
           git config user.name "arshdeepdhillon"
-          git config user.email "github-actions@github.com"
+          git config user.email "arshdhillon2050@gmail.com"
           git add code/backend/badges/coverage.json
           git commit -m "Update coverage JSON badge" || echo "No changes"
           git push origin coverage-badge
