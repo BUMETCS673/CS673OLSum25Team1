@@ -47,10 +47,10 @@ jobs:
           git fetch origin coverage-badge:coverage-badge
           git switch coverage-badge
 
-      - name: Copy badge to branch
-        run: |
-          mkdir -p code/backend/badges
-          cp code/backend/badges/coverage.json code/backend/badges/coverage.json
+#      - name: Copy badge to branch
+#        run: |
+#          mkdir -p code/backend/badges
+#          cp code/backend/badges/coverage.json code/backend/badges/coverage.json
 
       - name: Commit and push badge
         run: |
