@@ -3,11 +3,11 @@ import json
 import os
 
 JACOCO_XML_PATH = "build/reports/jacoco/test/jacocoTestReport.xml"
-BADGE_OUTPUT_PATH = "code/backend/badges/coverage.json"
+BADGE_OUTPUT_PATH = "../badges/coverage.json"
 
 def extract_coverage(xml_path):
     # print current working dire
-    print(f"Current working directory: {os.getcwd()}")
+    print(f"extract_coverage working directory: {os.getcwd()}")
     tree = ET.parse(xml_path)
     root = tree.getroot()
     for counter in root.findall("counter"):
@@ -38,6 +38,7 @@ def generate_badge_json(coverage, output_path):
         "color": coverage_color(coverage)
     }
     print(f"Generated badge: {badge}")
+    print(f"generate_badge_json working directory: {os.getcwd()}")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:
         json.dump(badge, f)
