@@ -1,0 +1,58 @@
+name: Update Coverage Badge
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+    types: [opened, synchronize, reopened]
+#    branches: [ main ]
+#  workflow_dispatch:
+
+jobs:
+  update-badge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Full history for branch switching
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Run tests and generate JaCoCo report
+        run: ./gradlew jacocoTestReport
+        working-directory: code/backend
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Generate coverage JSON badge
+        run: |
+          pip install lxml
+          python ../../.github/scripts/extract_coverage_and_generate_badge.py
+        working-directory: code/backend
+
+      - name: Checkout coverage-badge branch
+        run: |
+          git fetch origin coverage-badge:coverage-badge
+          git switch coverage-badge
+
+      - name: Copy badge to branch
+        run: |
+          mkdir -p code/backend/badges
+          cp code/backend/badges/coverage.json code/backend/badges/coverage.json
+
+      - name: Commit and push badge
+        run: |
+          git config user.name "arshdeepdhillon"
+          git config user.email "github-actions@github.com"
+          git add code/backend/badges/coverage.json
+          git commit -m "Update coverage JSON badge" || echo "No changes"
+          git push origin coverage-badge

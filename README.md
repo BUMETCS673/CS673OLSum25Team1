@@ -13,6 +13,8 @@
 [![CD workflow](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/cd.yml/badge.svg)](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/cd.yml) 
 [![CI workflow](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/ci.yml/badge.svg)](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/ci.yml)
 
+![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/arshdeepdhillon/BUMETCS673/CS673OLSum25Team1/coverage-badge/code/backend/badges/coverage.json)
+
 
 # GetActive
 <img src="misc/logo.png" alt="drawing" width="100"/>
