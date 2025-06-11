@@ -1,8 +1,19 @@
 # Contents
 - [GetActive](#SoloSavings)
 - [Software Architecture](#software-architecture)
-  - [Technology Stack and Frameworks](#technology-stack-and-frameworks)
-- [Package Structure](#package-structure)
+- [Class Diagram](#class-diagram)
+- [Database Diagram](#database-diagram)
+- [Docker Environment Configuration](#docker-environment-configuration)
+- [Environment Configuration](#environment-configuration)
+- [Development Guide](#development-guide)
+- [Troubleshooting](#troubleshooting)
+- [Important Notes](#important-notes)
+- [Contribution Guidelines](#contribution-guidelines)
+
+[![CD workflow](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/cd.yml/badge.svg)](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/cd.yml) 
+[![CI workflow](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/ci.yml/badge.svg)](https://github.com/BUMETCS673/CS673OLSum25Team1/actions/workflows/ci.yml)
+
+![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/BUMETCS673/CS673OLSum25Team1/coverage-badge/code/backend/badges/coverage.json)
 
 
 # GetActive
