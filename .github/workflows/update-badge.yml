@@ -27,6 +27,6 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Run backend tests
-        working-directory: ./code/backend
+        working-directory: ./code/backend/getactivecore
         run: |
-          ./getactivecore/gradlew jacocoTestReport
+          ./gradlew jacocoTestReport
