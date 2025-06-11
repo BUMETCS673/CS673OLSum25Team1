@@ -25,7 +25,7 @@ def coverage_color(coverage):
         return "brightgreen"
     elif coverage >= 75:
         return "yellowgreen"
-    elif coverage >= 50:
+    elif coverage >= 60:
         return "yellow"
     else:
         return "red"
