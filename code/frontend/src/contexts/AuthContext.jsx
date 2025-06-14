@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await authService.logout();
     setUser(null);
+    setLoading(true);
   };
 
   const register = async (username, email, password) => {

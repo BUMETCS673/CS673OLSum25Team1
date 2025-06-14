@@ -113,13 +113,8 @@ export const authService = {
   },
 
   logout: async () => {
-    try {
-      await api.post("/auth/logout");
-    } finally {
-      jwtUtils.removeToken("auth_token");
-      jwtUtils.removeToken("refresh_token");
-      localStorage.removeItem("userData");
-    }
+    jwtUtils.removeToken("auth_token");
+    localStorage.removeItem("userData");
   },
 
   getCurrentUser: async () => {
