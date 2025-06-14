@@ -1,5 +1,7 @@
 package com.bu.getactivecore.service.activity.api;
 
+import com.bu.getactivecore.service.activity.entity.ActivityCommentCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityCommentDto;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
@@ -9,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -22,6 +25,13 @@ public interface ActivityApi {
      * @return List of all activities
      */
     Page<ActivityDto> getAllActivities(Pageable page);
+
+     /**
+     * Retrieves all activities sorted by popularity.
+     *
+     * @return List of all activities
+     */
+    Page<ActivityDto> getAllActivitiesSortedByPopularity(Pageable page);
 
     /**
      * Retrieves activities by their name.
@@ -80,4 +90,21 @@ public interface ActivityApi {
      * @param activityId ID of the activity to leave
      */
     void leaveActivity(String userId, String activityId);
+
+    /**
+     * Creates a new activity comment.
+     *
+     * @param userId     ID of the user creating the activity comment
+     * @param activityId  ID of the activity'
+     * @param requestDto Details of the activity comment
+     * @param timestamp  comment creation timestamp
+     */
+    void createActivityComment(String userId, String activityId, @Valid ActivityCommentCreateRequestDto requestDto, LocalDateTime timestamp);
+
+    /**
+     * Retrieves all activity comments.
+     *
+     * @return List of all activity comments
+     */
+    Page<ActivityCommentDto> getAllActivityComments(Pageable page, String activityId);
 }

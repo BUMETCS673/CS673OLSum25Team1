@@ -1,11 +1,14 @@
 package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.model.activity.Activity;
+import com.bu.getactivecore.model.activity.ActivityComment;
 import com.bu.getactivecore.model.activity.RoleType;
 import com.bu.getactivecore.model.activity.UserActivity;
+import com.bu.getactivecore.repository.ActivityCommentRepository;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
+import com.bu.getactivecore.service.activity.entity.ActivityCommentCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
@@ -36,6 +39,9 @@ public class ActivityServiceTest {
 
     @Mock
     private ActivityRepository activityRepository;
+
+    @Mock
+    private ActivityCommentRepository activityCommentRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -115,6 +121,18 @@ public class ActivityServiceTest {
     }
 
     @Test
+    public void testGetActivitiesSortedByPopularity() {
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Activity> page = new PageImpl<>(List.of(Activity.builder().build()), pageable, 1);
+        when(activityRepository.findAllSortedByPopularity(pageable)).thenReturn(page);
+
+        activityService.getAllActivitiesSortedByPopularity(pageable);
+
+        verify(activityRepository).findAllSortedByPopularity(pageable);
+    }
+
+
+    @Test
     public void testGetActivitiesByName() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         Page<Activity> page = new PageImpl<>(List.of(Activity.builder().build()), pageable, 1);
@@ -123,6 +141,19 @@ public class ActivityServiceTest {
         activityService.getActivityByName("Rock Climbing", pageable);
 
         verify(activityRepository).findByNameContaining("Rock Climbing", pageable);
+    }
+
+    @Test
+    public void testGetAllActivityComments() {
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
+
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<ActivityComment> page = new PageImpl<>(List.of(ActivityComment.builder().build()), pageable, 1);
+        when(activityCommentRepository.findAllByActivityId(pageable, activityId)).thenReturn(page);
+
+        activityService.getAllActivityComments(pageable, activityId);
+
+        verify(activityCommentRepository).findAllByActivityId(pageable, activityId);
     }
 
     @Test
@@ -241,6 +272,8 @@ public class ActivityServiceTest {
 
     @Test
     public void updateActivityWithPastStartTime() {
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
+
         ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
                 .name("Rock Climbing")
                 .description("")
@@ -258,6 +291,8 @@ public class ActivityServiceTest {
 
     @Test
     public void updateActivityWithPastEndTime() {
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
+
         ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
                 .name("Rock Climbing")
                 .description("")
@@ -275,6 +310,8 @@ public class ActivityServiceTest {
 
     @Test
     public void updateActivityWithEndTimeBeforeStartTime() {
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
+
         ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
                 .name("Rock Climbing")
                 .description("")
@@ -291,7 +328,29 @@ public class ActivityServiceTest {
     }
 
     @Test
+    public void updateActivityWithActivityNotFound() {
+        when(activityRepository.findById(activityId)).thenReturn(Optional.empty());
+
+        ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
+                .name("Rock Climbing")
+                .description("")
+                .location("location")
+                .startDateTime(LocalDateTime.now().plusHours(1))
+                .endDateTime(LocalDateTime.now().plusHours(2))
+                .build();
+
+        Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
+
+        assertThrows(ApiException.class, () -> activityService.updateActivity(activityId, dtoRequest));
+
+        verify(activityRepository, never()).save(updateActivity);
+    }
+
+
+    @Test
     public void updateActivitySuccessfully() {
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
+
         ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
                 .name("Rock Climbing")
                 .description("")
@@ -387,5 +446,28 @@ public class ActivityServiceTest {
         List<UserActivityDto> result = activityService.getJoinedActivities(userId);
 
         verify(userActivityRepository).findJoinedActivitiesByUserId(userId);
+    }
+
+
+    @Test
+    public void createActivityCommentSuccessfully() {
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity())); 
+
+        ActivityCommentCreateRequestDto dtoRequest = ActivityCommentCreateRequestDto.builder()
+                .comment("comment")
+                .build();
+
+        LocalDateTime timestamp = LocalDateTime.now();        
+
+        ActivityComment activityComment = ActivityComment.builder().activityId(activityId)
+                                            .userId(userId)
+                                            .activityId(activityId)
+                                            .comment(dtoRequest.getComment())
+                                            .timestamp(timestamp)
+                                            .build();            
+
+        activityService.createActivityComment(userId, activityId, dtoRequest, timestamp);
+
+        verify(activityCommentRepository).save(activityComment);
     }
 }

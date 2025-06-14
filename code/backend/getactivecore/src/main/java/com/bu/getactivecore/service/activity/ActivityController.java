@@ -2,6 +2,8 @@ package com.bu.getactivecore.service.activity;
 
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
+import com.bu.getactivecore.service.activity.entity.ActivityCommentCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityCommentDto;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +66,11 @@ public class ActivityController {
                                                            @RequestParam(name = "size", defaultValue = "10") int size,
                                                            @RequestParam(defaultValue = "id") String sortBy,
                                                            @RequestParam(defaultValue = "true") boolean ascending) {
+        if(sortBy.equals("popularity")){
+            Pageable pageable = PageRequest.of(page, size, Sort.unsorted());
+            return ResponseEntity.ok(m_activityApi.getAllActivitiesSortedByPopularity(pageable));
+        }
+
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(m_activityApi.getAllActivities(pageable));
@@ -160,5 +168,37 @@ public class ActivityController {
     public ResponseEntity<ActivityDto> updateActivity(@PathVariable String id,
                                                       @Valid @RequestBody ActivityUpdateRequestDto request) {
         return ResponseEntity.ok(m_activityApi.updateActivity(id, request));
+    }
+
+       /**
+     * create an activity comment
+     *
+     * @param requestDto comment requestDto
+     * @return an activity
+     */
+    @PostMapping("/activity/{id}/comment")
+    public ResponseEntity<Object> createActivityComment(@AuthenticationPrincipal UserPrincipal user,
+                                                 @PathVariable String id,
+                                                 @RequestBody @Valid ActivityCommentCreateRequestDto requestDto) {
+        String userId = user.getUserDto().getUserId();
+        m_activityApi.createActivityComment(userId, id, requestDto, LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+      /**
+     * Get all comments by activity id.
+     *
+     * @return Page of activities
+     */
+    @GetMapping("/activity/{id}/comments")
+    public ResponseEntity<Page<ActivityCommentDto>> getActivityComments(
+                                                           @PathVariable String id,
+                                                           @RequestParam(name = "page", defaultValue = "0") int page,
+                                                           @RequestParam(name = "size", defaultValue = "10") int size,
+                                                           @RequestParam(defaultValue = "id") String sortBy,
+                                                           @RequestParam(defaultValue = "true") boolean ascending) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(m_activityApi.getAllActivityComments(pageable, id));
     }
 }
