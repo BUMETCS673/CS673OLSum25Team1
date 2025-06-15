@@ -19,12 +19,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bu.getactivecore.model.activity.Activity;
+import com.bu.getactivecore.model.activity.ActivityComment;
 import com.bu.getactivecore.model.activity.UserActivity;
+import com.bu.getactivecore.repository.ActivityCommentRepository;
 import com.bu.getactivecore.model.users.Users;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
 import com.bu.getactivecore.service.activity.api.ActivityApi;
+import com.bu.getactivecore.service.activity.entity.ActivityCommentCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityCommentDto;
 import com.bu.getactivecore.service.activity.entity.ActivityCreateRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDeleteRequestDto;
 import com.bu.getactivecore.service.activity.entity.ActivityDto;
@@ -33,6 +37,9 @@ import com.bu.getactivecore.service.activity.entity.UserActivityDto;
 import com.bu.getactivecore.service.users.entity.ParticipantDto;
 import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
+
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,34 +56,45 @@ public class ActivityService implements ActivityApi {
 
 	private static final Map<String, String> ROSTER_SORT_MAPPING = Map.of("name", "user.username");
 
-	private final UserActivityRepository m_userActivityRepo;
+	private final ActivityCommentRepository m_activityCommentRepo;
 
 	private final ActivityRepository m_activityRepo;
 
 	private final UserRepository m_userRepo;
 
+	private final UserActivityRepository m_userActivityRepo;
+
 	/**
 	 * Constructs the ActivityService.
 	 *
-	 * @param activityRepo     used to fetch and manage activities
-	 * @param userActivityRepo used to fetch and manage user activities
+	 * @param activityRepo        used to fetch and manage activities
+	 * @param userRepo            used to fetch and manage user
+	 * @param userActivityRepo    used to fetch and manage user activities
+	 * @param activityCommentRepo used to fetch and manage activity comment
 	 */
 	public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo,
-			UserRepository userRepo) {
+			ActivityCommentRepository activityCommentRepo, UserRepository userRepo) {
 		m_activityRepo = activityRepo;
-		m_userActivityRepo = userActivityRepo;
 		m_userRepo = userRepo;
+		m_userActivityRepo = userActivityRepo;
+		m_activityCommentRepo = activityCommentRepo;
 	}
 
 	@Override
-	public Page<ActivityDto> getActivityByName(String activityName, Pageable pageable) {
-		Page<Activity> activities = m_activityRepo.findByNameContaining(activityName, pageable);
+	public Page<ActivityDto> getAllActivitiesSortedByPopularity(Pageable pageable) {
+		Page<Activity> activities = m_activityRepo.findAllSortedByPopularity(pageable);
 		return activities.map(ActivityDto::of);
 	}
 
 	@Override
 	public Page<ActivityDto> getAllActivities(Pageable pageable) {
 		Page<Activity> activities = m_activityRepo.findAll(pageable);
+		return activities.map(ActivityDto::of);
+	}
+
+	@Override
+	public Page<ActivityDto> getActivityByName(String activityName, Pageable pageable) {
+		Page<Activity> activities = m_activityRepo.findByNameContaining(activityName, pageable);
 		return activities.map(ActivityDto::of);
 	}
 
@@ -137,6 +155,12 @@ public class ActivityService implements ActivityApi {
 
 	@Override
 	public ActivityDto updateActivity(String id, ActivityUpdateRequestDto requestDto) {
+		Optional<Activity> activity = m_activityRepo.findById(id);
+		if (activity.isEmpty()) {
+			throw new ApiException(
+					ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build());
+		}
+
 		if (requestDto.getEndDateTime().isBefore(LocalDateTime.now())
 				|| requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
 			throw new ApiException(ApiErrorPayload.builder().status(BAD_REQUEST)
@@ -157,6 +181,37 @@ public class ActivityService implements ActivityApi {
 
 		Activity updateActivity = m_activityRepo.save(ActivityUpdateRequestDto.from(id, requestDto));
 		return ActivityDto.of(updateActivity);
+	}
+
+	@Override
+	public void createActivityComment(String userId, String activityId,
+			@Valid ActivityCommentCreateRequestDto requestDto, LocalDateTime timestamp) {
+		Optional<Activity> activity = m_activityRepo.findById(activityId);
+		if (activity.isEmpty()) {
+			throw new ApiException(
+					ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build());
+		}
+
+		ActivityComment activityComment = ActivityComment.builder().activityId(activityId)
+				.userId(userId)
+				.comment(requestDto.getComment())
+				.timestamp(timestamp)
+				.build();
+		m_activityCommentRepo.save(activityComment);
+
+	}
+
+	@Override
+	public Page<ActivityCommentDto> getAllActivityComments(Pageable page, String activityId) {
+		Optional<Activity> activity = m_activityRepo.findById(activityId);
+
+		if (activity.isEmpty()) {
+			throw new ApiException(
+					ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build());
+		}
+
+		Page<ActivityComment> comments = m_activityCommentRepo.findAllByActivityId(page, activityId);
+		return comments.map(ActivityCommentDto::of);
 	}
 
 	@Override
@@ -216,4 +271,5 @@ public class ActivityService implements ActivityApi {
 		Page<UserActivity> result = m_userActivityRepo.findParticipantsByActivityId(activityId, updatedPageable);
 		return result.map(ParticipantDto::of);
 	}
+
 }

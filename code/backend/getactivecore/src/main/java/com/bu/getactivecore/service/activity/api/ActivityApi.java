@@ -1,5 +1,7 @@
 package com.bu.getactivecore.service.activity.api;
 
+import com.bu.getactivecore.service.activity.entity.ActivityCommentCreateRequestDto;
+import com.bu.getactivecore.service.activity.entity.ActivityCommentDto;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.service.activity.entity.UserActivityDto;
 import com.bu.getactivecore.service.users.entity.ParticipantDto;
 
+import java.time.LocalDateTime;
 import jakarta.validation.Valid;
 
 /**
@@ -25,6 +28,13 @@ public interface ActivityApi {
 	 * @return List of all activities
 	 */
 	Page<ActivityDto> getAllActivities(Pageable page);
+
+	/**
+	 * Retrieves all activities sorted by popularity.
+	 *
+	 * @return List of all activities
+	 */
+	Page<ActivityDto> getAllActivitiesSortedByPopularity(Pageable page);
 
 	/**
 	 * Retrieves activities by their name.
@@ -61,7 +71,8 @@ public interface ActivityApi {
 	ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
 
 	/**
-	 * Retrieves a list of joined activities for the requested user as either a participant or admin.
+	 * Retrieves a list of joined activities for the requested user as either a
+	 * participant or admin.
 	 *
 	 * @param userId ID of the user whose joined activities are to be fetched
 	 * @return List of {@link UserActivityDto} representing the activities the user
@@ -95,5 +106,23 @@ public interface ActivityApi {
 	 * @return A paginated list of {@link ParticipantDto} objects.
 	 */
 	Page<ParticipantDto> getActivityRoster(String requestedUserId, String activityId, Pageable pageable);
+
+	/**
+	 * Creates a new activity comment.
+	 *
+	 * @param userId     ID of the user creating the activity comment
+	 * @param activityId ID of the activity'
+	 * @param requestDto Details of the activity comment
+	 * @param timestamp  comment creation timestamp
+	 */
+	void createActivityComment(String userId, String activityId, @Valid ActivityCommentCreateRequestDto requestDto,
+			LocalDateTime timestamp);
+
+	/**
+	 * Retrieves all activity comments.
+	 *
+	 * @return List of all activity comments
+	 */
+	Page<ActivityCommentDto> getAllActivityComments(Pageable page, String activityId);
 
 }

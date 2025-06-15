@@ -28,10 +28,20 @@ package model {
         -startTime: LocalDateTime
         -endTime: LocalDateTime
     }
+    class ActivityComment {
+        -id: UUID
+        -userId: UUID
+        -activityId: UUID
+        -comment: String
+        -timestamp: LocalDateTime
+    }
 
     User "1" -l-> "0..*" UserActivity: Is a
     Activity "1..*" -r-> "1.*" UserActivity : Has
     UserActivity -d-> ParticipantRole: Is
+    Activity "1..*" -r-> "1.*" UserActivity : Has
+    User "1" -l-> "0..*" ActivityComment: Is a
+    Activity "1..*" -r-> "1.*" ActivityComment : Has
 }
 
 package repository {
