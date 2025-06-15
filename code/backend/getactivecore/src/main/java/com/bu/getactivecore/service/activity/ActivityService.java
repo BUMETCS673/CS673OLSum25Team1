@@ -68,13 +68,14 @@ public class ActivityService implements ActivityApi {
 	 * Constructs the ActivityService.
 	 *
 	 * @param activityRepo        used to fetch and manage activities
+	 * @param userRepo            used to fetch and manage user
 	 * @param userActivityRepo    used to fetch and manage user activities
-	 * @param activityCommentRepo used to fetch and manage user activities
+	 * @param activityCommentRepo used to fetch and manage activity comment
 	 */
 	public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo,
-			ActivityCommentRepository activityCommentRepo, UserRepository userRepository) {
+			ActivityCommentRepository activityCommentRepo, UserRepository userRepo) {
 		m_activityRepo = activityRepo;
-		m_userRepo = userRepository;
+		m_userRepo = userRepo;
 		m_userActivityRepo = userActivityRepo;
 		m_activityCommentRepo = activityCommentRepo;
 	}
