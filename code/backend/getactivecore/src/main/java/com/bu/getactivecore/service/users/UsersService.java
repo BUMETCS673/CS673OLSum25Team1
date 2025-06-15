@@ -11,7 +11,6 @@ import com.bu.getactivecore.shared.ErrorCode;
 import com.bu.getactivecore.shared.exception.ApiException;
 import com.bu.getactivecore.shared.validation.AccountStateChecker;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +22,8 @@ import java.util.Base64;
 
 import static com.bu.getactivecore.shared.ErrorCode.WRONG_CREDENTIALS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 /**
  * Core logic for managing user related operations.
@@ -92,9 +93,7 @@ public class UsersService implements UserInfoApi {
         String base64Data = requestDto.getAvatarData().split(",")[1];
         byte[] imageData = Base64.getDecoder().decode(base64Data);
         if (imageData.length > MAX_AVATAR_SIZE) {
-            ApiErrorPayload error = ApiErrorPayload.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .errorCode(ErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT)
+            ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(ErrorCode.AVATAR_SIZE_EXCEEDS_LIMIT)
                     .message("Avatar size exceeds 3MB limit")
                     .build();
             throw new ApiException(error);
@@ -103,9 +102,7 @@ public class UsersService implements UserInfoApi {
         // Update user avatar
         Users user = m_userRepo.findByUsername(username)
                 .orElseThrow(() -> {
-                    ApiErrorPayload error = ApiErrorPayload.builder()
-                            .status(HttpStatus.NOT_FOUND)
-                            .errorCode(ErrorCode.WRONG_CREDENTIALS)
+                    ApiErrorPayload error = ApiErrorPayload.builder().status(NOT_FOUND).errorCode(ErrorCode.WRONG_CREDENTIALS)
                             .message("User not found")
                             .build();
                     return new ApiException(error);
@@ -116,8 +113,8 @@ public class UsersService implements UserInfoApi {
         m_userRepo.save(user);
 
         return new UpdateAvatarResponseDto(
-                user.getAvatar(),
-                user.getAvatarUpdatedAt()
+            user.getAvatar(),
+            user.getAvatarUpdatedAt()
         );
     }
 }
