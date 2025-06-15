@@ -23,9 +23,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      const navigate = useNavigate();
-      navigate("/login");
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      window.location.replace("/login");
     }
 
     return Promise.reject(error);
