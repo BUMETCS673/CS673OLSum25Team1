@@ -24,6 +24,7 @@ vi.mock("../../services/activityService", () => {
       getParticipantActivities: vi.fn(),
       joinActivity: vi.fn(),
       leaveActivity: vi.fn(),
+      deleteActivity: vi.fn(),
     },
   };
 });
@@ -50,6 +51,15 @@ const mockParticipantActivities = [
     startDateTime: "2025-01-02T10:00:00",
     endDateTime: "2025-01-02T12:00:00",
   },
+  {
+    activityId: 2,
+    name: "Joined 2",
+    description: "desc2",
+    location: "loc2",
+    startDateTime: "2025-01-02T10:00:00",
+    endDateTime: "2025-01-02T12:00:00",
+    role: "ADMIN",
+  },
 ];
 
 describe("Home Page Unit Test", () => {
@@ -75,6 +85,51 @@ describe("Home Page Unit Test", () => {
     await screen.findByText("Recent 1");
     fireEvent.click(screen.getByText("Participated Activities"));
     await screen.findByText("Joined 1");
+  });
+
+  test("test delete activity without participants", async () => {
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </AuthProvider>
+    );
+    await screen.findByText("Recent 1");
+    fireEvent.click(screen.getByText("Participated Activities"));
+    await screen.findByText("Joined 2");
+    fireEvent.click(screen.getByText("Delete Activity"));
+  });
+
+  test("test delete activity with participants", async () => {
+    activityService.deleteActivity.mockResolvedValue({
+      success: false,
+      error: {
+        errorCode: "PARTICIPANTS_PRESENT",
+      },
+    });
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </AuthProvider>
+    );
+    await screen.findByText("Recent 1");
+    fireEvent.click(screen.getByText("Participated Activities"));
+    await screen.findByText("Joined 2");
+    fireEvent.click(screen.getByText("Delete Activity"));
+
+    await waitFor(() => {
+      expect(activityService.deleteActivity).toHaveBeenCalledWith(2);
+    });
+    expect(screen.getByText("Activity has participants. Do you want to delete it?")).toBeInTheDocument();
+    expect(screen.getByText("Yes")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Yes"));
+
+    await waitFor(() => {
+      expect(activityService.deleteActivity).toHaveBeenCalledWith(2, true);
+    });
   });
 
   test("test join activity", async () => {

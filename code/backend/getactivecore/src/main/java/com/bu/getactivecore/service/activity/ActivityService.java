@@ -2,6 +2,7 @@ package com.bu.getactivecore.service.activity;
 
 import static com.bu.getactivecore.model.activity.RoleType.ADMIN;
 import static com.bu.getactivecore.model.activity.RoleType.PARTICIPANT;
+import static com.bu.getactivecore.shared.ErrorCode.PARTICIPANTS_PRESENT;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -144,8 +145,11 @@ public class ActivityService implements ActivityApi {
 
 		List<UserActivity> userActivities = m_userActivityRepo.findByActivityIdAndRole(activityId, PARTICIPANT);
 		if (!requestDto.isForce() && !userActivities.isEmpty()) {
-			throw new ApiException(ApiErrorPayload.builder().status(FORBIDDEN)
-					.message("Force is set to false. There are participants in this activity. ").build());
+			throw new ApiException(ApiErrorPayload.builder()
+                    .status(FORBIDDEN)
+                    .errorCode(PARTICIPANTS_PRESENT)
+					.message("Unable to delete activity with participants")
+                    .build());
 		}
 
 		m_userActivityRepo.deleteByActivityId(activityId);

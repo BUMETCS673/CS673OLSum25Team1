@@ -1,7 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tabs, Tab, Snackbar, Alert } from "@mui/material";
+import { Tabs, Tab, Snackbar, Alert, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { activityService } from "../services/activityService";
 
@@ -33,6 +33,7 @@ export default function Home() {
     open: false,
     message: "",
     severity: "success",
+    actions: null,
   });
 
   const handleChange = async (event, newValue) => {
@@ -98,6 +99,77 @@ export default function Home() {
     }
   };
 
+  const notifySuccess = (message) => {
+    setNotification({
+      open: true,
+      message,
+      severity: "success",
+    });
+  };
+
+  const notifyError = (message) => {
+    setNotification({
+      open: true,
+      message,
+      severity: "error",
+    });
+  };
+  const refreshActivities = async () => {
+    const activities = await activityService.getParticipantActivities();
+    setParticipantActivities(activities);
+  };
+
+  const forceDeleteActivity = async (activityId) => {
+    try {
+      await activityService.deleteActivity(activityId, true);
+      await refreshActivities();
+      notifySuccess("Activity deleted successfully");
+    } catch (err) {
+      console.error("Error force deleting activity:");
+      notifyError("Failed to delete activity");
+    }
+  };
+
+  const handleDeleteError = (error, activityId) => {
+    if (error?.errorCode === "PARTICIPANTS_PRESENT") {
+      setNotification({
+        open: true,
+        message: "Activity has participants. Do you want to delete it?",
+        severity: "warning",
+        actions: [
+          {
+            label: "Yes",
+            onClick: async () => {
+              setNotification((n) => ({ ...n, open: false }));
+              await forceDeleteActivity(activityId);
+            },
+          },
+          {
+            label: "No",
+            onClick: () => {
+              setNotification((n) => ({ ...n, open: false }));
+            },
+          },
+        ],
+      });
+    } else {
+      notifyError(error || "Failed to delete activity");
+    }
+  };
+
+  const handleDeleteActivity = async (activityId) => {
+    try {
+      const { error } = await activityService.deleteActivity(activityId);
+      if (error) {
+        return handleDeleteError(error, activityId);
+      }
+      await refreshActivities();
+      notifySuccess("Activity deleted successfully");
+    } catch (err) {
+      console.error("Error deleting activity:", err);
+      notifyError("Failed to delete activity");
+    }
+  };
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -169,7 +241,28 @@ export default function Home() {
         onClose={handleClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleClose} severity={notification.severity} variant="filled" sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleClose}
+          severity={notification.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+          action={
+            notification.actions &&
+            notification.actions.map((action, index) => (
+              <Button
+                key={index}
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  action.onClick();
+                  setNotification((n) => ({ ...n, open: false }));
+                }}
+              >
+                {action.label}
+              </Button>
+            ))
+          }
+        >
           {notification.message}
         </Alert>
       </Snackbar>
@@ -239,6 +332,8 @@ export default function Home() {
           <TabPanel value={value} index={1}>
             <div style={styles.activitiesGrid}>
               {participantActivities.map((activity, index) => {
+                console.log("participantActivities", activity);
+                const isAdmin = activity.role === "ADMIN";
                 const startDate = new Date(activity.startDateTime);
                 const endDate = new Date(activity.endDateTime);
                 const formatDateTime = (date) =>
@@ -266,8 +361,13 @@ export default function Home() {
                         <span>{activity.location}</span>
                       </div>
                     </div>
-                    <button style={styles.joinButton} onClick={() => handleLeaveActivity(activity.activityId)}>
-                      Leave Activity
+                    <button
+                      style={styles.joinButton}
+                      onClick={() =>
+                        isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
+                      }
+                    >
+                      {isAdmin ? "Delete Activity" : "Leave Activity"}
                     </button>
                   </div>
                 );
