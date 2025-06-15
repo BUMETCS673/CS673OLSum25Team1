@@ -32,7 +32,7 @@ const HiddenInput = styled("input")({
   display: "none",
 });
 
-export default function AvatarUpload({ user, setUser }) {
+export default function AvatarUpload({ user }) {
   const { updateAvatar } = useAuth();
   const [notification, setNotification] = useState({
     open: false,

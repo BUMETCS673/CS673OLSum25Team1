@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from "axios";
 import { jwtUtils } from "../utils/jwt";
-import { useNavigate } from "react-router-dom";
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 5000,
