@@ -37,7 +37,6 @@ public class UserDto {
 	 */
 	private String password;
 
-<<<<<<< HEAD
     /**
      * The state of this user's account.
      */
