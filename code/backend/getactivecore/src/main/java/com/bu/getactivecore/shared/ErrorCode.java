@@ -18,7 +18,8 @@ public enum ErrorCode {
     UNSUPPORTED_MEDIA_TYPE("UNSUPPORTED_MEDIA_TYPE", "The provided media type is not supported"),
     UNSUPPORTED_OPERATION("UNSUPPORTED_OPERATION", "This endpoint does not support the requested operation"),
     VERIFIED_ACCOUNT_REQUIRED("VERIFIED_ACCOUNT_REQUIRED", "This endpoint requires a verified account"),
-    WRONG_CREDENTIALS("INVALID_CREDENTIALS", "The provided username and password are invalid");
+    WRONG_CREDENTIALS("INVALID_CREDENTIALS", "The provided username and password are invalid"),
+    AVATAR_SIZE_EXCEEDS_LIMIT("AVATAR_SIZE_EXCEEDS_LIMIT", "Avatar size exceeds 3MB limit");
 
     private final String m_code;
     private final String m_details;

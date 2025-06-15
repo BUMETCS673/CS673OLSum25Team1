@@ -5,6 +5,7 @@ import { Tabs, Tab, Snackbar, Alert, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { activityService } from "../services/activityService";
+import AvatarUpload from "../components/Avator";
 
 const StyledTab = styled(Tab)({
   textTransform: "none",
@@ -206,7 +207,7 @@ export default function Home() {
           {user ? (
             <div style={styles.headerRightContent}>
               <div style={styles.accountInfo}>
-                <div style={styles.avatar}>{user.username.charAt(0).toUpperCase()}</div>
+                <AvatarUpload user={user} />
                 <div style={styles.userDetails}>
                   <p style={styles.username}>{user.username}</p>
                   <p style={styles.userEmail}>{user.userEmail}</p>

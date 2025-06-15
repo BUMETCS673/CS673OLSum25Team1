@@ -4,6 +4,7 @@ import com.bu.getactivecore.model.users.AccountState;
 import com.bu.getactivecore.model.users.Users;
 import lombok.Builder;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 /**
  * DTO for exposing user data.
@@ -34,11 +35,20 @@ public class UserDto {
      */
     private String password;
 
-
     /**
      * The state of this user's account.
      */
     private AccountState accountState;
+
+    /**
+     * The avatar of the user in Base64 format.
+     */
+    private String avatar;
+
+    /**
+     * The last update time of the avatar.
+     */
+    private LocalDateTime avatarUpdatedAt;
 
     /**
      * Converts a Users entity to a UserDto.
@@ -47,7 +57,15 @@ public class UserDto {
      * @return the UserDto
      */
     public static UserDto of(Users user) {
-        return new UserDto(user.getUserId(), user.getEmail(), user.getUsername(), user.getPassword(), user.getAccountState());
+        return UserDto.builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .accountState(user.getAccountState())
+                .avatar(user.getAvatar())
+                .avatarUpdatedAt(user.getAvatarUpdatedAt())
+                .build();
     }
 
     /**

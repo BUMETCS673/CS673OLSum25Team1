@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
-
+import java.time.LocalDateTime;
 
 @Data
 @Builder(toBuilder = true)
@@ -41,4 +41,9 @@ public class Users {
     @Column(name = "account_state", nullable = false)
     private AccountState accountState;
 
+    @Column(name = "avatar", columnDefinition = "TEXT")
+    private String avatar;
+
+    @Column(name = "avatar_updated_at")
+    private LocalDateTime avatarUpdatedAt;
 }

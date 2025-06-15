@@ -1,6 +1,7 @@
 package com.bu.getactivecore.service.users.entity;
 
 import lombok.Value;
+import java.time.LocalDateTime;
 
 /**
  * The login response DTO containing the authentication token.
@@ -16,5 +17,7 @@ public class LoginResponseDto {
     String token;
     String username;
     String email;
+    String avatar;
+    LocalDateTime avatarUpdatedAt;
 
 }

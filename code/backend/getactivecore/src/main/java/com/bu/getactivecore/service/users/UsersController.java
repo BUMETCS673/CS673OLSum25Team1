@@ -10,9 +10,14 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.bu.getactivecore.model.users.UserPrincipal;
+import com.bu.getactivecore.service.users.entity.UpdateAvatarRequestDto;
+import com.bu.getactivecore.service.users.entity.UpdateAvatarResponseDto;
 
 /**
  * Entry point for all user related requests.
@@ -43,5 +48,13 @@ public class UsersController {
     public LoginResponseDto loginUser(@Valid @RequestBody LoginRequestDto loginUserDto) throws ApiException {
         log.debug("Got request at /login");
         return m_userInfoApi.loginUser(loginUserDto);
+    }
+
+    @PutMapping(path = "/avatar", consumes = "application/json")
+    public UpdateAvatarResponseDto updateAvatar(@AuthenticationPrincipal UserPrincipal user,
+            @Valid @RequestBody UpdateAvatarRequestDto requestDto) throws ApiException {
+        log.debug("Got request at /avatar");
+        String username = user.getUserDto().getUsername();
+        return m_userInfoApi.updateAvatar(username, requestDto);
     }
 }
