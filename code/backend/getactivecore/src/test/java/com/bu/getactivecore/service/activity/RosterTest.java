@@ -180,7 +180,7 @@ class RosterTest {
 		String user2AccessToken = registerUser(email2, username2, password2);
 		createActivity(username2, createActivity2);
 
-		ActivityDto activity2 = activityApi.getActivityByName(createActivity2.getName(), Pageable.unpaged()).get()
+		ActivityDto activity2 = activityApi.getActivityByName(createActivity2.name(), Pageable.unpaged()).get()
 				.findFirst().get();
 
 		Map<String, String> pathParams = Map.of("activityId", activity2.getId());

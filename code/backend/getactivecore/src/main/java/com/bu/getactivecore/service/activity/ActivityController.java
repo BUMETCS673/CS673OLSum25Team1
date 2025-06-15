@@ -141,7 +141,7 @@ public class ActivityController {
 		log.info("Got request: /v1/activity/participant");
 
 		String userId = user.getUserDto().getUserId();
-		m_activityApi.joinActivity(userId, request.getActivityId());
+		m_activityApi.joinActivity(userId, request.activityId());
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
@@ -151,7 +151,7 @@ public class ActivityController {
 		log.info("Got request: /v1/activity/leave");
 
 		String userId = user.getUserDto().getUserId();
-		m_activityApi.leaveActivity(userId, request.getActivityId());
+		m_activityApi.leaveActivity(userId, request.activityId());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 

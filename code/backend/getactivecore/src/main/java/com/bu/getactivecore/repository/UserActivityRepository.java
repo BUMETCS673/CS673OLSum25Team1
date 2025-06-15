@@ -44,7 +44,7 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Stri
 	void deleteByActivityId(String activityId);
 
 	@Query("SELECT ua FROM UserActivity ua JOIN ua.activity JOIN ua.user WHERE ua.user.userId = :userId")
-	List<UserActivity> findJoinedActivitiesByUserId(String userId);
+	List<UserActivity> findJoinedActivitiesByUserId(@Param("userId") String userId);
 
 	@Query("SELECT ua FROM UserActivity ua JOIN ua.activity a JOIN ua.user u WHERE a.id = :activityId")
 	Page<UserActivity> findParticipantsByActivityId(@Param("activityId") String activityId, Pageable pageable);

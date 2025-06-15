@@ -3,9 +3,6 @@ package com.bu.getactivecore.service.activity.entity;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Value;
 
-@Value
-public class ActivityParticipantRequestDto {
+public record ActivityParticipantRequestDto(@NotBlank(message = "Activity ID cannot be blank") String activityId) {
 
-	@NotBlank(message = "Activity ID cannot be blank")
-	private String activityId;
 }

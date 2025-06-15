@@ -100,25 +100,25 @@ public class ActivityService implements ActivityApi {
 	@Override
 	@Transactional
 	public void createActivity(String userId, ActivityCreateRequestDto requestDto) {
-		m_activityRepo.findByName(requestDto.getName()).ifPresent(a -> {
+		m_activityRepo.findByName(requestDto.name()).ifPresent(a -> {
 			throw new ApiException(
 					ApiErrorPayload.builder().status(BAD_REQUEST).message("Activity name exists").build());
 		});
 
-		if (requestDto.getEndDateTime().isEqual(requestDto.getStartDateTime())
-				|| requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
+		if (requestDto.endDateTime().isEqual(requestDto.startDateTime())
+				|| requestDto.endDateTime().isBefore(requestDto.startDateTime())) {
 			throw new ApiException(ApiErrorPayload.builder().status(BAD_REQUEST)
 					.message("End date time cannot be on or before start date time").build());
 		}
 
-		if (requestDto.getStartDateTime().isBefore(LocalDateTime.now())
-				|| requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
+		if (requestDto.startDateTime().isBefore(LocalDateTime.now())
+				|| requestDto.endDateTime().isBefore(requestDto.startDateTime())) {
 			throw new ApiException(ApiErrorPayload.builder().status(BAD_REQUEST)
 					.message("Start date time cannot be in the past").build());
 		}
 
-		if (requestDto.getEndDateTime().isBefore(LocalDateTime.now())
-				|| requestDto.getEndDateTime().isBefore(requestDto.getStartDateTime())) {
+		if (requestDto.endDateTime().isBefore(LocalDateTime.now())
+				|| requestDto.endDateTime().isBefore(requestDto.startDateTime())) {
 			throw new ApiException(ApiErrorPayload.builder().status(BAD_REQUEST)
 					.message("End date time cannot be in the past").build());
 		}
