@@ -23,6 +23,10 @@ export const activityService = {
     });
     return response.data;
   },
+  deleteActivity: async (activityId) => {
+    const response = await api.delete(`/activity/${activityId}`);
+    return response.data;
+  },
   createActivity: async (activityData) => {
     const response = await api.post("/activity", activityData);
     return response.data;

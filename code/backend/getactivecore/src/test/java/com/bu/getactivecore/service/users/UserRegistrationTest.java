@@ -14,6 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -35,6 +36,9 @@ import com.bu.getactivecore.shared.ErrorCode;
 class UserRegistrationTest {
 
 	private static final String PASSWORD = "Test123.";
+
+    @MockitoBean
+    private CommandLineRunner demoPreloadData;
 
 	@MockitoBean
 	private EmailVerificationService emailVerificationService;

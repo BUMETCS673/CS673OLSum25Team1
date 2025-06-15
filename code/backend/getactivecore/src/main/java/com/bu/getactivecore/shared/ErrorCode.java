@@ -11,6 +11,7 @@ public enum ErrorCode {
 	EMAIL_USERNAME_TAKEN("EMAIL_USERNAME_TAKEN", "The provided email or username is already taken"),
 	GENERAL_ERROR("GENERAL_ERROR", "An unexpected error occurred"),
 	INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "An unexpected error occurred"),
+	PARTICIPANTS_PRESENT("PARTICIPANTS_PRESENT", "The activity has participants and cannot be deleted"),
 	RESOURCE_ACCESS_DENIED("RESOURCE_ACCESS_DENIED", "Access to the requested resource is denied"),
 	TOKEN_EXPIRED("TOKEN_EXPIRED", "The provided token has expired"),
 	TOKEN_INVALID("TOKEN_INVALID", "The provided token is invalid"),

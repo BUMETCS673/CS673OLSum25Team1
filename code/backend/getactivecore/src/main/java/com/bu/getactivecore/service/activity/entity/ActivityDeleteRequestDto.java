@@ -10,7 +10,9 @@ import lombok.Value;
 @Builder
 public class ActivityDeleteRequestDto {
 
-	// remove all participants from this activity
-	private boolean force = false;
+    /**
+     * If true, the activity will be forcefully deleted even if it has participants.
+     */
+	boolean force;
 
 }

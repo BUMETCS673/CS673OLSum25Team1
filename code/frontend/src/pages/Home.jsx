@@ -98,6 +98,26 @@ export default function Home() {
     }
   };
 
+  const handleDeleteActivity = async (activityId) => {
+    try {
+      await activityService.deleteActivity(activityId);
+      const activities = await activityService.getParticipantActivities();
+      setParticipantActivities(activities);
+      setNotification({
+        open: true,
+        message: "Activity deleted successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      setNotification({
+        open: true,
+        message: "Failed to delete activity",
+        severity: "error",
+      });
+    }
+  };
+
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -239,6 +259,8 @@ export default function Home() {
           <TabPanel value={value} index={1}>
             <div style={styles.activitiesGrid}>
               {participantActivities.map((activity, index) => {
+                console.log("participantActivities", activity);
+                const isAdmin = activity.role === "ADMIN";
                 const startDate = new Date(activity.startDateTime);
                 const endDate = new Date(activity.endDateTime);
                 const formatDateTime = (date) =>
@@ -266,8 +288,13 @@ export default function Home() {
                         <span>{activity.location}</span>
                       </div>
                     </div>
-                    <button style={styles.joinButton} onClick={() => handleLeaveActivity(activity.activityId)}>
-                      Leave Activity
+                    <button
+                      style={styles.joinButton}
+                      onClick={() =>
+                        isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
+                      }
+                    >
+                      {isAdmin ? "Delete Activity" : "Leave Activity"}
                     </button>
                   </div>
                 );

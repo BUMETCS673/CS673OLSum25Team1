@@ -189,14 +189,15 @@ public class ActivityController {
 
 	@Transactional
 	@DeleteMapping("/activity/{id}")
-	@PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
-	public ResponseEntity<Object> deleteActivity(@PathVariable String id, @Valid ActivityDeleteRequestDto requestDto) {
+	@PreAuthorize("@activityPermissionEvaluator.assertAuthorizedToUpdateActivity(authentication, #id)")
+	public ResponseEntity<Object> deleteActivity(@PathVariable String id,
+			@Valid @RequestBody ActivityDeleteRequestDto requestDto) {
 		m_activityApi.deleteActivity(id, requestDto);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@PutMapping("/activity/{id}")
-	@PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
+	@PreAuthorize("@activityPermissionEvaluator.assertAuthorizedToUpdateActivity(authentication, #id)")
 	public ResponseEntity<ActivityDto> updateActivity(@PathVariable String id,
 			@Valid @RequestBody ActivityUpdateRequestDto request) {
 		return ResponseEntity.ok(m_activityApi.updateActivity(id, request));
