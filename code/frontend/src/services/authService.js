@@ -101,6 +101,7 @@ export const authService = {
           userId: data.userId,
           username: data.username,
           userEmail: data.email,
+          avatar: data.avatar,
         },
         error: null,
       };
@@ -113,13 +114,8 @@ export const authService = {
   },
 
   logout: async () => {
-    try {
-      await api.post("/auth/logout");
-    } finally {
-      jwtUtils.removeToken("auth_token");
-      jwtUtils.removeToken("refresh_token");
-      localStorage.removeItem("userData");
-    }
+    jwtUtils.removeToken("auth_token");
+    localStorage.removeItem("userData");
   },
 
   getCurrentUser: async () => {
@@ -144,5 +140,16 @@ export const authService = {
   isAuthenticated: () => {
     const token = jwtUtils.getToken("auth_token");
     return Boolean(token && !jwtUtils.isTokenExpired(token));
+  },
+
+  updateAvatar: async (avatarData) => {
+    try {
+      const response = await api.put("/avatar", {
+        avatarData,
+      });
+      return { success: true, avatarResponse: response.data.data, error: null };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.message || "failed to update avatar" };
+    }
   },
 };

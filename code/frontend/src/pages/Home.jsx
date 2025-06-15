@@ -1,15 +1,24 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tabs, Tab, Snackbar, Alert, Button } from "@mui/material";
+import { Tabs, Tab, Snackbar, Alert, IconButton, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { activityService } from "../services/activityService";
+import AvatarUpload from "../components/Avator";
 
 const StyledTab = styled(Tab)({
   textTransform: "none",
   color: "#1f2937",
   fontSize: "1.5rem",
   fontWeight: "600",
+});
+
+const StyledIconButton = styled(IconButton)({
+  color: "#ef4444",
+  "&:hover": {
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
+  },
 });
 
 function TabPanel(props) {
@@ -22,7 +31,7 @@ function TabPanel(props) {
 }
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
@@ -177,6 +186,19 @@ export default function Home() {
     setNotification({ ...notification, open: false });
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: "Logout failed",
+        severity: "error",
+      });
+    }
+  };
+
   // Example activity data - replace with actual data from API later
   // eslint-disable-next-line no-unused-vars
   const [activities] = useState([
@@ -276,12 +298,17 @@ export default function Home() {
         </div>
         <div style={styles.headerRight}>
           {user ? (
-            <div style={styles.accountInfo}>
-              <div style={styles.avatar}>{user.username.charAt(0).toUpperCase()}</div>
-              <div style={styles.userDetails}>
-                <p style={styles.username}>{user.username}</p>
-                <p style={styles.userEmail}>{user.userEmail}</p>
+            <div style={styles.headerRightContent}>
+              <div style={styles.accountInfo}>
+                <AvatarUpload user={user} />
+                <div style={styles.userDetails}>
+                  <p style={styles.username}>{user.username}</p>
+                  <p style={styles.userEmail}>{user.userEmail}</p>
+                </div>
               </div>
+              <StyledIconButton onClick={handleLogout} size="large" aria-label="logout">
+                <LogoutIcon />
+              </StyledIconButton>
             </div>
           ) : (
             <div style={styles.accountInfo}>
@@ -455,10 +482,17 @@ const styles = {
     display: "flex",
     alignItems: "center",
   },
+  headerRightContent: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
   accountInfo: {
     display: "flex",
     alignItems: "center",
     gap: "0.75rem",
+    padding: "0.5rem",
+    borderRadius: "0.5rem",
   },
   avatar: {
     width: "40px",

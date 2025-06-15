@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import {
-  Container,
-  Paper,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-} from "@mui/material";
+import { Container, Paper, TextField, Button, Typography, Box, Alert } from "@mui/material";
 import logo from "../../public/logo.png"; // Adjust the path as necessary
 
 const Login = () => {
@@ -28,10 +20,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { success, error: loginError } = await login(
-        username,
-        password
-      );
+      const { success, error: loginError } = await login(username, password);
       console.log("success", success);
       console.log("loginError", loginError);
       if (success) {
@@ -57,11 +46,7 @@ const Login = () => {
           alignItems: "center",
         }}
       >
-        <img
-          src={logo}
-          alt="GetActive Logo"
-          style={{ width: "100px", marginBottom: "16px" }}
-        />
+        <img src={logo} alt="GetActive Logo" style={{ width: "100px", marginBottom: "16px" }} />
         <Typography component="h1" variant="h4" align="center" gutterBottom>
           GetActive
         </Typography>
@@ -106,13 +91,7 @@ const Login = () => {
                 Remember me
               </label>
             </Box>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading}
-            >
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={loading}>
               {loading ? "Logging in..." : "Login"}
             </Button>
           </form>

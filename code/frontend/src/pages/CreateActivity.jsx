@@ -9,7 +9,7 @@ export default function CreateActivity() {
     description: "",
     location: "",
     startDateTime: "",
-    endDateTime: ""
+    endDateTime: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -18,16 +18,16 @@ export default function CreateActivity() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: "",
       }));
     }
   };
@@ -58,7 +58,7 @@ export default function CreateActivity() {
     if (formData.startDateTime && formData.endDateTime) {
       const startDate = new Date(formData.startDateTime);
       const endDate = new Date(formData.endDateTime);
-      
+
       if (endDate <= startDate) {
         newErrors.endDateTime = "End date and time must be after start date and time";
       }
@@ -71,7 +71,7 @@ export default function CreateActivity() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError("");
-    
+
     if (validateForm()) {
       setIsLoading(true);
       try {
@@ -85,20 +85,20 @@ export default function CreateActivity() {
         const activityData = {
           ...formData,
           startDateTime: formatDateTime(formData.startDateTime),
-          endDateTime: formatDateTime(formData.endDateTime)
+          endDateTime: formatDateTime(formData.endDateTime),
         };
 
         await activityService.createActivity(activityData);
-        
+
         // Success - navigate back to home
         navigate("/home");
       } catch (error) {
         console.error("Error creating activity:", error);
         console.error("Error response:", error.response);
         console.error("Error response data:", error.response?.data);
-        
+
         let errorMessage = "Failed to create activity. Please try again.";
-        
+
         if (error.response?.data?.message) {
           errorMessage = error.response.data.message;
         } else if (error.response?.data?.errors?.message) {
@@ -110,7 +110,7 @@ export default function CreateActivity() {
         } else if (error.response?.status === 401) {
           errorMessage = "You must be logged in to create an activity.";
         }
-        
+
         setApiError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -126,13 +126,9 @@ export default function CreateActivity() {
     <div style={styles.container}>
       <div style={styles.formContainer}>
         <h1 style={styles.title}>Create New Activity</h1>
-        
-        {apiError && (
-          <div style={styles.errorBanner}>
-            {apiError}
-          </div>
-        )}
-        
+
+        {apiError && <div style={styles.errorBanner}>{apiError}</div>}
+
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.formGroup}>
             <label style={styles.label}>Activity Name *</label>
@@ -143,7 +139,7 @@ export default function CreateActivity() {
               onChange={handleInputChange}
               style={{
                 ...styles.input,
-                ...(errors.name ? styles.inputError : {})
+                ...(errors.name ? styles.inputError : {}),
               }}
               placeholder="Enter activity name"
             />
@@ -158,7 +154,7 @@ export default function CreateActivity() {
               onChange={handleInputChange}
               style={{
                 ...styles.textarea,
-                ...(errors.description ? styles.inputError : {})
+                ...(errors.description ? styles.inputError : {}),
               }}
               placeholder="Describe your activity..."
               rows="4"
@@ -175,7 +171,7 @@ export default function CreateActivity() {
               onChange={handleInputChange}
               style={{
                 ...styles.input,
-                ...(errors.location ? styles.inputError : {})
+                ...(errors.location ? styles.inputError : {}),
               }}
               placeholder="Enter location"
             />
@@ -192,7 +188,7 @@ export default function CreateActivity() {
                 onChange={handleInputChange}
                 style={{
                   ...styles.input,
-                  ...(errors.startDateTime ? styles.inputError : {})
+                  ...(errors.startDateTime ? styles.inputError : {}),
                 }}
               />
               {errors.startDateTime && <span style={styles.errorText}>{errors.startDateTime}</span>}
@@ -207,7 +203,7 @@ export default function CreateActivity() {
                 onChange={handleInputChange}
                 style={{
                   ...styles.input,
-                  ...(errors.endDateTime ? styles.inputError : {})
+                  ...(errors.endDateTime ? styles.inputError : {}),
                 }}
               />
               {errors.endDateTime && <span style={styles.errorText}>{errors.endDateTime}</span>}
@@ -215,18 +211,14 @@ export default function CreateActivity() {
           </div>
 
           <div style={styles.buttonGroup}>
-            <button
-              type="button"
-              onClick={handleCancel}
-              style={styles.cancelButton}
-            >
+            <button type="button" onClick={handleCancel} style={styles.cancelButton}>
               Cancel
             </button>
             <button
               type="submit"
               style={{
                 ...styles.submitButton,
-                ...(isLoading ? styles.submitButtonDisabled : {})
+                ...(isLoading ? styles.submitButtonDisabled : {}),
               }}
               disabled={isLoading}
             >
@@ -244,7 +236,7 @@ const styles = {
     minHeight: "100vh",
     backgroundColor: "#f8fafc",
     padding: "2rem",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
   formContainer: {
     maxWidth: "600px",
@@ -253,34 +245,34 @@ const styles = {
     borderRadius: "0.75rem",
     padding: "2rem",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-    border: "1px solid #e5e7eb"
+    border: "1px solid #e5e7eb",
   },
   title: {
     color: "#1f2937",
     fontSize: "2rem",
     fontWeight: "bold",
     marginBottom: "2rem",
-    textAlign: "center"
+    textAlign: "center",
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: "1.5rem"
+    gap: "1.5rem",
   },
   formGroup: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.5rem"
+    gap: "0.5rem",
   },
   formRow: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "1rem"
+    gap: "1rem",
   },
   label: {
     color: "#374151",
     fontSize: "0.9rem",
-    fontWeight: "600"
+    fontWeight: "600",
   },
   input: {
     padding: "0.75rem",
@@ -289,7 +281,7 @@ const styles = {
     fontSize: "1rem",
     outline: "none",
     transition: "border-color 0.2s",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   },
   textarea: {
     padding: "0.75rem",
@@ -300,15 +292,15 @@ const styles = {
     transition: "border-color 0.2s",
     boxSizing: "border-box",
     resize: "vertical",
-    fontFamily: "inherit"
+    fontFamily: "inherit",
   },
   inputError: {
-    borderColor: "#ef4444"
+    borderColor: "#ef4444",
   },
   errorText: {
     color: "#ef4444",
     fontSize: "0.875rem",
-    fontWeight: "500"
+    fontWeight: "500",
   },
   errorBanner: {
     backgroundColor: "#fee2e2",
@@ -318,13 +310,13 @@ const styles = {
     borderRadius: "0.5rem",
     fontSize: "0.9rem",
     fontWeight: "500",
-    marginBottom: "1rem"
+    marginBottom: "1rem",
   },
   buttonGroup: {
     display: "flex",
     gap: "1rem",
     justifyContent: "flex-end",
-    marginTop: "1rem"
+    marginTop: "1rem",
   },
   cancelButton: {
     backgroundColor: "#6b7280",
@@ -335,7 +327,7 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
-    transition: "background-color 0.2s"
+    transition: "background-color 0.2s",
   },
   submitButton: {
     backgroundColor: "#10b981",
@@ -346,10 +338,10 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
-    transition: "background-color 0.2s"
+    transition: "background-color 0.2s",
   },
   submitButtonDisabled: {
     backgroundColor: "#9ca3af",
-    cursor: "not-allowed"
-  }
-}; 
+    cursor: "not-allowed",
+  },
+};

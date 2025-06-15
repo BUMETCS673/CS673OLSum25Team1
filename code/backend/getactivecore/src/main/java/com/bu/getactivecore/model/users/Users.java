@@ -14,6 +14,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -40,4 +42,9 @@ public class Users {
     @Builder.Default
 	private AccountState accountState = AccountState.UNVERIFIED;
 
+    @Column(name = "avatar", columnDefinition = "TEXT")
+    private String avatar;
+
+    @Column(name = "avatar_updated_at")
+    private LocalDateTime avatarUpdatedAt;
 }
