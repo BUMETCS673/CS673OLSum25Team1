@@ -50,6 +50,15 @@ const mockParticipantActivities = [
     startDateTime: "2025-01-02T10:00:00",
     endDateTime: "2025-01-02T12:00:00",
   },
+  {
+    activityId: 2,
+    name: "Joined 2",
+    description: "desc2",
+    location: "loc2",
+    startDateTime: "2025-01-02T10:00:00",
+    endDateTime: "2025-01-02T12:00:00",
+    role: "ADMIN",
+  },
 ];
 
 describe("Home Page Unit Test", () => {
@@ -77,6 +86,19 @@ describe("Home Page Unit Test", () => {
     await screen.findByText("Joined 1");
   });
 
+  test("test delete activity without participants", async () => {
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </AuthProvider>
+    );
+    await screen.findByText("Recent 1");
+    fireEvent.click(screen.getByText("Participated Activities"));
+    await screen.findByText("Joined 2");
+    fireEvent.click(screen.getByText("Delete Activity"));
+  });
   test("test join activity", async () => {
     render(
       <AuthProvider>

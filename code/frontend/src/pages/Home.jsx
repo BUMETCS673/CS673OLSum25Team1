@@ -1,7 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tabs, Tab, Snackbar, Alert } from "@mui/material";
+import { Tabs, Tab, Snackbar, Alert, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { activityService } from "../services/activityService";
 
@@ -33,6 +33,7 @@ export default function Home() {
     open: false,
     message: "",
     severity: "success",
+    actions: null,
   });
 
   const handleChange = async (event, newValue) => {
@@ -98,26 +99,77 @@ export default function Home() {
     }
   };
 
-  const handleDeleteActivity = async (activityId) => {
+  const notifySuccess = (message) => {
+    setNotification({
+      open: true,
+      message,
+      severity: "success",
+    });
+  };
+
+  const notifyError = (message) => {
+    setNotification({
+      open: true,
+      message,
+      severity: "error",
+    });
+  };
+  const refreshActivities = async () => {
+    const activities = await activityService.getParticipantActivities();
+    setParticipantActivities(activities);
+  };
+
+  const forceDeleteActivity = async (activityId) => {
     try {
-      await activityService.deleteActivity(activityId);
-      const activities = await activityService.getParticipantActivities();
-      setParticipantActivities(activities);
-      setNotification({
-        open: true,
-        message: "Activity deleted successfully",
-        severity: "success",
-      });
-    } catch (error) {
-      console.error("Error deleting activity:", error);
-      setNotification({
-        open: true,
-        message: "Failed to delete activity",
-        severity: "error",
-      });
+      await activityService.deleteActivity(activityId, true);
+      await refreshActivities();
+      notifySuccess("Activity deleted successfully");
+    } catch (err) {
+      console.error("Error force deleting activity:");
+      notifyError("Failed to delete activity");
     }
   };
 
+  const handleDeleteError = (error, activityId) => {
+    if (error?.errorCode === "PARTICIPANTS_PRESENT") {
+      setNotification({
+        open: true,
+        message: "Activity has participants. Do you want to delete it?",
+        severity: "warning",
+        actions: [
+          {
+            label: "Yes",
+            onClick: async () => {
+              setNotification((n) => ({ ...n, open: false }));
+              await forceDeleteActivity(activityId);
+            },
+          },
+          {
+            label: "No",
+            onClick: () => {
+              setNotification((n) => ({ ...n, open: false }));
+            },
+          },
+        ],
+      });
+    } else {
+      notifyError(error || "Failed to delete activity");
+    }
+  };
+
+  const handleDeleteActivity = async (activityId) => {
+    try {
+      const { error } = await activityService.deleteActivity(activityId);
+      if (error) {
+        return handleDeleteError(error, activityId);
+      }
+      await refreshActivities();
+      notifySuccess("Activity deleted successfully");
+    } catch (err) {
+      console.error("Error deleting activity:", err);
+      notifyError("Failed to delete activity");
+    }
+  };
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -189,7 +241,28 @@ export default function Home() {
         onClose={handleClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleClose} severity={notification.severity} variant="filled" sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleClose}
+          severity={notification.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+          action={
+            notification.actions &&
+            notification.actions.map((action, index) => (
+              <Button
+                key={index}
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  action.onClick();
+                  setNotification((n) => ({ ...n, open: false }));
+                }}
+              >
+                {action.label}
+              </Button>
+            ))
+          }
+        >
           {notification.message}
         </Alert>
       </Snackbar>
