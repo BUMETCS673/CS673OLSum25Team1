@@ -122,7 +122,7 @@ class UserLoginTest {
 			Thread.currentThread().interrupt();
 		}
 		MvcResult response = login(mockMvc,
-				new LoginRequestDto(registerReqDto.getUsername(), registerReqDto.getPassword()))
+				new LoginRequestDto(registerReqDto.username(), registerReqDto.password()))
 				.andExpect(status().is2xxSuccessful()).andDo(print()).andExpect(jsonPath("$.errors").doesNotExist())
 				.andExpect(jsonPath("$.data").exists()).andExpect(jsonPath("$.data.token").exists())
 				.andExpect(jsonPath("$.data.token").isNotEmpty()).andReturn();

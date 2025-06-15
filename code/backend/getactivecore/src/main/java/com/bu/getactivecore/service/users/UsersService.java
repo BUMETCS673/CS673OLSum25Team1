@@ -49,7 +49,7 @@ public class UsersService implements UserInfoApi {
 		// Given unauthenticated credentials, use the authentication manager to
 		// authenticate the user
 		Authentication authentication = m_authManager.authenticate(
-				new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword()));
+				new UsernamePasswordAuthenticationToken(requestDto.username(), requestDto.password()));
 
 		// If authentication is successful, the user is logged in
 		if (!authentication.isAuthenticated()) {
@@ -61,7 +61,7 @@ public class UsersService implements UserInfoApi {
 		// Only verified users can access resources
 		m_accountStateChecker.assertVerified(authentication);
 
-		String token = m_jwtApi.generateToken(requestDto.getUsername());
+		String token = m_jwtApi.generateToken(requestDto.username());
 		UserDto userDto = ((UserPrincipal) authentication.getPrincipal()).getUserDto();
 		return new LoginResponseDto(token, userDto.getUsername(), userDto.getEmail());
 	}

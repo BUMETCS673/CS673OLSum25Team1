@@ -66,8 +66,8 @@ public class RegistrationService implements RegistrationApi {
 	@Override
 	@Transactional
 	public RegistrationResponseDto registerUser(RegistrationRequestDto requestDto) throws ApiException {
-		String email = requestDto.getEmail();
-		String username = requestDto.getUsername();
+		String email = requestDto.email();
+		String username = requestDto.username();
 
 		synchronized (REGISTRATION_LOCK) {
 			boolean emailExists = m_userRepo.findByEmail(email).isPresent();
@@ -87,7 +87,7 @@ public class RegistrationService implements RegistrationApi {
 			}
 		}
 
-		String encodedPassword = m_passwordEncoder.encode(requestDto.getPassword());
+		String encodedPassword = m_passwordEncoder.encode(requestDto.password());
 		Users user = UserDto.from(email, username, encodedPassword);
 		m_userRepo.save(user);
 
@@ -130,8 +130,8 @@ public class RegistrationService implements RegistrationApi {
 	private String validateConfirmationToken(ConfirmationRequestDto confirmRegistrationDto) {
 		String username;
 		try {
-			m_jwtApi.validateToken(confirmRegistrationDto.getToken());
-			String claim = m_jwtApi.getClaim(confirmRegistrationDto.getToken(), TOKEN_CLAIM_TYPE_KEY);
+			m_jwtApi.validateToken(confirmRegistrationDto.token());
+			String claim = m_jwtApi.getClaim(confirmRegistrationDto.token(), TOKEN_CLAIM_TYPE_KEY);
 			if (!TokenClaimType.REGISTRATION_CONFIRMATION.name().equals(claim)) {
 				ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(TOKEN_INVALID)
 						.message("Invalid registration confirmation token provided")
@@ -140,7 +140,7 @@ public class RegistrationService implements RegistrationApi {
 						.build();
 				throw new ApiException(error);
 			}
-			username = m_jwtApi.getUsername(confirmRegistrationDto.getToken());
+			username = m_jwtApi.getUsername(confirmRegistrationDto.token());
 		} catch (ExpiredJwtException e) {
 			ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(TOKEN_EXPIRED)
 					.message("Token has expired").debugMessage("Token expired at " + e.getClaims().getExpiration())
@@ -149,7 +149,7 @@ public class RegistrationService implements RegistrationApi {
 		} catch (JwtException e) {
 			ApiErrorPayload error = ApiErrorPayload.builder().status(BAD_REQUEST).errorCode(TOKEN_INVALID)
 					.message("Invalid registration token provided").debugMessage("Provided token is invalid '"
-							+ confirmRegistrationDto.getToken() + "'. Reason: " + e.getMessage())
+							+ confirmRegistrationDto.token() + "'. Reason: " + e.getMessage())
 					.build();
 			throw new ApiException(error);
 		}
@@ -158,7 +158,7 @@ public class RegistrationService implements RegistrationApi {
 
 	@Override
 	public void resendConfirmation(ConfirmationResendRequestDto resendRequestDto) {
-		m_userRepo.findByEmailAndUsername(resendRequestDto.getEmail(), resendRequestDto.getUsername())
+		m_userRepo.findByEmailAndUsername(resendRequestDto.email(), resendRequestDto.username())
 				.ifPresentOrElse(user -> {
 					if (user.getAccountState() == AccountState.UNVERIFIED) {
 						String registrationToken = m_jwtApi.generateToken(user.getUsername(),
@@ -170,6 +170,6 @@ public class RegistrationService implements RegistrationApi {
 								user.getAccountState());
 					}
 				}, () -> log.debug("Cannot resend confirmation email, no user found with email/username '{}'/'{}'",
-						resendRequestDto.getEmail(), resendRequestDto.getUsername()));
+						resendRequestDto.email(), resendRequestDto.username()));
 	}
 }

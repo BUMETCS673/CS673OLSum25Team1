@@ -6,12 +6,7 @@ import lombok.Value;
 /**
  * The DTO for user login requests.
  */
-@Value
-public class LoginRequestDto {
+public record LoginRequestDto(@NotBlank(message = "Username must not be blank") String username,
+                              @NotBlank(message = "Password must not be blank") String password) {
 
-	@NotBlank(message = "Username must not be blank")
-	String username;
-
-	@NotBlank(message = "Password must not be blank")
-	String password;
 }

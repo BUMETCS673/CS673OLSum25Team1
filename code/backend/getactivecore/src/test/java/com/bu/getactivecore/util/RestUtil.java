@@ -171,8 +171,8 @@ public class RestUtil {
 		confirmRegistration(mockMvc, new ConfirmationRequestDto(confirmationToken)).andExpect(status().isOk());
 
 		// Then log in with the registered user
-		LoginRequestDto loginRequest = new LoginRequestDto(registerRequest.getUsername(),
-				registerRequest.getPassword());
+		LoginRequestDto loginRequest = new LoginRequestDto(registerRequest.username(),
+				registerRequest.password());
 		return login(mockMvc, loginRequest);
 	}
 
