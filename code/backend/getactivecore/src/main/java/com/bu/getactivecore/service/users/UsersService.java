@@ -77,7 +77,7 @@ public class UsersService implements UserInfoApi {
 
         String token = m_jwtApi.generateToken(requestDto.getUsername());
         UserDto userDto = ((UserPrincipal) authentication.getPrincipal()).getUserDto();
-        return new LoginResponseDto(token, userDto.getUsername(), userDto.getEmail());
+        return new LoginResponseDto(token, userDto.getUsername(), userDto.getEmail(), userDto.getAvatar(), userDto.getAvatarUpdatedAt());
     }
 
     @Override
