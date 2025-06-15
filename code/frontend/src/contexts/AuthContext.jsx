@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
   const updateAvatar = async (avatarData) => {
     const { success, avatarResponse, error } = await authService.updateAvatar(avatarData);
     if (success) {
-      setUser(prev => ({
+      setUser((prev) => ({
         ...prev,
         avatar: avatarResponse.avatar,
       }));
@@ -76,7 +76,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, registerConfirmation, resendConfirmation, updateAvatar, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, register, registerConfirmation, resendConfirmation, updateAvatar, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

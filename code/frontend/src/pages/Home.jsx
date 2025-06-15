@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, Tab, Snackbar, Alert, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 import { activityService } from "../services/activityService";
 import AvatarUpload from "../components/Avator";
 
@@ -15,9 +15,9 @@ const StyledTab = styled(Tab)({
 });
 
 const StyledIconButton = styled(IconButton)({
-  color: '#ef4444',
-  '&:hover': {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+  color: "#ef4444",
+  "&:hover": {
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
   },
 });
 
@@ -213,11 +213,7 @@ export default function Home() {
                   <p style={styles.userEmail}>{user.userEmail}</p>
                 </div>
               </div>
-              <StyledIconButton 
-                onClick={handleLogout}
-                size="large"
-                aria-label="logout"
-              >
+              <StyledIconButton onClick={handleLogout} size="large" aria-label="logout">
                 <LogoutIcon />
               </StyledIconButton>
             </div>
@@ -387,9 +383,9 @@ const styles = {
     alignItems: "center",
   },
   headerRightContent: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
   },
   accountInfo: {
     display: "flex",

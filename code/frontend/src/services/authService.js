@@ -144,12 +144,12 @@ export const authService = {
 
   updateAvatar: async (avatarData) => {
     try {
-      const response = await api.put('/avatar', {
+      const response = await api.put("/avatar", {
         avatarData,
       });
       return { success: true, avatarResponse: response.data.data, error: null };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'failed to update avatar' };
+      return { success: false, error: error.response?.data?.message || "failed to update avatar" };
     }
-  }
+  },
 };

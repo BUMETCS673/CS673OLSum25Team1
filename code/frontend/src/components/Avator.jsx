@@ -1,43 +1,43 @@
-import { useState, useRef } from 'react';
-import { styled } from '@mui/material/styles';
-import imageCompression from 'browser-image-compression';
-import { Snackbar, Alert, Tooltip } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { useState, useRef } from "react";
+import { styled } from "@mui/material/styles";
+import imageCompression from "browser-image-compression";
+import { Snackbar, Alert, Tooltip } from "@mui/material";
+import { useAuth } from "../contexts/AuthContext";
 
-const AvatarContainer = styled('div')({
-  position: 'relative',
-  cursor: 'pointer',
+const AvatarContainer = styled("div")({
+  position: "relative",
+  cursor: "pointer",
 });
 
-const AvatarImage = styled('div')({
-  width: '40px',
-  height: '40px',
-  borderRadius: '50%',
-  backgroundColor: '#3b82f6',
-  color: 'white',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontWeight: 'bold',
-  fontSize: '1.1rem',
-  overflow: 'hidden',
-  '& img': {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
+const AvatarImage = styled("div")({
+  width: "40px",
+  height: "40px",
+  borderRadius: "50%",
+  backgroundColor: "#3b82f6",
+  color: "white",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: "bold",
+  fontSize: "1.1rem",
+  overflow: "hidden",
+  "& img": {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
 });
 
-const HiddenInput = styled('input')({
-  display: 'none',
+const HiddenInput = styled("input")({
+  display: "none",
 });
 
 export default function AvatarUpload({ user, setUser }) {
   const { updateAvatar } = useAuth();
   const [notification, setNotification] = useState({
     open: false,
-    message: '',
-    severity: 'success',
+    message: "",
+    severity: "success",
   });
   const fileInputRef = useRef(null);
 
@@ -48,8 +48,8 @@ export default function AvatarUpload({ user, setUser }) {
     if (!file.type.match(/^image\/(jpeg|png)$/)) {
       setNotification({
         open: true,
-        message: 'only jpeg and png are supported',
-        severity: 'error',
+        message: "only jpeg and png are supported",
+        severity: "error",
       });
       return;
     }
@@ -61,7 +61,7 @@ export default function AvatarUpload({ user, setUser }) {
         useWebWorker: true,
       };
       const compressedFile = await imageCompression(file, options);
-      
+
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Data = e.target.result;
@@ -69,14 +69,14 @@ export default function AvatarUpload({ user, setUser }) {
           await updateAvatar(base64Data);
           setNotification({
             open: true,
-            message: 'success to update avatar',
-            severity: 'success',
+            message: "success to update avatar",
+            severity: "success",
           });
         } catch (error) {
           setNotification({
             open: true,
-            message: error.message || 'failed to update avatar',
-            severity: 'error',
+            message: error.message || "failed to update avatar",
+            severity: "error",
           });
         }
       };
@@ -84,14 +84,14 @@ export default function AvatarUpload({ user, setUser }) {
     } catch (error) {
       setNotification({
         open: true,
-        message: 'failed to process image',
-        severity: 'error',
+        message: "failed to process image",
+        severity: "error",
       });
     }
   };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') return;
+    if (reason === "clickaway") return;
     setNotification({ ...notification, open: false });
   };
 
@@ -103,26 +103,15 @@ export default function AvatarUpload({ user, setUser }) {
     <>
       <Tooltip title="Click to update avatar" placement="top">
         <AvatarContainer onClick={handleClick}>
-          <AvatarImage>
-            {user.avatar ? (
-              <img src={user.avatar} />
-            ) : (
-              user.username.charAt(0).toUpperCase()
-            )}
-          </AvatarImage>
-          <HiddenInput
-            type="file"
-            ref={fileInputRef}
-            accept="image/jpeg,image/png"
-            onChange={handleFileSelect}
-          />
+          <AvatarImage>{user.avatar ? <img src={user.avatar} /> : user.username.charAt(0).toUpperCase()}</AvatarImage>
+          <HiddenInput type="file" ref={fileInputRef} accept="image/jpeg,image/png" onChange={handleFileSelect} />
         </AvatarContainer>
       </Tooltip>
       <Snackbar
         open={notification.open}
         autoHideDuration={5000}
         onClose={handleClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert onClose={handleClose} severity={notification.severity} variant="filled">
           {notification.message}
