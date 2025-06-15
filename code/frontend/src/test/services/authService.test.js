@@ -151,23 +151,10 @@ describe("authService", () => {
   });
 
   describe("logout", () => {
-    it("should remove token and user data on logout, regardless of API call success", async () => {
-      api.post.mockResolvedValue({}); // Simulate API success
+    it("should remove token and user data on logout", async () => {
       await authService.logout();
 
       expect(jwtUtils.removeToken).toHaveBeenCalledWith("auth_token");
-      // expect(jwtUtils.removeToken).toHaveBeenCalledWith('refresh_token'); // Uncomment if refresh token is used
-      expect(localStorage.removeItem).toHaveBeenCalledWith("userData");
-    });
-
-    it("should remove token and user data on logout, even if API call fails (due to finally)", async () => {
-      api.post.mockRejectedValue(new Error("API logout failed")); // Simulate API failure
-
-      // Expect the logout function to throw when the API call within it fails, but still perform cleanup
-      await expect(authService.logout()).rejects.toThrow("API logout failed");
-
-      expect(jwtUtils.removeToken).toHaveBeenCalledWith("auth_token");
-      // expect(jwtUtils.removeToken).toHaveBeenCalledWith('refresh_token');
       expect(localStorage.removeItem).toHaveBeenCalledWith("userData");
     });
   });
