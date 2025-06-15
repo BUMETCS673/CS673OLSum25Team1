@@ -10,13 +10,13 @@ import com.bu.getactivecore.shared.exception.ApiException;
  * Interface for managing user operations.
  */
 public interface UserInfoApi {
-    /**
-     * Authenticates a user with the given login credentials.
-     *
-     * @param userDto Data Transfer Object containing login credentials.
-     * @return {@link LoginResponseDto} containing authentication token on success.
-     */
-    LoginResponseDto loginUser(LoginRequestDto userDto);
+	/**
+	 * Authenticates a user with the given login credentials.
+	 *
+	 * @param userDto Data Transfer Object containing login credentials.
+	 * @return {@link LoginResponseDto} containing authentication token on success.
+	 */
+	LoginResponseDto loginUser(LoginRequestDto userDto);
 
     /**
      * Updates the avatar of the authenticated user.

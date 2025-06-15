@@ -1,14 +1,5 @@
 package com.bu.getactivecore.service.users;
 
-import com.bu.getactivecore.service.users.api.UserInfoApi;
-import com.bu.getactivecore.service.users.entity.LoginRequestDto;
-import com.bu.getactivecore.service.users.entity.LoginResponseDto;
-import com.bu.getactivecore.service.users.entity.TestResponseDto;
-import com.bu.getactivecore.shared.exception.ApiException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +10,14 @@ import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.service.users.entity.UpdateAvatarRequestDto;
 import com.bu.getactivecore.service.users.entity.UpdateAvatarResponseDto;
 
+import com.bu.getactivecore.service.users.api.UserInfoApi;
+import com.bu.getactivecore.service.users.entity.LoginRequestDto;
+import com.bu.getactivecore.service.users.entity.LoginResponseDto;
+import com.bu.getactivecore.shared.exception.ApiException;
+
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Entry point for all user related requests.
  */
@@ -27,22 +26,16 @@ import com.bu.getactivecore.service.users.entity.UpdateAvatarResponseDto;
 @RequestMapping(value = "/v1")
 public class UsersController {
 
-    private final UserInfoApi m_userInfoApi;
+	private final UserInfoApi m_userInfoApi;
 
-    /**
-     * Constructs the UsersController.
-     *
-     * @param userInfoApi used to fetch and manage user information
-     */
-    public UsersController(UserInfoApi userInfoApi) {
-        m_userInfoApi = userInfoApi;
-    }
-
-    @GetMapping(path = "/test")
-    public TestResponseDto test(HttpServletRequest request) {
-        log.debug("Got request at /test");
-        return new TestResponseDto(request.getSession().getId());
-    }
+	/**
+	 * Constructs the UsersController.
+	 *
+	 * @param userInfoApi used to fetch and manage user information
+	 */
+	public UsersController(UserInfoApi userInfoApi) {
+		m_userInfoApi = userInfoApi;
+	}
 
     @PostMapping(path = "/login", consumes = "application/json")
     public LoginResponseDto loginUser(@Valid @RequestBody LoginRequestDto loginUserDto) throws ApiException {

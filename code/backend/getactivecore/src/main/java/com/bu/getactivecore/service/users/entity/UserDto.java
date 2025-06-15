@@ -2,39 +2,42 @@ package com.bu.getactivecore.service.users.entity;
 
 import com.bu.getactivecore.model.users.AccountState;
 import com.bu.getactivecore.model.users.Users;
+
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
  * DTO for exposing user data.
- * <p>For internal use only, not to be exposed in public APIs.
+ * <p>
+ * For internal use only, not to be exposed in public APIs.
  */
 @Builder
 @Data
 public class UserDto {
 
-    /**
-     * UUID of the user.
-     */
-    private String userId;
+	/**
+	 * UUID of the user.
+	 */
+	private String userId;
 
-    /**
-     * The email of the user.
-     */
-    private String email;
+	/**
+	 * The email of the user.
+	 */
+	private String email;
 
-    /**
-     * The username of the user.
-     */
-    private String username;
+	/**
+	 * The username of the user.
+	 */
+	private String username;
 
-    /**
-     * The password of the user.
-     * Note: This field should not be exposed in public APIs for security reasons.
-     */
-    private String password;
+	/**
+	 * The password of the user. Note: This field should not be exposed in public
+	 * APIs for security reasons.
+	 */
+	private String password;
 
+<<<<<<< HEAD
     /**
      * The state of this user's account.
      */
@@ -83,6 +86,5 @@ public class UserDto {
                 .password(encodedPassword)
                 .accountState(AccountState.UNVERIFIED)
                 .build();
-    }
+	}
 }
-
