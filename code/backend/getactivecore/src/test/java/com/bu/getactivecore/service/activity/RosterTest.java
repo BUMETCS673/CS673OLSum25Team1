@@ -235,7 +235,7 @@ class RosterTest {
 
 	@Test
 	void verify_next_and_previous_page_urls_return_correct_data() throws Exception {
-		// Step 1: Create activity
+		// Create activity
 		ActivityCreateRequestDto createActivityRequest = ActivityCreateRequestDto.builder()
 				.name("Pagination Test Activity").description("Testing pagination with many participants")
 				.location("Earth").startDateTime(now().plusDays(1)).endDateTime(now().plusDays(2)).build();
@@ -244,7 +244,7 @@ class RosterTest {
 		ActivityDto activity = activityApi.getActivityByName("Pagination Test Activity", Pageable.unpaged()).get()
 				.findFirst().orElseThrow();
 
-		// Step 2: Add 2 participants
+		// Add 2 participants
 		for (int i = 0; i < 2; i++) {
 			String username = "user" + i;
 			String email = username + "@bu.edu";
@@ -255,7 +255,7 @@ class RosterTest {
 			activityApi.joinActivity(user.getUserId(), activity.getId());
 		}
 
-		// Step 3: Page 0 with size 2
+		// Page 0 with size 2
 		Map<String, String> pathParams = Map.of("activityId", activity.getId());
 		Map<String, String> pageParams = Map.of("page", "0", "size", "2");
 
@@ -270,7 +270,7 @@ class RosterTest {
 
 		assertTrue(page0Json.at("/previousPageUrl").isNull(), "On page 0, previousPageUrl should not have any value");
 
-		// Step 4: GET page 1 using nextPageUrl
+		// GET page 1 using nextPageUrl
 		MvcResult page1Result = mockMvc.perform(get(nextPageUrl).contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + user1AccessToken)).andExpect(status().isOk()).andReturn();
 
@@ -284,7 +284,7 @@ class RosterTest {
 				"Total elements should be 3. 2 participants and 1 admin");
 		assertEquals(2, page1Json.at("/totalPages").asInt(), "Total pages should be 2");
 
-		// Step 5: Confirm correct next/prev links on page 1
+		// Confirm correct next/prev links on page 1
 		String prevPageUrlFrom1 = page1Json.at("/previousPageUrl").asText();
 		assertTrue(page1Json.at("/nextPageUrl").isNull() || page1Json.at("/nextPageUrl").asText().isEmpty(),
 				"Last page should not have nextPageUrl");

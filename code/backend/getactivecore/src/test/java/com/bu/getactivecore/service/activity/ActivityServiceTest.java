@@ -1,6 +1,8 @@
 package com.bu.getactivecore.service.activity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,12 +16,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.bu.getactivecore.model.activity.Activity;
@@ -305,7 +309,7 @@ class ActivityServiceTest {
 		assertThrows(ApiException.class, () -> activityService.joinActivity(user.getUserId(), activityId));
 		verify(userActivityRepository).findByUserIdAndActivityId(user.getUserId(), activityId);
 		verify(activityRepository, never()).findById(activityId);
-		verify(userActivityRepository, never()).save(org.mockito.ArgumentMatchers.any());
+		verify(userActivityRepository, never()).save(any());
 	}
 
 	@Test
@@ -317,7 +321,7 @@ class ActivityServiceTest {
 		assertThrows(ApiException.class, () -> activityService.joinActivity(user.getUserId(), activityId));
 		verify(userActivityRepository).findByUserIdAndActivityId(user.getUserId(), activityId);
 		verify(activityRepository).findById(activityId);
-		verify(userActivityRepository, never()).save(org.mockito.ArgumentMatchers.any());
+		verify(userActivityRepository, never()).save(any());
 	}
 
 	@Test
@@ -340,7 +344,7 @@ class ActivityServiceTest {
 		activityService.leaveActivity(user.getUserId(), activityId);
 
 		verify(userActivityRepository).findByUserIdAndActivityId(user.getUserId(), activityId);
-		verify(userActivityRepository, never()).delete(org.mockito.ArgumentMatchers.any());
+		verify(userActivityRepository, never()).delete(any());
 	}
 
 	@Test
@@ -354,5 +358,60 @@ class ActivityServiceTest {
 
 		activityService.getJoinedActivities(user.getUserId());
 		verify(userActivityRepository).findJoinedActivitiesByUserId(user.getUserId());
+	}
+
+	@Test
+	void given_out_of_range_page_size_then_default_page_size_is_used() {
+		UserActivity userActivity = UserActivity.builder().user(user)
+				.activity(Activity.builder().id(activityId).name("Test Activity").build()).role(RoleType.PARTICIPANT)
+				.build();
+
+		when(activityRepository.findById(activityId))
+				.thenReturn(Optional.of(Activity.builder().id(activityId).name("Test Activity").build()));
+		when(userActivityRepository.findByUserIdAndActivityId(user.getUserId(), activityId))
+				.thenReturn(Optional.of(userActivity));
+
+		ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+		when(userActivityRepository.findParticipantsByActivityId(any(), any())).thenReturn(
+				new PageImpl<>(List.of(userActivity), PageRequest.of(0, 20, Sort.by("name").ascending()), 1));
+
+		activityService.getActivityRoster(user.getUserId(), activityId,
+				PageRequest.of(0, 100, Sort.by("name").ascending()));
+		verify(userActivityRepository).findParticipantsByActivityId(any(), pageableCaptor.capture());
+
+		Pageable actual = pageableCaptor.getValue();
+		Pageable expected = PageRequest.of(0, 20, Sort.by("user.username").ascending());
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	void should_throw_IllegalArgumentException_for_invalid_page() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			activityService.getActivityRoster(user.getUserId(), activityId,
+					PageRequest.of(-5, 10, Sort.by("name").ascending())); // invalid page
+		});
+	}
+
+	@Test
+	void given_unknown_sort_field_then_default_sort_is_used() {
+		UserActivity userActivity = UserActivity.builder().user(user)
+				.activity(Activity.builder().id(activityId).name("Test Activity").build()).role(RoleType.PARTICIPANT)
+				.build();
+		when(activityRepository.findById(activityId))
+				.thenReturn(Optional.of(Activity.builder().id(activityId).name("Test Activity").build()));
+		when(userActivityRepository.findByUserIdAndActivityId(user.getUserId(), activityId))
+				.thenReturn(Optional.of(userActivity));
+		when(userActivityRepository.findParticipantsByActivityId(any(), any()))
+				.thenReturn(new PageImpl<>(List.of(userActivity)));
+
+		Pageable inputPageable = PageRequest.of(0, 10, Sort.by("unknownField").descending());
+		activityService.getActivityRoster(user.getUserId(), activityId, inputPageable);
+
+		ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+		verify(userActivityRepository).findParticipantsByActivityId(any(), pageableCaptor.capture());
+
+		Pageable actual = pageableCaptor.getValue();
+		Pageable expected = PageRequest.of(0, 10, ActivityService.DEFAULT_SORT);
+		assertEquals(expected, actual);
 	}
 }

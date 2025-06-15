@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +33,7 @@ import com.bu.getactivecore.service.activity.entity.ActivityParticipantRequestDt
 import com.bu.getactivecore.service.activity.entity.ActivityParticipantResponseDto;
 import com.bu.getactivecore.service.activity.entity.ActivityUpdateRequestDto;
 import com.bu.getactivecore.service.users.entity.ParticipantDto;
-import com.bu.getactivecore.shared.PaginatedResponse;
+import com.bu.getactivecore.shared.entity.PaginatedResponse;
 import com.bu.getactivecore.shared.exception.ApiException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -84,12 +85,13 @@ public class ActivityController {
 	@GetMapping(path = "/activities/{activityId}/participants")
 	@PreAuthorize("@accountChecker.assertVerified(authentication)")
 	public ResponseEntity<PaginatedResponse<ParticipantDto>> getRoster(@PathVariable String activityId,
-			@AuthenticationPrincipal UserPrincipal user, @PageableDefault(size = 20) final Pageable pageable,
+			@AuthenticationPrincipal UserPrincipal user,
+			@SortDefault(sort = "name", direction = Sort.Direction.ASC) @PageableDefault(size = 20) final Pageable pageable,
 			HttpServletRequest request) throws ApiException {
 		log.debug("Got request at /activities/{}/participants", activityId);
 
 		String requestedUserId = user.getUserDto().getUserId();
-		Page<ParticipantDto> rosterData = m_activityApi.getActivityRoster(requestedUserId, activityId, pageable);
+		Page<ParticipantDto> roster = m_activityApi.getActivityRoster(requestedUserId, activityId, pageable);
 
 		// Build base path and extra query params
 		String basePath = request.getRequestURI();
@@ -99,9 +101,7 @@ public class ActivityController {
 				queryParams.put(key, values[0]); // simplistic, assumes single value
 			}
 		});
-
-		PaginatedResponse<ParticipantDto> response = new PaginatedResponse<>(rosterData, basePath, queryParams);
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(new PaginatedResponse<>(roster, basePath, queryParams));
 	}
 
 	/**

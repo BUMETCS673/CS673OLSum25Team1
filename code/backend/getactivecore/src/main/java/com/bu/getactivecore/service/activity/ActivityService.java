@@ -8,10 +8,13 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ActivityService implements ActivityApi {
+
+	public static final Sort DEFAULT_SORT = Sort.by(List.of(new Sort.Order(Sort.Direction.ASC, "user.username")));
+
+	private static final int MAX_PAGE_SIZE = 20;
+
+	private static final Map<String, String> ROSTER_SORT_MAPPING = Map.of("name", "user.username");
 
 	private final UserActivityRepository m_userActivityRepo;
 
@@ -194,8 +203,17 @@ public class ActivityService implements ActivityApi {
 					.message("User does not have access to this activity") //
 					.debugMessage(debugMessage).build());
 		});
+		List<Sort.Order> sanitizedSortOrder = pageable.getSort().stream() //
+				.filter(order -> ROSTER_SORT_MAPPING.containsKey(order.getProperty())) //
+				.map(order -> {
+					String mappedProperty = ROSTER_SORT_MAPPING.getOrDefault(order.getProperty(), order.getProperty());
+					return new Sort.Order(order.getDirection(), mappedProperty);
+				}).toList();
 
-		Page<UserActivity> result = m_userActivityRepo.findParticipantsByActivityId(activityId, pageable);
+		Sort sort = sanitizedSortOrder.isEmpty() ? DEFAULT_SORT : Sort.by(sanitizedSortOrder);
+		int pageSize = Math.min(pageable.getPageSize(), MAX_PAGE_SIZE);
+		PageRequest updatedPageable = PageRequest.of(pageable.getPageNumber(), pageSize, sort);
+		Page<UserActivity> result = m_userActivityRepo.findParticipantsByActivityId(activityId, updatedPageable);
 		return result.map(ParticipantDto::of);
 	}
 }

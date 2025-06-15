@@ -1,4 +1,4 @@
-package com.bu.getactivecore.shared;
+package com.bu.getactivecore.shared.entity;
 
 import java.util.List;
 import java.util.Map;

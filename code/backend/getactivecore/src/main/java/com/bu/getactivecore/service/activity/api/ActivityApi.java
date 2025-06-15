@@ -61,7 +61,7 @@ public interface ActivityApi {
 	ActivityDto updateActivity(String activityId, @Valid ActivityUpdateRequestDto requestDto);
 
 	/**
-	 * Retrieves a list of joined activities for the requested user.
+	 * Retrieves a list of joined activities for the requested user as either a participant or admin.
 	 *
 	 * @param userId ID of the user whose joined activities are to be fetched
 	 * @return List of {@link UserActivityDto} representing the activities the user
