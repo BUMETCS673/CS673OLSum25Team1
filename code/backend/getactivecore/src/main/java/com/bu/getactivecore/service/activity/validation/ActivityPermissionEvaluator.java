@@ -2,12 +2,14 @@ package com.bu.getactivecore.service.activity.validation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.bu.getactivecore.model.activity.RoleType;
+import com.bu.getactivecore.model.activity.UserActivity;
 import com.bu.getactivecore.model.users.UserPrincipal;
 import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.shared.ApiErrorPayload;
@@ -43,17 +45,34 @@ public class ActivityPermissionEvaluator {
 	 * @throws ResourceAccessDeniedException if the user is not an admin of the
 	 *                                       activity
 	 */
-	public boolean isAuthorizedToUpdateActivity(Authentication authentication, String activityId) {
+	public void assertAuthorizedToUpdateActivity(Authentication authentication, String activityId) {
 		String userId = ((UserPrincipal) authentication.getPrincipal()).getUserDto().getUserId();
-		return userActivityRepo.findByUserIdAndActivityId(userId, activityId)
-				.map(role -> RoleType.ADMIN == role.getRole()).orElseThrow(() -> {
-					String reason = String.format("User %s is not an admin of activity %s", userId, activityId);
-					Map<String, List<String>> validationErrors = Map.of("permission",
-							List.of("User is not the admin of given activity"));
-					ApiErrorPayload error = ApiErrorPayload.builder().status(HttpStatus.FORBIDDEN)
-							.errorCode(ErrorCode.RESOURCE_ACCESS_DENIED).message(reason)
-							.validationErrors(validationErrors).build();
-					return new ResourceAccessDeniedException(error);
-				});
+		Optional<UserActivity> userActivity = userActivityRepo.findByUserIdAndActivityId(userId, activityId);
+		if (userActivity.isEmpty()) {
+			String reason = String.format("User %s is not an admin of activity %s", userId, activityId);
+			Map<String, List<String>> validationErrors = Map.of("permission",
+					List.of("User is not a participant of this activity"));
+
+            ApiErrorPayload error = ApiErrorPayload.builder() //
+					.status(HttpStatus.FORBIDDEN) //
+					.errorCode(ErrorCode.RESOURCE_ACCESS_DENIED) //
+					.message("User is not a participant of this activity") //
+					.debugMessage(reason) //
+					.validationErrors(validationErrors) //
+					.build();
+			throw new ResourceAccessDeniedException(error);
+		}
+		if (userActivity.get().getRole() != RoleType.ADMIN) {
+			String reason = String.format("User %s is not an admin of activity %s", userId, activityId);
+			Map<String, List<String>> validationErrors = Map.of("permission",
+					List.of("User is not the admin of this activity"));
+			ApiErrorPayload error = ApiErrorPayload.builder().status(HttpStatus.FORBIDDEN) //
+					.errorCode(ErrorCode.RESOURCE_ACCESS_DENIED) //
+					.message("Only admin can update the activity") //
+					.debugMessage(reason) //
+					.validationErrors(validationErrors) //
+					.build();
+			throw new ResourceAccessDeniedException(error);
+		}
 	}
 }
