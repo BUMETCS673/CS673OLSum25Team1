@@ -66,7 +66,11 @@ public class UserDto {
 	 * @return an unverified Users entity
 	 */
 	public static Users from(String email, String username, String encodedPassword) {
-		return Users.builder().email(email).username(username).password(encodedPassword)
-				.accountState(AccountState.UNVERIFIED).build();
+		return Users.builder()
+                .email(email) //
+                .username(username) //
+                .password(encodedPassword) //
+				.accountState(AccountState.UNVERIFIED) //
+                .build();
 	}
 }

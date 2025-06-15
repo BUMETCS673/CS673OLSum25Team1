@@ -37,6 +37,7 @@ public class Users {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "account_state", nullable = false)
-	private AccountState accountState;
+    @Builder.Default
+	private AccountState accountState = AccountState.UNVERIFIED;
 
 }
