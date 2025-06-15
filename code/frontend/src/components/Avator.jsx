@@ -1,15 +1,12 @@
 import { useState, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import imageCompression from 'browser-image-compression';
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, Tooltip } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 
 const AvatarContainer = styled('div')({
   position: 'relative',
   cursor: 'pointer',
-  '&:hover .avatar-overlay': {
-    opacity: 1,
-  },
 });
 
 const AvatarImage = styled('div')({
@@ -29,23 +26,6 @@ const AvatarImage = styled('div')({
     height: '100%',
     objectFit: 'cover',
   },
-});
-
-const AvatarOverlay = styled('div')({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  borderRadius: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: 'white',
-  fontSize: '0.8rem',
-  opacity: 0,
-  transition: 'opacity 0.2s',
 });
 
 const HiddenInput = styled('input')({
@@ -68,7 +48,7 @@ export default function AvatarUpload({ user, setUser }) {
     if (!file.type.match(/^image\/(jpeg|png)$/)) {
       setNotification({
         open: true,
-        message: '只支持 JPEG 和 PNG 格式的图片',
+        message: 'only jpeg and png are supported',
         severity: 'error',
       });
       return;
@@ -121,24 +101,23 @@ export default function AvatarUpload({ user, setUser }) {
 
   return (
     <>
-      <AvatarContainer onClick={handleClick}>
-        <AvatarImage>
-          {user.avatar ? (
-            <img src={user.avatar} />
-          ) : (
-            user.username.charAt(0).toUpperCase()
-          )}
-        </AvatarImage>
-        <AvatarOverlay className="avatar-overlay">
-          update avatar
-        </AvatarOverlay>
-        <HiddenInput
-          type="file"
-          ref={fileInputRef}
-          accept="image/jpeg,image/png"
-          onChange={handleFileSelect}
-        />
-      </AvatarContainer>
+      <Tooltip title="Click to update avatar" placement="top">
+        <AvatarContainer onClick={handleClick}>
+          <AvatarImage>
+            {user.avatar ? (
+              <img src={user.avatar} />
+            ) : (
+              user.username.charAt(0).toUpperCase()
+            )}
+          </AvatarImage>
+          <HiddenInput
+            type="file"
+            ref={fileInputRef}
+            accept="image/jpeg,image/png"
+            onChange={handleFileSelect}
+          />
+        </AvatarContainer>
+      </Tooltip>
       <Snackbar
         open={notification.open}
         autoHideDuration={5000}
