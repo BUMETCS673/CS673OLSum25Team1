@@ -13,6 +13,6 @@ public class ActivityDeleteRequestDto {
     /**
      * If true, the activity will be forcefully deleted even if it has participants.
      */
-	boolean force = false;
+	boolean force;
 
 }
