@@ -1,12 +1,13 @@
 package com.bu.getactivecore.model.activity;
 
-import com.bu.getactivecore.model.users.Users;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+import com.bu.getactivecore.model.users.Users;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -19,7 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 @Data
 @Builder

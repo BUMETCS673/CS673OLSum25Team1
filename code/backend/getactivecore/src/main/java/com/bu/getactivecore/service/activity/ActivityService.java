@@ -15,14 +15,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bu.getactivecore.model.activity.Activity;
 import com.bu.getactivecore.model.activity.ActivityComment;
 import com.bu.getactivecore.model.activity.UserActivity;
-import com.bu.getactivecore.repository.ActivityCommentRepository;
 import com.bu.getactivecore.model.users.Users;
+import com.bu.getactivecore.repository.ActivityCommentRepository;
 import com.bu.getactivecore.repository.ActivityRepository;
 import com.bu.getactivecore.repository.UserActivityRepository;
 import com.bu.getactivecore.repository.UserRepository;
@@ -39,8 +40,6 @@ import com.bu.getactivecore.shared.ApiErrorPayload;
 import com.bu.getactivecore.shared.exception.ApiException;
 
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -192,11 +191,8 @@ public class ActivityService implements ActivityApi {
 					ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build());
 		}
 
-		ActivityComment activityComment = ActivityComment.builder().activityId(activityId)
-				.userId(userId)
-				.comment(requestDto.getComment())
-				.timestamp(timestamp)
-				.build();
+		ActivityComment activityComment = ActivityComment.builder().activityId(activityId).userId(userId)
+				.comment(requestDto.getComment()).timestamp(timestamp).build();
 		m_activityCommentRepo.save(activityComment);
 
 	}
