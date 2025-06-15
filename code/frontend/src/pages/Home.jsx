@@ -1,7 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tabs, Tab, Snackbar, Alert, IconButton } from "@mui/material";
+import { Tabs, Tab, Snackbar, Alert, IconButton, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { activityService } from "../services/activityService";
