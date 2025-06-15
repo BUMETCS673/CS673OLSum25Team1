@@ -36,79 +36,75 @@ import com.bu.getactivecore.service.activity.entity.ActivityDto;
 @WebAppConfiguration
 class ActivityRestControllerTest {
 
-        @Autowired
-        private MockMvc m_mvc;
+	@Autowired
+	private MockMvc m_mvc;
 
-        @MockitoBean
-        private ActivityService m_activityService;
+	@MockitoBean
+	private ActivityService m_activityService;
 
-        @Autowired
-        private ActivityApi m_activityApi;
+	@Autowired
+	private ActivityApi m_activityApi;
 
-        @WithMockUser
-        @Test
-        void givenActivities_expectedActivitiesReturned() throws Exception {
+	@WithMockUser
+	@Test
+	void givenActivities_expectedActivitiesReturned() throws Exception {
 
-                List<ActivityDto> mockedActivities = List.of(ActivityDto.builder().name("Running").build(),
-                                ActivityDto.builder().name("Yoga").build(),
-                                ActivityDto.builder().name("Rock Climbing").build());
+		List<ActivityDto> mockedActivities = List.of(ActivityDto.builder().name("Running").build(),
+				ActivityDto.builder().name("Yoga").build(), ActivityDto.builder().name("Rock Climbing").build());
 
-                Sort sort = Sort.by("id").ascending();
-                Pageable pageable = PageRequest.of(0, 10, sort);
-                Page<ActivityDto> page = new PageImpl<>(mockedActivities, pageable, mockedActivities.size());
+		Sort sort = Sort.by("id").ascending();
+		Pageable pageable = PageRequest.of(0, 10, sort);
+		Page<ActivityDto> page = new PageImpl<>(mockedActivities, pageable, mockedActivities.size());
 
-                given(m_activityApi.getAllActivities(pageable)).willReturn(page);
-                m_mvc.perform(get("/v1/activities").accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(jsonPath("data.content[0].name").value("Running"))
-                                .andExpect(jsonPath("data.content[1].name").value("Yoga"))
-                                .andExpect(jsonPath("data.content[2].name").value("Rock Climbing"));
-        }
+		given(m_activityApi.getAllActivities(pageable)).willReturn(page);
+		m_mvc.perform(get("/v1/activities").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("data.content[0].name").value("Running"))
+				.andExpect(jsonPath("data.content[1].name").value("Yoga"))
+				.andExpect(jsonPath("data.content[2].name").value("Rock Climbing"));
+	}
 
-        @WithMockUser
-        @Test
-        void givenNoActivities_then_200Returned() throws Exception {
+	@WithMockUser
+	@Test
+	void givenNoActivities_then_200Returned() throws Exception {
 
-                Page<ActivityDto> mockedActivities = Page.empty();
-                Sort sort = Sort.by("id").ascending();
-                Pageable pageable = PageRequest.of(0, 10, sort);
-                given(m_activityApi.getAllActivities(pageable)).willReturn(mockedActivities);
-                m_mvc.perform(get("/v1/activities").accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(jsonPath("data.content").isEmpty());
-        }
+		Page<ActivityDto> mockedActivities = Page.empty();
+		Sort sort = Sort.by("id").ascending();
+		Pageable pageable = PageRequest.of(0, 10, sort);
+		given(m_activityApi.getAllActivities(pageable)).willReturn(mockedActivities);
+		m_mvc.perform(get("/v1/activities").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("data.content").isEmpty());
+	}
 
-        @WithMockUser
-        @Test
-        void givenActivityFound_then_200Returned() throws Exception {
-                Activity act1 = Activity.builder().name("Rock Climbing").startDateTime(LocalDateTime.now())
-                                .location("Location")
-                                .endDateTime(LocalDateTime.now()).build();
-                List<ActivityDto> mockedActivities = new ArrayList<>();
-                mockedActivities.add(ActivityDto.of(act1));
+	@WithMockUser
+	@Test
+	void givenActivityFound_then_200Returned() throws Exception {
+		Activity act1 = Activity.builder().name("Rock Climbing").startDateTime(LocalDateTime.now()).location("Location")
+				.endDateTime(LocalDateTime.now()).build();
+		List<ActivityDto> mockedActivities = new ArrayList<>();
+		mockedActivities.add(ActivityDto.of(act1));
 
-                Sort sort = Sort.by("id").ascending();
-                Pageable pageable = PageRequest.of(0, 10, sort);
-                Page<ActivityDto> page = new PageImpl<>(mockedActivities, pageable, mockedActivities.size());
+		Sort sort = Sort.by("id").ascending();
+		Pageable pageable = PageRequest.of(0, 10, sort);
+		Page<ActivityDto> page = new PageImpl<>(mockedActivities, pageable, mockedActivities.size());
 
-                given(m_activityApi.getActivityByName("Rock Climbing", pageable)).willReturn(page);
-                m_mvc.perform(get("/v1/activity/{name}", "Rock Climbing").accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(jsonPath("data.content[0].name").value("Rock Climbing"));
-        }
+		given(m_activityApi.getActivityByName("Rock Climbing", pageable)).willReturn(page);
+		m_mvc.perform(get("/v1/activity/{name}", "Rock Climbing").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("data.content[0].name").value("Rock Climbing"));
+	}
 
-        @WithMockUser
-        @Test
-        void givenActivityNotFound_then_200Returned() throws Exception {
-                Page<ActivityDto> mockedActivities = Page.empty();
-                Sort sort = Sort.by("id").ascending();
-                Pageable pageable = PageRequest.of(0, 10, sort);
-                given(m_activityApi.getActivityByName("Rock Climbing", pageable)).willReturn(mockedActivities);
-                m_mvc.perform(get("/v1/activity/{name}", "Rock Climbing").accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-        }
+	@WithMockUser
+	@Test
+	void givenActivityNotFound_then_200Returned() throws Exception {
+		Page<ActivityDto> mockedActivities = Page.empty();
+		Sort sort = Sort.by("id").ascending();
+		Pageable pageable = PageRequest.of(0, 10, sort);
+		given(m_activityApi.getActivityByName("Rock Climbing", pageable)).willReturn(mockedActivities);
+		m_mvc.perform(get("/v1/activity/{name}", "Rock Climbing").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+	}
 }

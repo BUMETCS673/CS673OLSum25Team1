@@ -210,8 +210,7 @@ public class ActivityController {
 	 */
 	@PostMapping("/activity/{id}/comment")
 	public ResponseEntity<Object> createActivityComment(@AuthenticationPrincipal UserPrincipal user,
-			@PathVariable String id,
-			@RequestBody @Valid ActivityCommentCreateRequestDto requestDto) {
+			@PathVariable String id, @RequestBody @Valid ActivityCommentCreateRequestDto requestDto) {
 		String userId = user.getUserDto().getUserId();
 		m_activityApi.createActivityComment(userId, id, requestDto, LocalDateTime.now());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -223,12 +222,10 @@ public class ActivityController {
 	 * @return Page of activities
 	 */
 	@GetMapping("/activity/{id}/comments")
-	public ResponseEntity<Page<ActivityCommentDto>> getActivityComments(
-			@PathVariable String id,
+	public ResponseEntity<Page<ActivityCommentDto>> getActivityComments(@PathVariable String id,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "10") int size,
-			@RequestParam(defaultValue = "id") String sortBy,
-			@RequestParam(defaultValue = "true") boolean ascending) {
+			@RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "true") boolean ascending) {
 		Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 		Pageable pageable = PageRequest.of(page, size, sort);
 		return ResponseEntity.ok(m_activityApi.getAllActivityComments(pageable, id));

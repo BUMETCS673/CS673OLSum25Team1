@@ -4,12 +4,10 @@ import static com.bu.getactivecore.service.jwt.api.JwtApi.TOKEN_CLAIM_TYPE_KEY;
 import static com.bu.getactivecore.service.jwt.api.JwtApi.TokenClaimType;
 import static com.bu.getactivecore.shared.Constants.PASSWORD_ENCODER_STRENGTH;
 import static com.bu.getactivecore.shared.ErrorCode.EMAIL_USERNAME_TAKEN;
-import static com.bu.getactivecore.shared.ErrorCode.INTERNAL_SERVER_ERROR;
 import static com.bu.getactivecore.shared.ErrorCode.TOKEN_EXPIRED;
 import static com.bu.getactivecore.shared.ErrorCode.TOKEN_INVALID;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,27 +63,6 @@ public class RegistrationService implements RegistrationApi {
 		m_jwtApi = jwtApi;
 	}
 
-	/**
-	 * Helper to build a descriptive debug message when a duplicate user is
-	 * detected.
-	 *
-	 * @param existingUser The existing user found in database.
-	 * @param email        Email to check.
-	 * @param username     Username to check.
-	 * @return Debug message indicating which fields are taken.
-	 */
-	private String buildDebugMessage(Users existingUser, String email, String username) {
-		String debugMessage = "";
-		if (existingUser.getEmail().equals(email) && existingUser.getUsername().equals(username)) {
-			debugMessage = String.format("Email '%s' and username '%s' are already taken", email, username);
-		} else if (existingUser.getEmail().equals(email)) {
-			debugMessage = String.format("Email '%s' is already taken", email);
-		} else if (existingUser.getUsername().equals(username)) {
-			debugMessage = String.format("Username '%s' is already taken", username);
-		}
-		return debugMessage;
-	}
-
 	@Override
 	@Transactional
 	public RegistrationResponseDto registerUser(RegistrationRequestDto requestDto) throws ApiException {
@@ -137,14 +114,6 @@ public class RegistrationService implements RegistrationApi {
 				user.setAccountState(AccountState.VERIFIED);
 				m_userRepo.save(user);
 				log.info("Successfully confirmed registration for user '{}'", username);
-			}
-			default -> {
-				log.warn("User '{}' is in an unexpected state: {}", username, user.getAccountState());
-				ApiErrorPayload error = ApiErrorPayload.builder().status(HttpStatus.INTERNAL_SERVER_ERROR)
-						.errorCode(INTERNAL_SERVER_ERROR).message("User is in an unexpected state "
-								+ user.getAccountState() + ", cannot confirm registration")
-						.build();
-				throw new ApiException(error);
 			}
 			}
 		}

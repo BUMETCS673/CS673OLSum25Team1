@@ -151,7 +151,7 @@ class ActivityServiceTest {
 	}
 
 	@Test
-	public void testGetActivitiesSortedByPopularity() {
+	void testGetActivitiesSortedByPopularity() {
 		PageRequest pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
 		Page<Activity> page = new PageImpl<>(List.of(Activity.builder().build()), pageable, 1);
 		when(activityRepository.findAllSortedByPopularity(pageable)).thenReturn(page);
@@ -162,7 +162,7 @@ class ActivityServiceTest {
 	}
 
 	@Test
-	public void testGetAllActivityComments() {
+	void testGetAllActivityComments() {
 		when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
 
 		PageRequest pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
@@ -324,16 +324,12 @@ class ActivityServiceTest {
 	}
 
 	@Test
-	public void updateActivityWithActivityNotFound() {
+	void updateActivityWithActivityNotFound() {
 		when(activityRepository.findById(activityId)).thenReturn(Optional.empty());
 
-		ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder()
-				.name("Rock Climbing")
-				.description("")
-				.location("location")
-				.startDateTime(LocalDateTime.now().plusHours(1))
-				.endDateTime(LocalDateTime.now().plusHours(2))
-				.build();
+		ActivityUpdateRequestDto dtoRequest = ActivityUpdateRequestDto.builder().name("Rock Climbing").description("")
+				.location("location").startDateTime(LocalDateTime.now().plusHours(1))
+				.endDateTime(LocalDateTime.now().plusHours(2)).build();
 
 		Activity updateActivity = ActivityUpdateRequestDto.from(activityId, dtoRequest);
 
@@ -473,21 +469,16 @@ class ActivityServiceTest {
 	}
 
 	@Test
-	public void createActivityCommentSuccessfully() {
+	void createActivityCommentSuccessfully() {
 		when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
 
-		ActivityCommentCreateRequestDto dtoRequest = ActivityCommentCreateRequestDto.builder()
-				.comment("comment")
+		ActivityCommentCreateRequestDto dtoRequest = ActivityCommentCreateRequestDto.builder().comment("comment")
 				.build();
 
 		LocalDateTime timestamp = LocalDateTime.now();
 
-		ActivityComment activityComment = ActivityComment.builder().activityId(activityId)
-				.userId(user.getUserId())
-				.activityId(activityId)
-				.comment(dtoRequest.getComment())
-				.timestamp(timestamp)
-				.build();
+		ActivityComment activityComment = ActivityComment.builder().activityId(activityId).userId(user.getUserId())
+				.activityId(activityId).comment(dtoRequest.getComment()).timestamp(timestamp).build();
 
 		activityService.createActivityComment(user.getUserId(), activityId, dtoRequest, timestamp);
 

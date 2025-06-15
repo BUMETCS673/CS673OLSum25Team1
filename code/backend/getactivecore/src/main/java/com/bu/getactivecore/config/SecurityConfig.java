@@ -76,7 +76,9 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(AbstractHttpConfigurer::disable)
-				.headers(headers -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))) // Allow H2 Console to load in frame
+                // Allow H2 Console to load in frame
+				.headers(headers -> headers.addHeaderWriter(
+						new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
 				.exceptionHandling(accessDenied -> accessDenied.accessDeniedHandler(m_customAccessDeniedHandler))
 				.authorizeHttpRequests(request -> request
 
