@@ -45,12 +45,12 @@ public class ActivityService implements ActivityApi {
     /**
      * Constructs the ActivityService.
      *
-     * @param activityRepo     used to fetch and manage activities
-     * @param userActivityRepo used to fetch and manage user activities
+     * @param activityRepo        used to fetch and manage activities
+     * @param userActivityRepo    used to fetch and manage user activities
      * @param activityCommentRepo used to fetch and manage user activities
      */
     public ActivityService(ActivityRepository activityRepo, UserActivityRepository userActivityRepo,
-    ActivityCommentRepository activityCommentRepo) {
+            ActivityCommentRepository activityCommentRepo) {
         m_activityRepo = activityRepo;
         m_userActivityRepo = userActivityRepo;
         m_activityCommentRepo = activityCommentRepo;
@@ -193,20 +193,21 @@ public class ActivityService implements ActivityApi {
     }
 
     @Override
-    public void createActivityComment(String userId, String activityId, @Valid ActivityCommentCreateRequestDto requestDto, LocalDateTime timestamp) {
+    public void createActivityComment(String userId, String activityId,
+            @Valid ActivityCommentCreateRequestDto requestDto, LocalDateTime timestamp) {
         Optional<Activity> activity = m_activityRepo.findById(activityId);
         if (activity.isEmpty()) {
             throw new ApiException(
                     ApiErrorPayload.builder().status(HttpStatus.BAD_REQUEST).message("Activity not found").build());
-        }         
+        }
 
-       ActivityComment activityComment = ActivityComment.builder().activityId(activityId)
-                                            .userId(userId)
-                                            .comment(requestDto.getComment())
-                                            .timestamp(timestamp)
-                                            .build();         
-       m_activityCommentRepo.save(activityComment);
-    
+        ActivityComment activityComment = ActivityComment.builder().activityId(activityId)
+                .userId(userId)
+                .comment(requestDto.getComment())
+                .timestamp(timestamp)
+                .build();
+        m_activityCommentRepo.save(activityComment);
+
     }
 
     @Override
@@ -221,4 +222,5 @@ public class ActivityService implements ActivityApi {
         Page<ActivityComment> comments = m_activityCommentRepo.findAllByActivityId(page, activityId);
         return comments.map(ActivityCommentDto::of);
     }
+
 }

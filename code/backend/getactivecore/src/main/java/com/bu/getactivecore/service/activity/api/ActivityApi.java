@@ -26,7 +26,7 @@ public interface ActivityApi {
      */
     Page<ActivityDto> getAllActivities(Pageable page);
 
-     /**
+    /**
      * Retrieves all activities sorted by popularity.
      *
      * @return List of all activities
@@ -71,7 +71,8 @@ public interface ActivityApi {
      * Retrieves a list of joined activities for the requested user.
      *
      * @param userId ID of the user whose joined activities are to be fetched
-     * @return List of {@link UserActivityDto} representing the activities the user has joined
+     * @return List of {@link UserActivityDto} representing the activities the user
+     *         has joined
      */
     List<UserActivityDto> getJoinedActivities(String userId);
 
@@ -95,11 +96,12 @@ public interface ActivityApi {
      * Creates a new activity comment.
      *
      * @param userId     ID of the user creating the activity comment
-     * @param activityId  ID of the activity'
+     * @param activityId ID of the activity'
      * @param requestDto Details of the activity comment
      * @param timestamp  comment creation timestamp
      */
-    void createActivityComment(String userId, String activityId, @Valid ActivityCommentCreateRequestDto requestDto, LocalDateTime timestamp);
+    void createActivityComment(String userId, String activityId, @Valid ActivityCommentCreateRequestDto requestDto,
+            LocalDateTime timestamp);
 
     /**
      * Retrieves all activity comments.
@@ -107,4 +109,5 @@ public interface ActivityApi {
      * @return List of all activity comments
      */
     Page<ActivityCommentDto> getAllActivityComments(Pageable page, String activityId);
+
 }

@@ -1,6 +1,5 @@
 package com.bu.getactivecore.service.activity.entity;
 
-import com.bu.getactivecore.model.activity.Activity;
 import com.bu.getactivecore.model.activity.ActivityComment;
 
 import lombok.Builder;
@@ -40,4 +39,5 @@ public class ActivityCommentDto {
                 .timestamp(comment.getTimestamp())
                 .build();
     }
+
 }

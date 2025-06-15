@@ -63,10 +63,10 @@ public class ActivityController {
      */
     @GetMapping("/activities")
     public ResponseEntity<Page<ActivityDto>> getActivities(@RequestParam(name = "page", defaultValue = "0") int page,
-                                                           @RequestParam(name = "size", defaultValue = "10") int size,
-                                                           @RequestParam(defaultValue = "id") String sortBy,
-                                                           @RequestParam(defaultValue = "true") boolean ascending) {
-        if(sortBy.equals("popularity")){
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending) {
+        if (sortBy.equals("popularity")) {
             Pageable pageable = PageRequest.of(page, size, Sort.unsorted());
             return ResponseEntity.ok(m_activityApi.getAllActivitiesSortedByPopularity(pageable));
         }
@@ -83,10 +83,10 @@ public class ActivityController {
      */
     @GetMapping("/activity/{name}")
     public ResponseEntity<Page<ActivityDto>> getActivityByName(@PathVariable String name,
-                                                               @RequestParam(name = "page", defaultValue = "0") int page,
-                                                               @RequestParam(name = "size", defaultValue = "10") int size,
-                                                               @RequestParam(defaultValue = "id") String sortBy,
-                                                               @RequestParam(defaultValue = "true") boolean ascending) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(m_activityApi.getActivityByName(name, pageable));
@@ -102,7 +102,7 @@ public class ActivityController {
 
     @PostMapping("/activity/participants")
     public ResponseEntity<Void> join(@AuthenticationPrincipal UserPrincipal user,
-                                     @Valid @RequestBody ActivityParticipantRequestDto request) {
+            @Valid @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/participant");
 
         String userId = user.getUserDto().getUserId();
@@ -112,7 +112,7 @@ public class ActivityController {
 
     @DeleteMapping("/activity/participants")
     public ResponseEntity<Void> leave(@AuthenticationPrincipal UserPrincipal user,
-                                      @Valid @RequestBody ActivityParticipantRequestDto request) {
+            @Valid @RequestBody ActivityParticipantRequestDto request) {
         log.info("Got request: /v1/activity/leave");
 
         String userId = user.getUserDto().getUserId();
@@ -149,7 +149,7 @@ public class ActivityController {
     @Transactional
     @PostMapping("/activity")
     public ResponseEntity<Object> createActivity(@AuthenticationPrincipal UserPrincipal user,
-                                                 @RequestBody @Valid ActivityCreateRequestDto requestDto) {
+            @RequestBody @Valid ActivityCreateRequestDto requestDto) {
         String userId = user.getUserDto().getUserId();
         m_activityApi.createActivity(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -166,11 +166,11 @@ public class ActivityController {
     @PutMapping("/activity/{id}")
     @PreAuthorize("@activityPermissionEvaluator.isAuthorizedToUpdateActivity(authentication, #id)")
     public ResponseEntity<ActivityDto> updateActivity(@PathVariable String id,
-                                                      @Valid @RequestBody ActivityUpdateRequestDto request) {
+            @Valid @RequestBody ActivityUpdateRequestDto request) {
         return ResponseEntity.ok(m_activityApi.updateActivity(id, request));
     }
 
-       /**
+    /**
      * create an activity comment
      *
      * @param requestDto comment requestDto
@@ -178,27 +178,28 @@ public class ActivityController {
      */
     @PostMapping("/activity/{id}/comment")
     public ResponseEntity<Object> createActivityComment(@AuthenticationPrincipal UserPrincipal user,
-                                                 @PathVariable String id,
-                                                 @RequestBody @Valid ActivityCommentCreateRequestDto requestDto) {
+            @PathVariable String id,
+            @RequestBody @Valid ActivityCommentCreateRequestDto requestDto) {
         String userId = user.getUserDto().getUserId();
         m_activityApi.createActivityComment(userId, id, requestDto, LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-      /**
+    /**
      * Get all comments by activity id.
      *
      * @return Page of activities
      */
     @GetMapping("/activity/{id}/comments")
     public ResponseEntity<Page<ActivityCommentDto>> getActivityComments(
-                                                           @PathVariable String id,
-                                                           @RequestParam(name = "page", defaultValue = "0") int page,
-                                                           @RequestParam(name = "size", defaultValue = "10") int size,
-                                                           @RequestParam(defaultValue = "id") String sortBy,
-                                                           @RequestParam(defaultValue = "true") boolean ascending) {
+            @PathVariable String id,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(m_activityApi.getAllActivityComments(pageable, id));
     }
+
 }

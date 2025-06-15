@@ -131,7 +131,6 @@ public class ActivityServiceTest {
         verify(activityRepository).findAllSortedByPopularity(pageable);
     }
 
-
     @Test
     public void testGetActivitiesByName() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
@@ -346,7 +345,6 @@ public class ActivityServiceTest {
         verify(activityRepository, never()).save(updateActivity);
     }
 
-
     @Test
     public void updateActivitySuccessfully() {
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
@@ -379,18 +377,17 @@ public class ActivityServiceTest {
         verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
         verify(activityRepository).findById(activityId);
         verify(userActivityRepository).save(
-            UserActivity.builder()
-                .userId(userId)
-                .activity(activity)
-                .role(RoleType.PARTICIPANT)
-                .build()
-        );
+                UserActivity.builder()
+                        .userId(userId)
+                        .activity(activity)
+                        .role(RoleType.PARTICIPANT)
+                        .build());
     }
 
     @Test
     public void joinActivityAlreadyJoined() {
         when(userActivityRepository.findByUserIdAndActivityId(userId, activityId))
-            .thenReturn(Optional.of(new UserActivity()));
+                .thenReturn(Optional.of(new UserActivity()));
 
         assertThrows(ApiException.class, () -> activityService.joinActivity(userId, activityId));
         verify(userActivityRepository).findByUserIdAndActivityId(userId, activityId);
@@ -413,7 +410,7 @@ public class ActivityServiceTest {
     public void leaveActivitySuccessfully() {
         UserActivity userActivity = UserActivity.builder().userId(userId).build();
         when(userActivityRepository.findByUserIdAndActivityId(userId, activityId))
-            .thenReturn(Optional.of(userActivity));
+                .thenReturn(Optional.of(userActivity));
 
         activityService.leaveActivity(userId, activityId);
 
@@ -424,7 +421,7 @@ public class ActivityServiceTest {
     @Test
     public void leaveActivityNotJoined() {
         when(userActivityRepository.findByUserIdAndActivityId(userId, activityId))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         activityService.leaveActivity(userId, activityId);
 
@@ -448,26 +445,26 @@ public class ActivityServiceTest {
         verify(userActivityRepository).findJoinedActivitiesByUserId(userId);
     }
 
-
     @Test
     public void createActivityCommentSuccessfully() {
-        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity())); 
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(new Activity()));
 
         ActivityCommentCreateRequestDto dtoRequest = ActivityCommentCreateRequestDto.builder()
                 .comment("comment")
                 .build();
 
-        LocalDateTime timestamp = LocalDateTime.now();        
+        LocalDateTime timestamp = LocalDateTime.now();
 
         ActivityComment activityComment = ActivityComment.builder().activityId(activityId)
-                                            .userId(userId)
-                                            .activityId(activityId)
-                                            .comment(dtoRequest.getComment())
-                                            .timestamp(timestamp)
-                                            .build();            
+                .userId(userId)
+                .activityId(activityId)
+                .comment(dtoRequest.getComment())
+                .timestamp(timestamp)
+                .build();
 
         activityService.createActivityComment(userId, activityId, dtoRequest, timestamp);
 
         verify(activityCommentRepository).save(activityComment);
     }
+
 }

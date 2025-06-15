@@ -29,4 +29,5 @@ public class ActivityCommentCreateRequestDto {
                 .comment(request.getComment())
                 .build();
     }
+
 }
