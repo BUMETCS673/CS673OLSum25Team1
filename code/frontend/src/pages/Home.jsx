@@ -1,9 +1,12 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tabs, Tab, Snackbar, Alert, IconButton, Button } from "@mui/material";
+import { Tabs, Tab, Snackbar, Alert, IconButton, Button, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import LogoutIcon from "@mui/icons-material/Logout";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { activityService } from "../services/activityService";
 import AvatarUpload from "../components/Avator";
 
@@ -38,6 +41,14 @@ export default function Home() {
   const [value, setValue] = useState(0);
   const [participantActivities, setParticipantActivities] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
+  const [editingActivityId, setEditingActivityId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    description: "",
+    location: "",
+    startDateTime: "",
+    endDateTime: "",
+  });
   const [notification, setNotification] = useState({
     open: false,
     message: "",
@@ -255,6 +266,75 @@ export default function Home() {
     navigate("/create-activity");
   };
 
+  const handleEditClick = (activity) => {
+    setEditingActivityId(activity.activityId);
+    setEditFormData({
+      name: activity.name,
+      description: activity.description,
+      location: activity.location,
+      startDateTime: activity.startDateTime.replace(" ", "T"),
+      endDateTime: activity.endDateTime.replace(" ", "T"),
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingActivityId(null);
+    setEditFormData({
+      name: "",
+      description: "",
+      location: "",
+      startDateTime: "",
+      endDateTime: "",
+    });
+  };
+
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveEdit = async (activityId) => {
+    try {
+      // Convert datetime-local format to the required format (YYYY-MM-DD HH:MM)
+      const formatDateTime = (dateTimeStr) => {
+        const date = new Date(dateTimeStr);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+      };
+
+      const activityData = {
+        ...editFormData,
+        startDateTime: formatDateTime(editFormData.startDateTime),
+        endDateTime: formatDateTime(editFormData.endDateTime),
+      };
+
+      await activityService.updateActivity(activityId, activityData);
+      setEditingActivityId(null);
+      // Refresh activities
+      const activities = await activityService.getParticipantActivities();
+      setParticipantActivities(activities);
+      setNotification({
+        open: true,
+        message: "Activity updated successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Error updating activity:", error);
+      setNotification({
+        open: true,
+        message: error.response?.data?.message || "Failed to update activity",
+        severity: "error",
+      });
+    }
+  };
+
   return (
     <div style={styles.container}>
       <Snackbar
@@ -359,8 +439,8 @@ export default function Home() {
           <TabPanel value={value} index={1}>
             <div style={styles.activitiesGrid}>
               {participantActivities.map((activity, index) => {
-                console.log("participantActivities", activity);
                 const isAdmin = activity.role === "ADMIN";
+                const isEditing = editingActivityId === activity.activityId;
                 const startDate = new Date(activity.startDateTime);
                 const endDate = new Date(activity.endDateTime);
                 const formatDateTime = (date) =>
@@ -368,34 +448,118 @@ export default function Home() {
 
                 return (
                   <div key={index} style={styles.activityCard}>
-                    <h3 style={styles.activityTitle}>{activity.name}</h3>
-                    <p style={styles.activityDescription}>{activity.description}</p>
-                    <div style={styles.activityDetails}>
-                      <div style={styles.activityMeta}>
-                        <span style={styles.metaIcon}>🕐</span>
-                        <span>
-                          <strong>Start:</strong> {formatDateTime(startDate)}
-                        </span>
-                      </div>
-                      <div style={styles.activityMeta}>
-                        <span style={styles.metaIcon}>🕕</span>
-                        <span>
-                          <strong>End:</strong> {formatDateTime(endDate)}
-                        </span>
-                      </div>
-                      <div style={styles.activityMeta}>
-                        <span style={styles.metaIcon}>📍</span>
-                        <span>{activity.location}</span>
-                      </div>
-                    </div>
-                    <button
-                      style={styles.joinButton}
-                      onClick={() =>
-                        isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
-                      }
-                    >
-                      {isAdmin ? "Delete Activity" : "Leave Activity"}
-                    </button>
+                    {isEditing ? (
+                      <>
+                        <TextField
+                          fullWidth
+                          name="name"
+                          value={editFormData.name}
+                          onChange={handleEditInputChange}
+                          style={styles.editInput}
+                          placeholder="Activity Name"
+                        />
+                        <TextField
+                          fullWidth
+                          multiline
+                          rows={3}
+                          name="description"
+                          value={editFormData.description}
+                          onChange={handleEditInputChange}
+                          style={styles.editInput}
+                          placeholder="Description"
+                        />
+                        <TextField
+                          fullWidth
+                          name="location"
+                          value={editFormData.location}
+                          onChange={handleEditInputChange}
+                          style={styles.editInput}
+                          placeholder="Location"
+                        />
+                        <TextField
+                          fullWidth
+                          type="datetime-local"
+                          name="startDateTime"
+                          value={editFormData.startDateTime}
+                          onChange={handleEditInputChange}
+                          style={styles.editInput}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                        <TextField
+                          fullWidth
+                          type="datetime-local"
+                          name="endDateTime"
+                          value={editFormData.endDateTime}
+                          onChange={handleEditInputChange}
+                          style={styles.editInput}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                        <div style={styles.editButtons}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<SaveIcon />}
+                            onClick={() => handleSaveEdit(activity.activityId)}
+                            style={styles.editButton}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="secondary"
+                            startIcon={<CancelIcon />}
+                            onClick={handleCancelEdit}
+                            style={styles.editButton}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <h3 style={styles.activityTitle}>{activity.name}</h3>
+                        <p style={styles.activityDescription}>{activity.description}</p>
+                        <div style={styles.activityDetails}>
+                          <div style={styles.activityMeta}>
+                            <span style={styles.metaIcon}>🕐</span>
+                            <span>
+                              <strong>Start:</strong> {formatDateTime(startDate)}
+                            </span>
+                          </div>
+                          <div style={styles.activityMeta}>
+                            <span style={styles.metaIcon}>🕕</span>
+                            <span>
+                              <strong>End:</strong> {formatDateTime(endDate)}
+                            </span>
+                          </div>
+                          <div style={styles.activityMeta}>
+                            <span style={styles.metaIcon}>📍</span>
+                            <span>{activity.location}</span>
+                          </div>
+                        </div>
+                        <div style={styles.cardButtons}>
+                          {isAdmin && (
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              startIcon={<EditIcon />}
+                              onClick={() => handleEditClick(activity)}
+                              style={styles.editButton}
+                            >
+                              Edit
+                            </Button>
+                          )}
+                          <button
+                            style={styles.joinButton}
+                            onClick={() =>
+                              isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
+                            }
+                          >
+                            {isAdmin ? "Delete Activity" : "Leave Activity"}
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 );
               })}
@@ -655,6 +819,22 @@ const styles = {
     transition: "background-color 0.2s",
     width: "100%",
     alignSelf: "center",
+    marginTop: "auto",
+  },
+  editInput: {
+    marginBottom: "1rem",
+  },
+  editButtons: {
+    display: "flex",
+    gap: "1rem",
+    marginTop: "1rem",
+  },
+  editButton: {
+    flex: 1,
+  },
+  cardButtons: {
+    display: "flex",
+    gap: "1rem",
     marginTop: "auto",
   },
 };
