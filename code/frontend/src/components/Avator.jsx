@@ -104,7 +104,7 @@ export default function AvatarUpload({ user }) {
       <Tooltip title="Click to update avatar" placement="top">
         <AvatarContainer onClick={handleClick}>
           <AvatarImage>{user.avatar ? <img src={user.avatar} /> : user.username.charAt(0).toUpperCase()}</AvatarImage>
-          <HiddenInput type="file" ref={fileInputRef} accept="image/jpeg,image/png" onChange={handleFileSelect} />
+          <HiddenInput data-testid="avatar-input" type="file" ref={fileInputRef} accept="image/jpeg,image/png" onChange={handleFileSelect} />
         </AvatarContainer>
       </Tooltip>
       <Snackbar
