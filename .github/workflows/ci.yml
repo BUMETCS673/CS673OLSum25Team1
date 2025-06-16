@@ -8,8 +8,8 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  integration-test:
-    name: Integration Tests
+  unit-test-and-e2e-test:
+    name: Unit Tests and E2E Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read

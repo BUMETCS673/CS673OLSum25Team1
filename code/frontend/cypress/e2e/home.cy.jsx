@@ -1,5 +1,12 @@
 /* eslint-disable no-undef */
 describe("Home Page E2E Test", () => {
+  const testActivity = {
+    name: "Test Activity",
+    description: "This is a test activity created by Cypress",
+    location: "Test Location",
+    startDateTime: "2025-09-16T10:00",
+    endDateTime: "2025-09-16T12:00",
+  };
   it("should allow a user to register successfully", () => {
     // Intercept the registration request to capture the token
     cy.intercept("POST", "/v1/register", (req) => {
@@ -36,7 +43,7 @@ describe("Home Page E2E Test", () => {
     });
   });
 
-  it("should allow a user to log in successfully", () => {
+  it("should allow a user to log in to home page and join/leave activities successfully", () => {
     cy.visit("/login");
     cy.findByLabelText(/username/i).type("testuser2");
     cy.findByLabelText(/password/i).type("Password123!");
@@ -58,4 +65,39 @@ describe("Home Page E2E Test", () => {
       });
     cy.contains(/Rock Climbing/i).should("not.exist");
   });
+
+  it("should create a new activity and display it on the home page", () => {
+    cy.visit("/login");
+    cy.findByLabelText(/username/i).type("testuser2");
+    cy.findByLabelText(/password/i).type("Password123!");
+    cy.findByRole("button", { name: /Login/i }).click();
+    cy.url().should("include", "/home");
+
+    cy.contains("button", "+ Create Activity").click();
+
+    cy.url().should("include", "/create-activity");
+
+    cy.get('input[id="activity-name"]').type(testActivity.name);
+    cy.get('textarea[id="activity-description"]').type(testActivity.description);
+    cy.get('input[id="activity-location"]').type(testActivity.location);
+    cy.get('input[id="activity-start-date-time"]').type(testActivity.startDateTime);
+    cy.get('input[id="activity-end-date-time"]').type(testActivity.endDateTime);
+
+    cy.findByRole("button", { name: /Create Activity/i }).click();
+
+    cy.url().should("include", "/home");
+
+    cy.contains(testActivity.name).should("be.visible");
+    cy.contains(testActivity.description).should("be.visible");
+    cy.contains(testActivity.location).should("be.visible");
+
+    const startDate = new Date(testActivity.startDateTime);
+    const endDate = new Date(testActivity.endDateTime);
+    const formatDateTime = (date) =>
+      `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+
+    cy.contains(formatDateTime(startDate)).should("be.visible");
+    cy.contains(formatDateTime(endDate)).should("be.visible");
+  });
+
 });
