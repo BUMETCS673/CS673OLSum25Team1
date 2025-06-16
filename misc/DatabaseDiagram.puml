@@ -6,11 +6,19 @@ package model {
         +email: VARCHAR
         +password: VARCHAR
         +username: VARCHAR
+        +accountState: AccountState <<Enum>>
+        +avatar: TEXT
+        +avatarUpdatedAt: LocalDateTime
     }
-
+    
     enum ParticipantRole {
         ADMIN
         PARTICIPANT
+    }
+
+    enum AccountState {
+        UNVERIFIED
+        VERIFIED
     }
 
     class Activity {
@@ -42,6 +50,7 @@ package model {
     User "1" o-- "0..*" UserActivity : participates in
     Activity "1" o-- "0..*" UserActivity : includes
     UserActivity --> ParticipantRole : is assigned a role
+    User --> AccountState : is assigned a state
     User "1" o-- "0..*" ActivityComment : participates in
     Activity "1" o-- "0..*" ActivityComment : includes
 
