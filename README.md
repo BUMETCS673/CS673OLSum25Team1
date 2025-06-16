@@ -104,6 +104,11 @@ The project uses Docker Compose to manage multiple services, including frontend,
 - Database: localhost:3306
 
 - CURL Examples: 
+0. Exec into the Docker container:
+  ```bash
+  docker exec -it getactive-backend bash
+  ``` 
+
 1. Register
 curl -d '{"email":"jin@bu.edu", "username":"jin2022", "password": "Password123!"}' -H "Content-Type: application/json" -X POST http://localhost:3232/v1/register
 
