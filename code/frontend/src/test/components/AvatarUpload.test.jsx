@@ -25,7 +25,6 @@ class MockFileReader {
   }
 }
 
-global.FileReader = MockFileReader;
 import { AuthProvider } from "../../contexts/AuthContext";
 
 describe("AvatarUpload Component Tests", () => {
