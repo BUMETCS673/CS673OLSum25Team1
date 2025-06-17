@@ -266,9 +266,9 @@ export default function Home() {
     
     // Convert backend date format (YYYY-MM-DD HH:mm) to datetime-local format (YYYY-MM-DDTHH:mm)
     const convertToDateTimeLocal = (dateTimeStr) => {
-      if (!dateTimeStr) return '';
+      if (!dateTimeStr) return "";
       // Replace space with T for datetime-local input
-      return dateTimeStr.replace(' ', 'T');
+      return dateTimeStr.replace(" ", "T");
     };
 
     setEditedActivity({
@@ -289,25 +289,25 @@ export default function Home() {
     try {
       // Format the dates to match the backend's expected format (YYYY-MM-DD HH:mm)
       const formatDateTime = (dateTimeStr) => {
-        if (!dateTimeStr) return '';
+        if (!dateTimeStr) return "";
         
         // Parse the datetime-local input value and format it properly
         const date = new Date(dateTimeStr);
         
         // Format as YYYY-MM-DD HH:mm (without seconds)
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
         
         return `${year}-${month}-${day} ${hours}:${minutes}`;
       };
 
       const formattedActivity = {
-        name: editedActivity.name || '',
-        description: editedActivity.description || '',
-        location: editedActivity.location || '',
+        name: editedActivity.name || "",
+        description: editedActivity.description || "",
+        location: editedActivity.location || "",
         startDateTime: formatDateTime(editedActivity.startDateTime),
         endDateTime: formatDateTime(editedActivity.endDateTime)
       };
