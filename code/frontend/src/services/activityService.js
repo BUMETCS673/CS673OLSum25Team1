@@ -58,4 +58,8 @@ export const activityService = {
     });
     return response.data.data;
   },
+  updateActivity: async (activityId, activityData) => {
+    const response = await api.put(`/activity/${activityId}`, activityData);
+    return response.data;
+  },
 };
