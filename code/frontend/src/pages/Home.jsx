@@ -1,9 +1,12 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tabs, Tab, Snackbar, Alert, IconButton, Button } from "@mui/material";
+import { Tabs, Tab, Snackbar, Alert, IconButton, Button, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import LogoutIcon from "@mui/icons-material/Logout";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { activityService } from "../services/activityService";
 import AvatarUpload from "../components/Avator";
 import ParticipantsList from "../components/ParticipantsList";
@@ -45,6 +48,8 @@ export default function Home() {
     severity: "success",
     actions: null,
   });
+  const [editingActivity, setEditingActivity] = useState(null);
+  const [editedActivity, setEditedActivity] = useState(null);
 
   const handleChange = async (event, newValue) => {
     setValue(newValue);
@@ -256,6 +261,84 @@ export default function Home() {
     navigate("/create-activity");
   };
 
+  const handleEditActivity = (activity) => {
+    setEditingActivity(activity.activityId);
+    
+    // Convert backend date format (YYYY-MM-DD HH:mm) to datetime-local format (YYYY-MM-DDTHH:mm)
+    const convertToDateTimeLocal = (dateTimeStr) => {
+      if (!dateTimeStr) return '';
+      // Replace space with T for datetime-local input
+      return dateTimeStr.replace(' ', 'T');
+    };
+
+    setEditedActivity({
+      name: activity.name,
+      description: activity.description,
+      location: activity.location,
+      startDateTime: convertToDateTimeLocal(activity.startDateTime),
+      endDateTime: convertToDateTimeLocal(activity.endDateTime)
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingActivity(null);
+    setEditedActivity(null);
+  };
+
+  const handleSaveEdit = async (activityId) => {
+    try {
+      // Format the dates to match the backend's expected format (YYYY-MM-DD HH:mm)
+      const formatDateTime = (dateTimeStr) => {
+        if (!dateTimeStr) return '';
+        
+        // Parse the datetime-local input value and format it properly
+        const date = new Date(dateTimeStr);
+        
+        // Format as YYYY-MM-DD HH:mm (without seconds)
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+      };
+
+      const formattedActivity = {
+        name: editedActivity.name || '',
+        description: editedActivity.description || '',
+        location: editedActivity.location || '',
+        startDateTime: formatDateTime(editedActivity.startDateTime),
+        endDateTime: formatDateTime(editedActivity.endDateTime)
+      };
+
+      console.log("Payload to updateActivity:", formattedActivity);
+
+      await activityService.updateActivity(activityId, formattedActivity);
+      const activities = await activityService.getParticipantActivities();
+      setParticipantActivities(activities);
+      setEditingActivity(null);
+      setEditedActivity(null);
+      notifySuccess("Activity updated successfully");
+    } catch (error) {
+      console.error("Error updating activity:", error);
+      let errorMessage = "Failed to update activity";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.errors) {
+        errorMessage = JSON.stringify(error.response.data.errors);
+      }
+      notifyError(errorMessage);
+    }
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditedActivity(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return (
     <div style={styles.container}>
       <Snackbar
@@ -360,8 +443,8 @@ export default function Home() {
           <TabPanel value={value} index={1}>
             <div style={styles.activitiesGrid}>
               {participantActivities.map((activity, index) => {
-                console.log("participantActivities", activity);
                 const isAdmin = activity.role === "ADMIN";
+                const isEditing = editingActivity === activity.activityId;
                 const startDate = new Date(activity.startDateTime);
                 const endDate = new Date(activity.endDateTime);
                 const formatDateTime = (date) =>
@@ -369,44 +452,121 @@ export default function Home() {
 
                 return (
                   <div key={index} style={styles.activityCard}>
-                    <h3 style={styles.activityTitle}>{activity.name}</h3>
-                    <p style={styles.activityDescription}>{activity.description}</p>
-                    <div style={styles.activityDetails}>
-                      <div style={styles.activityMeta}>
-                        <span style={styles.metaIcon}>🕐</span>
-                        <span>
-                          <strong>Start:</strong> {formatDateTime(startDate)}
-                        </span>
-                      </div>
-                      <div style={styles.activityMeta}>
-                        <span style={styles.metaIcon}>🕕</span>
-                        <span>
-                          <strong>End:</strong> {formatDateTime(endDate)}
-                        </span>
-                      </div>
-                      <div style={styles.activityMeta}>
-                        <span style={styles.metaIcon}>📍</span>
-                        <span>{activity.location}</span>
-                      </div>
-                    </div>
-                    <div style={styles.activityActions}>
-                      <ParticipantsList 
-                        activityId={activity.activityId} 
-                        onError={(message) => setNotification({
-                          open: true,
-                          message,
-                          severity: "error",
-                        })}
-                      />
-                      <button
-                        style={styles.joinButton}
-                        onClick={() =>
-                          isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
-                        }
-                      >
-                        {isAdmin ? "Delete Activity" : "Leave Activity"}
-                      </button>
-                    </div>
+                    {isEditing ? (
+                      <>
+                        <TextField
+                          fullWidth
+                          value={editedActivity.name}
+                          onChange={(e) => handleEditChange("name", e.target.value)}
+                          margin="normal"
+                          label="Activity Name"
+                        />
+                        <TextField
+                          fullWidth
+                          multiline
+                          rows={3}
+                          value={editedActivity.description}
+                          onChange={(e) => handleEditChange("description", e.target.value)}
+                          margin="normal"
+                          label="Description"
+                        />
+                        <TextField
+                          fullWidth
+                          value={editedActivity.location}
+                          onChange={(e) => handleEditChange("location", e.target.value)}
+                          margin="normal"
+                          label="Location"
+                        />
+                        <TextField
+                          fullWidth
+                          type="datetime-local"
+                          value={editedActivity.startDateTime.slice(0, 16)}
+                          onChange={(e) => handleEditChange("startDateTime", e.target.value)}
+                          margin="normal"
+                          label="Start Time"
+                          InputLabelProps={{ shrink: true }}
+                        />
+                        <TextField
+                          fullWidth
+                          type="datetime-local"
+                          value={editedActivity.endDateTime.slice(0, 16)}
+                          onChange={(e) => handleEditChange("endDateTime", e.target.value)}
+                          margin="normal"
+                          label="End Time"
+                          InputLabelProps={{ shrink: true }}
+                        />
+                        <div style={styles.editActions}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<SaveIcon />}
+                            onClick={() => handleSaveEdit(activity.activityId)}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="secondary"
+                            startIcon={<CancelIcon />}
+                            onClick={handleCancelEdit}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <h3 style={styles.activityTitle}>{activity.name}</h3>
+                        <p style={styles.activityDescription}>{activity.description}</p>
+                        <div style={styles.activityDetails}>
+                          <div style={styles.activityMeta}>
+                            <span style={styles.metaIcon}>🕐</span>
+                            <span>
+                              <strong>Start:</strong> {formatDateTime(startDate)}
+                            </span>
+                          </div>
+                          <div style={styles.activityMeta}>
+                            <span style={styles.metaIcon}>🕕</span>
+                            <span>
+                              <strong>End:</strong> {formatDateTime(endDate)}
+                            </span>
+                          </div>
+                          <div style={styles.activityMeta}>
+                            <span style={styles.metaIcon}>📍</span>
+                            <span>{activity.location}</span>
+                          </div>
+                        </div>
+                        <div style={styles.activityActions}>
+                          <ParticipantsList 
+                            activityId={activity.activityId} 
+                            onError={(message) => setNotification({
+                              open: true,
+                              message,
+                              severity: "error",
+                            })}
+                          />
+                          {isAdmin && (
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              startIcon={<EditIcon />}
+                              onClick={() => handleEditActivity(activity)}
+                              style={styles.editButton}
+                            >
+                              Edit Activity
+                            </Button>
+                          )}
+                          <button
+                            style={styles.joinButton}
+                            onClick={() =>
+                              isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
+                            }
+                          >
+                            {isAdmin ? "Delete Activity" : "Leave Activity"}
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 );
               })}
@@ -677,5 +837,14 @@ const styles = {
     alignSelf: "center",
     margin: "0 auto",
     boxSizing: "border-box",
+  },
+  editActions: {
+    display: "flex",
+    gap: "1rem",
+    marginTop: "1rem",
+    justifyContent: "center",
+  },
+  editButton: {
+    marginBottom: "0.5rem",
   },
 };
