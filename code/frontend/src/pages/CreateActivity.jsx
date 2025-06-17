@@ -135,6 +135,7 @@ export default function CreateActivity() {
             <input
               type="text"
               name="name"
+              id="activity-name"
               value={formData.name}
               onChange={handleInputChange}
               style={{
@@ -150,6 +151,7 @@ export default function CreateActivity() {
             <label style={styles.label}>Description *</label>
             <textarea
               name="description"
+              id="activity-description"
               value={formData.description}
               onChange={handleInputChange}
               style={{
@@ -167,6 +169,7 @@ export default function CreateActivity() {
             <input
               type="text"
               name="location"
+              id="activity-location"
               value={formData.location}
               onChange={handleInputChange}
               style={{
@@ -184,6 +187,7 @@ export default function CreateActivity() {
               <input
                 type="datetime-local"
                 name="startDateTime"
+                id="activity-start-date-time"
                 value={formData.startDateTime}
                 onChange={handleInputChange}
                 style={{
@@ -199,6 +203,7 @@ export default function CreateActivity() {
               <input
                 type="datetime-local"
                 name="endDateTime"
+                id="activity-end-date-time"
                 value={formData.endDateTime}
                 onChange={handleInputChange}
                 style={{
