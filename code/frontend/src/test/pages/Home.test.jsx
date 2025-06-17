@@ -4,6 +4,15 @@ import Home from "../../pages/Home";
 import { describe, expect, vi, beforeEach, afterEach, test } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 vi.mock("../../contexts/AuthContext", () => {
   return {
     useAuth: () => ({
@@ -12,6 +21,7 @@ vi.mock("../../contexts/AuthContext", () => {
         username: "testuser",
         userEmail: "test@example.com",
       },
+      logout: vi.fn(),
     }),
     AuthProvider: ({ children }) => <div data-testid="MockAuthProvider">{children}</div>,
   };
@@ -166,5 +176,20 @@ describe("Home Page Unit Test", () => {
       expect(activityService.leaveActivity).toHaveBeenCalledWith(2);
     });
     expect(screen.queryByText("Joined 1")).toBeNull();
+  });
+
+  test("logout", async () => {
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </AuthProvider>
+    );
+    fireEvent.click(screen.getByLabelText("logout"));
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith("/login");
+    });
   });
 });

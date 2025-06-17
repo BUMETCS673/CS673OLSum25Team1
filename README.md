@@ -103,6 +103,22 @@ The project uses Docker Compose to manage multiple services, including frontend,
 - Backend API: http://localhost:3232/v1
 - Database: localhost:3306
 
+- CURL Examples: 
+0. Exec into the Docker container:
+  ```bash
+  docker exec -it getactive-backend bash
+  ``` 
+
+1. Register
+curl -d '{"email":"jin@bu.edu", "username":"jin2022", "password": "Password123!"}' -H "Content-Type: application/json" -X POST http://localhost:3232/v1/register
+
+2. Create Activity 
+curl -d '{"name":"New Activity", "description":"description", "location": "location", "startDateTime": "2026-05-25 19:00", "endDateTime": "2026-05-25 19:59"}' -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoiUkVHSVNUUkFUSU9OX0NPTkZJUk1BVElPTiIsInN1YiI6ImppbjIwMjIiLCJpYXQiOjE3NTAwMzY2MTEsImV4cCI6MTc1MDAzODQxMX0.gPVUISr-o_IxWfIOEbFAeLHI2QPASZd43IciyV-qves" -X POST http://localhost:3232/v1/activity
+
+3. Get Activities
+curl -H "Content-Type: application/json"  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoiUkVHSVNUUkFUSU9OX0NPTkZJUk1BVElPTiIsInN1YiI6ImppbjIwMjIiLCJpYXQiOjE3NTAwMzY2MTEsImV4cCI6MTc1MDAzODQxMX0.gPVUISr-o_IxWfIOEbFAeLHI2QPASZd43IciyV-qves" -X GET http://localhost:3232/v1/activities
+
+
 ## Environment Configuration
 
 ### Database Configuration
