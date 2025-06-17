@@ -6,6 +6,7 @@ import { styled } from "@mui/material/styles";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { activityService } from "../services/activityService";
 import AvatarUpload from "../components/Avator";
+import ParticipantsList from "../components/ParticipantsList";
 
 const StyledTab = styled(Tab)({
   textTransform: "none",
@@ -388,14 +389,24 @@ export default function Home() {
                         <span>{activity.location}</span>
                       </div>
                     </div>
-                    <button
-                      style={styles.joinButton}
-                      onClick={() =>
-                        isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
-                      }
-                    >
-                      {isAdmin ? "Delete Activity" : "Leave Activity"}
-                    </button>
+                    <div style={styles.activityActions}>
+                      <ParticipantsList 
+                        activityId={activity.activityId} 
+                        onError={(message) => setNotification({
+                          open: true,
+                          message,
+                          severity: "error",
+                        })}
+                      />
+                      <button
+                        style={styles.joinButton}
+                        onClick={() =>
+                          isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
+                        }
+                      >
+                        {isAdmin ? "Delete Activity" : "Leave Activity"}
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -643,18 +654,28 @@ const styles = {
   metaIcon: {
     fontSize: "1rem",
   },
+  activityActions: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+    marginTop: "auto",
+    alignItems: "stretch",
+  },
   joinButton: {
     backgroundColor: "#3b82f6",
     color: "white",
     border: "none",
-    padding: "0.75rem 1.5rem",
+    padding: "0.5rem 0.75rem",
     borderRadius: "0.5rem",
-    fontSize: "0.9rem",
+    fontSize: "0.95rem",
     fontWeight: "600",
     cursor: "pointer",
     transition: "background-color 0.2s",
     width: "100%",
+    minWidth: "120px",
+    maxWidth: "200px",
     alignSelf: "center",
-    marginTop: "auto",
+    margin: "0 auto",
+    boxSizing: "border-box",
   },
 };
