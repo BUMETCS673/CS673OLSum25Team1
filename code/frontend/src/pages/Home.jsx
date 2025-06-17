@@ -9,6 +9,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { activityService } from "../services/activityService";
 import AvatarUpload from "../components/Avator";
+import ParticipantsList from "../components/ParticipantsList";
 
 const StyledTab = styled(Tab)({
   textTransform: "none",
@@ -448,118 +449,127 @@ export default function Home() {
 
                 return (
                   <div key={index} style={styles.activityCard}>
-                    {isEditing ? (
-                      <>
-                        <TextField
-                          fullWidth
-                          name="name"
-                          value={editFormData.name}
-                          onChange={handleEditInputChange}
-                          style={styles.editInput}
-                          placeholder="Activity Name"
-                        />
-                        <TextField
-                          fullWidth
-                          multiline
-                          rows={3}
-                          name="description"
-                          value={editFormData.description}
-                          onChange={handleEditInputChange}
-                          style={styles.editInput}
-                          placeholder="Description"
-                        />
-                        <TextField
-                          fullWidth
-                          name="location"
-                          value={editFormData.location}
-                          onChange={handleEditInputChange}
-                          style={styles.editInput}
-                          placeholder="Location"
-                        />
-                        <TextField
-                          fullWidth
-                          type="datetime-local"
-                          name="startDateTime"
-                          value={editFormData.startDateTime}
-                          onChange={handleEditInputChange}
-                          style={styles.editInput}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                        <TextField
-                          fullWidth
-                          type="datetime-local"
-                          name="endDateTime"
-                          value={editFormData.endDateTime}
-                          onChange={handleEditInputChange}
-                          style={styles.editInput}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                        <div style={styles.editButtons}>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<SaveIcon />}
-                            onClick={() => handleSaveEdit(activity.activityId)}
-                            style={styles.editButton}
-                          >
-                            Save
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="secondary"
-                            startIcon={<CancelIcon />}
-                            onClick={handleCancelEdit}
-                            style={styles.editButton}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <h3 style={styles.activityTitle}>{activity.name}</h3>
-                        <p style={styles.activityDescription}>{activity.description}</p>
-                        <div style={styles.activityDetails}>
-                          <div style={styles.activityMeta}>
-                            <span style={styles.metaIcon}>🕐</span>
-                            <span>
-                              <strong>Start:</strong> {formatDateTime(startDate)}
-                            </span>
-                          </div>
-                          <div style={styles.activityMeta}>
-                            <span style={styles.metaIcon}>🕕</span>
-                            <span>
-                              <strong>End:</strong> {formatDateTime(endDate)}
-                            </span>
-                          </div>
-                          <div style={styles.activityMeta}>
-                            <span style={styles.metaIcon}>📍</span>
-                            <span>{activity.location}</span>
-                          </div>
-                        </div>
-                        <div style={styles.cardButtons}>
-                          {isAdmin && (
-                            <Button
-                              variant="outlined"
-                              color="primary"
-                              startIcon={<EditIcon />}
-                              onClick={() => handleEditClick(activity)}
-                              style={styles.editButton}
-                            >
-                              Edit
-                            </Button>
-                          )}
-                          <button
-                            style={styles.joinButton}
-                            onClick={() =>
-                              isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
-                            }
-                          >
-                            {isAdmin ? "Delete Activity" : "Leave Activity"}
-                          </button>
-                        </div>
-                      </>
-                    )}
+{isEditing ? (
+  <>
+    <TextField
+      fullWidth
+      name="name"
+      value={editFormData.name}
+      onChange={handleEditInputChange}
+      style={styles.editInput}
+      placeholder="Activity Name"
+    />
+    <TextField
+      fullWidth
+      multiline
+      rows={3}
+      name="description"
+      value={editFormData.description}
+      onChange={handleEditInputChange}
+      style={styles.editInput}
+      placeholder="Description"
+    />
+    <TextField
+      fullWidth
+      name="location"
+      value={editFormData.location}
+      onChange={handleEditInputChange}
+      style={styles.editInput}
+      placeholder="Location"
+    />
+    <TextField
+      fullWidth
+      type="datetime-local"
+      name="startDateTime"
+      value={editFormData.startDateTime}
+      onChange={handleEditInputChange}
+      style={styles.editInput}
+      InputLabelProps={{ shrink: true }}
+    />
+    <TextField
+      fullWidth
+      type="datetime-local"
+      name="endDateTime"
+      value={editFormData.endDateTime}
+      onChange={handleEditInputChange}
+      style={styles.editInput}
+      InputLabelProps={{ shrink: true }}
+    />
+    <div style={styles.editButtons}>
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<SaveIcon />}
+        onClick={() => handleSaveEdit(activity.activityId)}
+        style={styles.editButton}
+      >
+        Save
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        startIcon={<CancelIcon />}
+        onClick={handleCancelEdit}
+        style={styles.editButton}
+      >
+        Cancel
+      </Button>
+    </div>
+  </>
+) : (
+  <>
+    <h3 style={styles.activityTitle}>{activity.name}</h3>
+    <p style={styles.activityDescription}>{activity.description}</p>
+    <div style={styles.activityDetails}>
+      <div style={styles.activityMeta}>
+        <span style={styles.metaIcon}>🕐</span>
+        <span>
+          <strong>Start:</strong> {formatDateTime(startDate)}
+        </span>
+      </div>
+      <div style={styles.activityMeta}>
+        <span style={styles.metaIcon}>🕕</span>
+        <span>
+          <strong>End:</strong> {formatDateTime(endDate)}
+        </span>
+      </div>
+      <div style={styles.activityMeta}>
+        <span style={styles.metaIcon}>📍</span>
+        <span>{activity.location}</span>
+      </div>
+    </div>
+    <div style={styles.activityActions}>
+      <ParticipantsList 
+        activityId={activity.activityId} 
+        onError={(message) => setNotification({
+          open: true,
+          message,
+          severity: "error",
+        })}
+      />
+      {isAdmin && (
+        <Button
+          variant="outlined"
+          color="primary"
+          startIcon={<EditIcon />}
+          onClick={() => handleEditClick(activity)}
+          style={styles.editButton}
+        >
+          Edit
+        </Button>
+      )}
+      <button
+        style={styles.joinButton}
+        onClick={() =>
+          isAdmin ? handleDeleteActivity(activity.activityId) : handleLeaveActivity(activity.activityId)
+        }
+      >
+        {isAdmin ? "Delete Activity" : "Leave Activity"}
+      </button>
+    </div>
+  </>
+)}
+
                   </div>
                 );
               })}
@@ -807,19 +817,29 @@ const styles = {
   metaIcon: {
     fontSize: "1rem",
   },
+  activityActions: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+    marginTop: "auto",
+    alignItems: "stretch",
+  },
   joinButton: {
     backgroundColor: "#3b82f6",
     color: "white",
     border: "none",
-    padding: "0.75rem 1.5rem",
+    padding: "0.5rem 0.75rem",
     borderRadius: "0.5rem",
-    fontSize: "0.9rem",
+    fontSize: "0.95rem",
     fontWeight: "600",
     cursor: "pointer",
     transition: "background-color 0.2s",
     width: "100%",
+    minWidth: "120px",
+    maxWidth: "200px",
     alignSelf: "center",
-    marginTop: "auto",
+    margin: "0 auto",
+    boxSizing: "border-box",
   },
   editInput: {
     marginBottom: "1rem",

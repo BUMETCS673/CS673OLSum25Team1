@@ -56,4 +56,13 @@ export const activityService = {
     const response = await api.put(`/activity/${activityId}`, activityData);
     return response.data;
   },
+
+  getActivityParticipants: async (activityId, page = 0, size = 20) => {
+    const response = await api.get(`/activities/${activityId}/participants`, {
+      params: { page, size }
+    });
+    return response.data.data;
+  },
+
+  },
 };
